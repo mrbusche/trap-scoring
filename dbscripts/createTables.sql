@@ -38,7 +38,7 @@ CREATE TABLE IF NOT EXISTS singles (
 
 CREATE OR REPLACE VIEW singlesData AS
 WITH s AS (
-	SELECT s.eventid, s.event, s.locationid, s.location, s.squadname, s.team, s.athlete, s.gender
+	SELECT s.eventid, s.event, s.locationid, s.location, s.squadname, replace(s.team, 'Club', 'Team') AS team, s.athlete, s.gender
     , CASE WHEN s.classification IN ('Senior/Varsity','Senior/Jr. Varsity') THEN 'Varsity' ELSE s.classification END classification
 	, s.round1, s.round2, s.round3, s.round4
 	, GREATEST(GREATEST(s.round1 + s.round2, s.round2 + s.round3), s.round3 + s.round4) total
@@ -71,35 +71,6 @@ UNION ALL
     WHERE fourth = 1
 );
 
-/*CREATE OR REPLACE VIEW singlesData AS
-WITH s AS (
-	SELECT s.eventid, s.event, s.locationid, s.location, s.squadname, s.team, s.athlete, s.gender
-    , CASE WHEN s.classification IN ('Senior/Varsity','Senior/Jr. Varsity') THEN 'Varsity' ELSE s.classification END classification
-	, s.round1, s.round2
-	, s.round1 + s.round2 total
-	, row_number() OVER (PARTITION BY athlete ORDER BY round1 + round2 DESC) AS seqnum
-	FROM singles s
-    WHERE s.locationid > 0
-    ORDER BY athlete, total DESC
-),
-s3 AS (
-	SELECT s.*
-	FROM s
-	where seqnum <= 3
-)
-SELECT *
-FROM s3
-UNION ALL
-(
-	SELECT s.*
-	FROM s
-	WHERE (
-		(SELECT COUNT(distinct locationid) FROM s3) > 1 AND seqnum = 4 ) OR
-		((SELECT COUNT(distinct locationid) FROM s3) = 1 AND seqnum = (
-		SELECT MIN(seqnum) FROM s where locationid not in (SELECT locationid FROM s3))
-	)
-);*/
-
 CREATE OR REPLACE VIEW singlesAggregate AS
 SELECT athlete, classification, gender, team, SUM(total) total
 FROM (
@@ -112,14 +83,13 @@ ORDER BY total DESC;
 CREATE OR REPLACE VIEW singlesTeamAggregate AS
 SELECT team, gender, classification, SUM(total) total
 FROM (
-	SELECT team, gender, classification, total, row_number() OVER (PARTITION BY team ORDER BY total DESC ) AS segnum
+	SELECT team, gender, classification, total, row_number() OVER (PARTITION BY team, gender, classification ORDER BY total DESC ) AS segnum
 	FROM singlesaggregate
-	ORDER BY team, total DESC
+	ORDER BY team, gender, classification, total DESC
 ) a
 WHERE segnum <= 5
 GROUP BY team, gender, classification
 ORDER BY total DESC;
-
 
 CREATE TABLE IF NOT EXISTS doubles (
     EventId VARCHAR(6),
