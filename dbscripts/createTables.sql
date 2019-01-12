@@ -40,9 +40,9 @@ CREATE OR REPLACE VIEW singlesData AS
 WITH s AS (
 	SELECT s.eventid, s.event, s.locationid, s.location, s.squadname, s.team, s.athlete, s.gender
     , CASE WHEN s.classification IN ('Senior/Varsity','Senior/Jr. Varsity') THEN 'Varsity' ELSE s.classification END classification
-	, s.round1, s.round2
-	, s.round1 + s.round2 total
-	, row_number() OVER (PARTITION BY athlete ORDER BY round1 + round2 DESC) AS seqnum
+	, s.round1, s.round2, s.round3, s.round4
+	, GREATEST(GREATEST(s.round1 + s.round2, s.round2 + s.round3), s.round3 + s.round4) total
+	, row_number() OVER (PARTITION BY athlete ORDER BY GREATEST(GREATEST(s.round1 + s.round2, s.round2 + s.round3), s.round3 + s.round4) DESC) AS seqnum
 	FROM singles s
     WHERE s.locationid > 0
     ORDER BY athlete, total DESC
@@ -56,9 +56,9 @@ SELECT *
 FROM s3
 UNION ALL
 (
-	SELECT eventid, event, locationid, location, squadname, team, athlete, gender, classification, round1, round2, total, fourth
+	SELECT eventid, event, locationid, location, squadname, team, athlete, gender, classification, round1, round2, round3, round4, total, fourth
     FROM (
-	SELECT eventid, event, locationid, location, squadname, team, unreal.athlete, gender, classification, round1, round2, total, seqnum, row_number() OVER (PARTITION BY athlete ORDER BY total DESC) AS fourth
+	SELECT eventid, event, locationid, location, squadname, team, unreal.athlete, gender, classification, round1, round2, round3, round4, total, seqnum, row_number() OVER (PARTITION BY athlete ORDER BY total DESC) AS fourth
     FROM s,
 		(SELECT s3.athlete, CASE WHEN COUNT(DISTINCT s3.locationid) = 1 THEN 'Next' ELSE 'Four' END numberfour, (SELECT DISTINCT s3.locationid) dontuselocid
 		FROM s

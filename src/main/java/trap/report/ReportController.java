@@ -73,15 +73,15 @@ public class ReportController {
         return results.toString();
     }
 
-    private void joinSinglesData(List<SinglesAggregate> data, StringBuilder results) {
+    private static void joinSinglesData(List<SinglesAggregate> data, StringBuilder results) {
         results.append(data.stream().map(SinglesAggregate::toString).collect(Collectors.joining("<br>")));
     }
 
-    private void joinDoublesData(List<DoublesAggregate> data, StringBuilder results) {
+    private static void joinDoublesData(List<DoublesAggregate> data, StringBuilder results) {
         results.append(data.stream().map(DoublesAggregate::toString).collect(Collectors.joining("<br>")));
     }
 
-    private void joinHandicapData(List<HandicapAggregate> data, StringBuilder results) {
+    private static void joinHandicapData(List<HandicapAggregate> data, StringBuilder results) {
         results.append(data.stream().map(HandicapAggregate::toString).collect(Collectors.joining("<br>")));
     }
 
@@ -112,15 +112,15 @@ public class ReportController {
         return results.toString();
     }
 
-    private void joinTeamData(List<SinglesTeamAggregate> data, StringBuilder results) {
+    private static void joinTeamData(List<SinglesTeamAggregate> data, StringBuilder results) {
         results.append(data.stream().map(SinglesTeamAggregate::toString).collect(Collectors.joining("<br>")));
     }
 
-    private void joinDoublesTeamData(List<DoublesTeamAggregate> data, StringBuilder results) {
+    private static void joinDoublesTeamData(List<DoublesTeamAggregate> data, StringBuilder results) {
         results.append(data.stream().map(DoublesTeamAggregate::toString).collect(Collectors.joining("<br>")));
     }
 
-    private void joinHandicapTeamData(List<HandicapTeamAggregate> data, StringBuilder results) {
+    private static void joinHandicapTeamData(List<HandicapTeamAggregate> data, StringBuilder results) {
         results.append(data.stream().map(HandicapTeamAggregate::toString).collect(Collectors.joining("<br>")));
     }
 
