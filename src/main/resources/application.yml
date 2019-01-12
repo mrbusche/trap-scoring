@@ -1,0 +1,17 @@
+#logging:
+#  level: debug
+
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost/trap?useSSL=false&useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+    username: trap
+    password: trappass
+  jpa:
+    show-sql: true
+trap:
+  singles: C:/Users/buschm3/Desktop/trap/singles.csv
+  doubles: C:/Users/buschm3/Desktop/trap/doubles.csv
+  handicap: C:/Users/buschm3/Desktop/trap/handicap.csv
+  skeet: C:/Users/buschm3/Desktop/trap/skeet.csv
+  clays: C:/Users/buschm3/Desktop/trap/clays.csv
