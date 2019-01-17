@@ -46,6 +46,7 @@ public class DataController {
         try {
             return saveDataToDatabase();
         } catch (BadSqlGrammarException e) {
+            e.printStackTrace();
             return "The MySQL database must allow local files to be imported. " + "From the mysql CLI, type 'set global local_infile=1'";
         } catch (Exception e) {
             e.printStackTrace();
@@ -59,8 +60,8 @@ public class DataController {
         jdbc.execute("TRUNCATE TABLE singles;");
         jdbc.execute("TRUNCATE TABLE doubles;");
         jdbc.execute("TRUNCATE TABLE handicap;");
-//        jdbc.execute("TRUNCATE TABLE skeet;");
-//        jdbc.execute("TRUNCATE TABLE clays;");
+        jdbc.execute("TRUNCATE TABLE skeet;");
+        jdbc.execute("TRUNCATE TABLE clays;");
 
         StringBuilder results = new StringBuilder();
         String singlesSql = "load data local infile '" + singles + "' into table singles fields terminated by ',' lines terminated by '\n';";
@@ -74,16 +75,15 @@ public class DataController {
         String handicapSql = "load data local infile '" + handicap + "' into table handicap fields terminated by ',' lines terminated by '\n';";
         int handicapCount = jdbc.update(con -> con.prepareStatement(handicapSql));
         results.append("Added ").append(handicapCount).append(" new records to database in handicap table.<br>");
-//
-//        String skeetSql = "load data local infile '" + skeet + "' into table skeet fields terminated by ',' lines terminated by '\n';";
-//        int skeetCount = jdbc.update(con -> con.prepareStatement(skeetSql));
-//        results.append("Added " + skeetCount + " new records to database in skeet table.<br>");
-//
-//        String claysSql = "load data local infile '" + clays + "' into table clays fields terminated by ',' lines terminated by '\n';";
-//        int claysCount = jdbc.update(con -> con.prepareStatement(claysSql));
-//        results.append("Added " + claysCount + " new records to database in clays table.<br>");
 
-        //jdbc.execute("DELETE FROM singles WHERE locationid = 0;");
+        String skeetSql = "load data local infile '" + skeet + "' into table skeet fields terminated by ',' lines terminated by '\n';";
+        int skeetCount = jdbc.update(con -> con.prepareStatement(skeetSql));
+        results.append("Added " + skeetCount + " new records to database in skeet table.<br>");
+
+        String claysSql = "load data local infile '" + clays + "' into table clays fields terminated by ',' lines terminated by '\n';";
+        int claysCount = jdbc.update(con -> con.prepareStatement(claysSql));
+        results.append("Added " + claysCount + " new records to database in clays table.<br>");
+
         return results.toString();
     }
 
