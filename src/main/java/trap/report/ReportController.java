@@ -13,12 +13,16 @@ import trap.model.HandicapAggregate;
 import trap.model.HandicapTeamAggregate;
 import trap.model.SinglesAggregate;
 import trap.model.SinglesTeamAggregate;
+import trap.model.SkeetAggregate;
+import trap.model.SkeetTeamAggregate;
 import trap.repository.DoublesDataRepository;
 import trap.repository.DoublesDataTeamRepository;
 import trap.repository.HandicapDataRepository;
 import trap.repository.HandicapDataTeamRepository;
 import trap.repository.SinglesDataRepository;
 import trap.repository.SinglesDataTeamRepository;
+import trap.repository.SkeetDataRepository;
+import trap.repository.SkeetDataTeamRepository;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -34,16 +38,20 @@ public class ReportController {
     private final DoublesDataTeamRepository doublesDataTeamRepository;
     private final HandicapDataRepository handicapDataRepository;
     private final HandicapDataTeamRepository handicapDataTeamRepository;
+    private final SkeetDataRepository skeetDataRepository;
+    private final SkeetDataTeamRepository skeetDataTeamRepository;
     private final List<String> classificationOptions = Stream.of(ClassificationsEnum.values()).map(ClassificationsEnum::name).collect(Collectors.toList());
 
     @Autowired
-    public ReportController(SinglesDataRepository singlesRepository, SinglesDataTeamRepository singlesDataTeamRepository, DoublesDataRepository doublesDataRepository, DoublesDataTeamRepository doublesDataTeamRepository, HandicapDataRepository handicapDataRepository, HandicapDataTeamRepository handicapDataTeamRepository) {
+    public ReportController(SinglesDataRepository singlesRepository, SinglesDataTeamRepository singlesDataTeamRepository, DoublesDataRepository doublesDataRepository, DoublesDataTeamRepository doublesDataTeamRepository, HandicapDataRepository handicapDataRepository, HandicapDataTeamRepository handicapDataTeamRepository, SkeetDataRepository skeetDataRepository, SkeetDataTeamRepository skeetDataTeamRepository) {
         this.singlesRepository = singlesRepository;
         this.singlesDataTeamRepository = singlesDataTeamRepository;
         this.doublesDataRepository = doublesDataRepository;
         this.doublesDataTeamRepository = doublesDataTeamRepository;
         this.handicapDataRepository = handicapDataRepository;
         this.handicapDataTeamRepository = handicapDataTeamRepository;
+        this.skeetDataRepository = skeetDataRepository;
+        this.skeetDataTeamRepository = skeetDataTeamRepository;
     }
 
     @RequestMapping(method = RequestMethod.GET, value = "/individual/{gender}")
@@ -52,37 +60,48 @@ public class ReportController {
         results.append("<h1>Singles</h1>");
         for (String classification : classificationOptions) {
             List<SinglesAggregate> data = singlesRepository.getAllByClassificationAndGenderOrderByTotalDescAthleteAsc(ClassificationsEnum.valueOf(classification).value, GendersEnum.valueOf(gender.toUpperCase()).value);
-            results.append("<h2>").append(ClassificationsEnum.valueOf(classification)).append("</h2>");
+            //results.append("<h2>").append(ClassificationsEnum.valueOf(classification)).append("</h2>");
             joinSinglesData(data, results);
         }
 
         results.append("<h1>Doubles</h1>");
         for (String classification : classificationOptions) {
             List<DoublesAggregate> data = doublesDataRepository.getAllByClassificationAndGenderOrderByTotalDescAthleteAsc(ClassificationsEnum.valueOf(classification).value, GendersEnum.valueOf(gender.toUpperCase()).value);
-            results.append("<h2>").append(ClassificationsEnum.valueOf(classification)).append("</h2>");
+            //results.append("<h2>").append(ClassificationsEnum.valueOf(classification)).append("</h2>");
             joinDoublesData(data, results);
         }
 
         results.append("<h1>Handicap</h1>");
         for (String classification : classificationOptions) {
             List<HandicapAggregate> data = handicapDataRepository.getAllByClassificationAndGenderOrderByTotalDescAthleteAsc(ClassificationsEnum.valueOf(classification).value, GendersEnum.valueOf(gender.toUpperCase()).value);
-            results.append("<h2>").append(ClassificationsEnum.valueOf(classification)).append("</h2>");
+            //results.append("<h2>").append(ClassificationsEnum.valueOf(classification)).append("</h2>");
             joinHandicapData(data, results);
+        }
+
+        results.append("<h1>Skeet</h1>");
+        for (String classification : classificationOptions) {
+            List<SkeetAggregate> data = skeetDataRepository.getAllByClassificationAndGenderOrderByTotalDescAthleteAsc(ClassificationsEnum.valueOf(classification).value, GendersEnum.valueOf(gender.toUpperCase()).value);
+            //results.append("<h2>").append(ClassificationsEnum.valueOf(classification)).append("</h2>");
+            joinSkeetData(data, results);
         }
 
         return results.toString();
     }
 
     private static void joinSinglesData(List<SinglesAggregate> data, StringBuilder results) {
-        results.append(data.stream().map(SinglesAggregate::toString).collect(Collectors.joining("<br>")));
+        results.append(data.stream().map(SinglesAggregate::toString).limit(25).collect(Collectors.joining("<br>")));
     }
 
     private static void joinDoublesData(List<DoublesAggregate> data, StringBuilder results) {
-        results.append(data.stream().map(DoublesAggregate::toString).collect(Collectors.joining("<br>")));
+        results.append(data.stream().map(DoublesAggregate::toString).limit(25).collect(Collectors.joining("<br>")));
     }
 
     private static void joinHandicapData(List<HandicapAggregate> data, StringBuilder results) {
-        results.append(data.stream().map(HandicapAggregate::toString).collect(Collectors.joining("<br>")));
+        results.append(data.stream().map(HandicapAggregate::toString).limit(25).collect(Collectors.joining("<br>")));
+    }
+
+    private static void joinSkeetData(List<SkeetAggregate> data, StringBuilder results) {
+        results.append(data.stream().map(SkeetAggregate::toString).limit(25).collect(Collectors.joining("<br>")));
     }
 
     @RequestMapping(method = RequestMethod.GET, value = "/team/{gender}")
@@ -91,37 +110,48 @@ public class ReportController {
         results.append("<h1>Singles</h1>");
         for (String classification : classificationOptions) {
             List<SinglesTeamAggregate> data = singlesDataTeamRepository.getAllByClassificationAndGenderOrderByTotalDesc(ClassificationsEnum.valueOf(classification).value, GendersEnum.valueOf(gender.toUpperCase()).value);
-            results.append("<h2>").append(ClassificationsEnum.valueOf(classification)).append("</h2>");
+            //results.append("<h2>").append(ClassificationsEnum.valueOf(classification)).append("</h2>");
             joinTeamData(data, results);
         }
 
         results.append("<h1>Doubles</h1>");
         for (String classification : classificationOptions) {
             List<DoublesTeamAggregate> data = doublesDataTeamRepository.getAllByClassificationAndGenderOrderByTotalDesc(ClassificationsEnum.valueOf(classification).value, GendersEnum.valueOf(gender.toUpperCase()).value);
-            results.append("<h2>").append(ClassificationsEnum.valueOf(classification)).append("</h2>");
+            //results.append("<h2>").append(ClassificationsEnum.valueOf(classification)).append("</h2>");
             joinDoublesTeamData(data, results);
         }
 
         results.append("<h1>Handicap</h1>");
         for (String classification : classificationOptions) {
             List<HandicapTeamAggregate> data = handicapDataTeamRepository.getAllByClassificationAndGenderOrderByTotalDesc(ClassificationsEnum.valueOf(classification).value, GendersEnum.valueOf(gender.toUpperCase()).value);
-            results.append("<h2>").append(ClassificationsEnum.valueOf(classification)).append("</h2>");
+            //results.append("<h2>").append(ClassificationsEnum.valueOf(classification)).append("</h2>");
             joinHandicapTeamData(data, results);
+        }
+
+        results.append("<h1>Skeet</h1>");
+        for (String classification : classificationOptions) {
+            List<SkeetTeamAggregate> data = skeetDataTeamRepository.getAllByClassificationAndGenderOrderByTotalDesc(ClassificationsEnum.valueOf(classification).value, GendersEnum.valueOf(gender.toUpperCase()).value);
+            //results.append("<h2>").append(ClassificationsEnum.valueOf(classification)).append("</h2>");
+            joinSkeetTeamData(data, results);
         }
 
         return results.toString();
     }
 
     private static void joinTeamData(List<SinglesTeamAggregate> data, StringBuilder results) {
-        results.append(data.stream().map(SinglesTeamAggregate::toString).collect(Collectors.joining("<br>")));
+        results.append(data.stream().map(SinglesTeamAggregate::toString).limit(10).collect(Collectors.joining("<br>")));
     }
 
     private static void joinDoublesTeamData(List<DoublesTeamAggregate> data, StringBuilder results) {
-        results.append(data.stream().map(DoublesTeamAggregate::toString).collect(Collectors.joining("<br>")));
+        results.append(data.stream().map(DoublesTeamAggregate::toString).limit(10).collect(Collectors.joining("<br>")));
     }
 
     private static void joinHandicapTeamData(List<HandicapTeamAggregate> data, StringBuilder results) {
-        results.append(data.stream().map(HandicapTeamAggregate::toString).collect(Collectors.joining("<br>")));
+        results.append(data.stream().map(HandicapTeamAggregate::toString).limit(10).collect(Collectors.joining("<br>")));
+    }
+
+    private static void joinSkeetTeamData(List<SkeetTeamAggregate> data, StringBuilder results) {
+        results.append(data.stream().map(SkeetTeamAggregate::toString).limit(10).collect(Collectors.joining("<br>")));
     }
 
 }
