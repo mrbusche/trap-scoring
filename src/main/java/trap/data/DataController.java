@@ -78,11 +78,11 @@ public class DataController {
 
         String skeetSql = "load data local infile '" + skeet + "' into table skeet fields terminated by ',' lines terminated by '\n';";
         int skeetCount = jdbc.update(con -> con.prepareStatement(skeetSql));
-        results.append("Added " + skeetCount + " new records to database in skeet table.<br>");
+        results.append("Added ").append(skeetCount).append(" new records to database in skeet table.<br>");
 
         String claysSql = "load data local infile '" + clays + "' into table clays fields terminated by ',' lines terminated by '\n';";
         int claysCount = jdbc.update(con -> con.prepareStatement(claysSql));
-        results.append("Added " + claysCount + " new records to database in clays table.<br>");
+        results.append("Added ").append(claysCount).append(" new records to database in clays table.<br>");
 
         return results.toString();
     }
