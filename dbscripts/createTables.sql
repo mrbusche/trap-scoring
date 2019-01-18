@@ -36,6 +36,7 @@ CREATE TABLE IF NOT EXISTS singles (
     NSSAPaymenT VARCHAR(16)
 );
 
+-- top 4 scores
 CREATE OR REPLACE VIEW singlesData AS
 WITH s AS (
   SELECT s.eventid, s.event, s.locationid, s.location, s.squadname, replace(s.team, 'Club', 'Team') AS team, s.athlete, s.gender
@@ -126,13 +127,14 @@ CREATE TABLE IF NOT EXISTS doubles (
     NSSAPaymenT VARCHAR(16)
 );
 
+-- top 4 scores for individual rounds
 CREATE OR REPLACE VIEW doublesData AS
 WITH s AS (
   SELECT s.eventid, s.event, s.locationid, s.location, s.squadname, replace(s.team, 'Club', 'Team') AS team, s.athlete, s.gender
     , CASE WHEN s.classification IN ('Senior/Varsity','Senior/Jr. Varsity') THEN 'Varsity' ELSE s.classification END classification
   , s.round1, s.round2, s.round3, s.round4
-  , GREATEST(GREATEST(GREATEST(GREATEST(GREATEST(GREATEST(s.round1 + s.round2, s.round2 + s.round3), s.round3 + s.round4), s.round4 + s.round5), s.round5 + s.round6), s.round6 + s.round7), s.round7 + s.round8) total
-  , row_number() OVER (PARTITION BY athlete ORDER BY GREATEST(GREATEST(GREATEST(GREATEST(GREATEST(GREATEST(s.round1 + s.round2, s.round2 + s.round3), s.round3 + s.round4), s.round4 + s.round5), s.round5 + s.round6), s.round6 + s.round7), s.round7 + s.round8) DESC) AS seqnum
+  , GREATEST(GREATEST(GREATEST(GREATEST(GREATEST(GREATEST(GREATEST(s.round1, s.round2), s.round3), s.round4), s.round5), s.round6), s.round7), s.round8) total
+  , row_number() OVER (PARTITION BY athlete ORDER BY GREATEST(GREATEST(GREATEST(GREATEST(GREATEST(GREATEST(GREATEST(s.round1, s.round2), s.round3), s.round4), s.round5), s.round6), s.round7), s.round8) DESC) AS seqnum
   FROM doubles s
     WHERE s.locationid > 0
     ORDER BY athlete, total DESC
@@ -216,6 +218,7 @@ CREATE TABLE IF NOT EXISTS handicap (
     NSSAPaymenT VARCHAR(16)
 );
 
+--top 4 scores
 CREATE OR REPLACE VIEW handicapData AS
 WITH s AS (
   SELECT s.eventid, s.event, s.locationid, s.location, s.squadname, replace(s.team, 'Club', 'Team') AS team, s.athlete, s.gender
@@ -306,6 +309,7 @@ CREATE TABLE IF NOT EXISTS skeet (
     NSSAPaymenT VARCHAR(16)
 );
 
+-- top 3 scores only
 CREATE OR REPLACE VIEW skeetData AS
 WITH s AS (
   SELECT s.eventid, s.event, s.locationid, s.location, s.squadname, replace(s.team, 'Club', 'Team') AS team, s.athlete, s.gender
@@ -320,7 +324,7 @@ WITH s AS (
 s3 AS (
   SELECT s.*
   FROM s
-  where seqnum <= 3
+  where seqnum <= 2
 )
 SELECT *
 FROM s3
@@ -336,7 +340,7 @@ UNION ALL
         GROUP BY s.athlete) unreal
       WHERE s.athlete = unreal.athlete
       AND seqnum > 2
-      AND CASE WHEN numberfour = 'four' THEN seqnum = 4 ELSE locationid != dontuselocid END
+      AND CASE WHEN numberfour = 'four' THEN seqnum = 3 ELSE locationid != dontuselocid END
     ) bananas
     WHERE fourth = 1
 );
