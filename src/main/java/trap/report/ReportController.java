@@ -88,6 +88,28 @@ public class ReportController {
         return results.toString();
     }
 
+    @RequestMapping(method = RequestMethod.GET, value = "/school/{schoolName}")
+    public String school(@PathVariable(name = "schoolName") String schoolName) {
+        StringBuilder results = new StringBuilder();
+        results.append("<h1>Singles</h1>");
+        List<SinglesAggregate> data = singlesRepository.getAllByTeam(schoolName);
+        joinSinglesData(data, results);
+
+        results.append("<h1>Doubles</h1>");
+        List<DoublesAggregate> doublesData = doublesDataRepository.getAllByTeam(schoolName);
+        joinDoublesData(doublesData, results);
+
+        results.append("<h1>Handicap</h1>");
+        List<HandicapAggregate> handicapData = handicapDataRepository.getAllByTeam(schoolName);
+        joinHandicapData(handicapData, results);
+
+        results.append("<h1>Skeet</h1>");
+        List<SkeetAggregate> skeetData = skeetDataRepository.getAllByTeam(schoolName);
+        joinSkeetData(skeetData, results);
+
+        return results.toString();
+    }
+
     private static void joinSinglesData(List<SinglesAggregate> data, StringBuilder results) {
         results.append(data.stream().map(SinglesAggregate::toString).limit(25).collect(Collectors.joining("<br>")));
     }
