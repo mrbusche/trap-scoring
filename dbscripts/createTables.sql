@@ -51,7 +51,6 @@ s3 AS (
   SELECT s.*
   FROM s
   where seqnum <= 3
-  AND total <= 50
 )
 SELECT *
 FROM s3
@@ -70,7 +69,6 @@ UNION ALL
     AND CASE WHEN numberfour = 'four' THEN seqnum = 4 ELSE locationid != dontuselocid END
     ) bananas
     WHERE fourth = 1
-    AND total <= 50
 );
 
 CREATE OR REPLACE VIEW singlesAggregate AS
@@ -143,7 +141,6 @@ s3 AS (
   SELECT s.*
   FROM s
   where seqnum <= 3
-  AND total <= 50
 )
 SELECT *
 FROM s3
@@ -162,7 +159,6 @@ UNION ALL
     AND CASE WHEN numberfour = 'four' THEN seqnum = 4 ELSE locationid != dontuselocid END
     ) bananas
     WHERE fourth = 1
-    AND total <= 50
 );
 
 CREATE OR REPLACE VIEW doublesAggregate AS
@@ -235,7 +231,6 @@ s3 AS (
   SELECT s.*
   FROM s
   where seqnum <= 3
-  AND total <= 50
 )
 SELECT *
 FROM s3
@@ -254,7 +249,6 @@ UNION ALL
     AND CASE WHEN numberfour = 'four' THEN seqnum = 4 ELSE locationid != dontuselocid END
     ) bananas
     WHERE fourth = 1
-    AND total <= 50
 );
 
 CREATE OR REPLACE VIEW handicapAggregate AS
@@ -327,7 +321,6 @@ s3 AS (
   SELECT s.*
   FROM s
   where seqnum <= 3
-  AND total <= 50
 )
 SELECT *
 FROM s3
@@ -346,7 +339,6 @@ UNION ALL
       AND CASE WHEN numberfour = 'four' THEN seqnum = 4 ELSE locationid != dontuselocid END
     ) bananas
     WHERE fourth = 1
-    AND total <= 50
 );
 
 CREATE OR REPLACE VIEW skeetAggregate AS
