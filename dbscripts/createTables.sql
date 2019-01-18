@@ -309,7 +309,7 @@ CREATE TABLE IF NOT EXISTS skeet (
     NSSAPaymenT VARCHAR(16)
 );
 
--- top 3 scores only
+-- top 4 scores only
 CREATE OR REPLACE VIEW skeetData AS
 WITH s AS (
   SELECT s.eventid, s.event, s.locationid, s.location, s.squadname, replace(s.team, 'Club', 'Team') AS team, s.athlete, s.gender
@@ -324,7 +324,7 @@ WITH s AS (
 s3 AS (
   SELECT s.*
   FROM s
-  where seqnum <= 2
+  where seqnum <= 3
 )
 SELECT *
 FROM s3
@@ -339,8 +339,8 @@ UNION ALL
           INNER JOIN s3 ON s.athlete = s3.athlete
         GROUP BY s.athlete) unreal
       WHERE s.athlete = unreal.athlete
-      AND seqnum > 2
-      AND CASE WHEN numberfour = 'four' THEN seqnum = 3 ELSE locationid != dontuselocid END
+      AND seqnum > 3
+      AND CASE WHEN numberfour = 'four' THEN seqnum = 4 ELSE locationid != dontuselocid END
     ) bananas
     WHERE fourth = 1
 );
@@ -361,7 +361,7 @@ FROM (
   FROM skeetaggregate
   ORDER BY team, gender, classification, total DESC
 ) a
-WHERE segnum <= 4
+WHERE segnum <= 3
 GROUP BY team, gender, classification
 ORDER BY total DESC;
 
