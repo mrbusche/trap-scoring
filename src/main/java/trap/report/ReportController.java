@@ -1,5 +1,10 @@
 package trap.report;
 
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -7,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import trap.enums.ClassificationsEnum;
 import trap.enums.GendersEnum;
+import trap.model.AllData;
 import trap.model.DoublesAggregate;
 import trap.model.DoublesTeamAggregate;
 import trap.model.HandicapAggregate;
@@ -15,6 +21,7 @@ import trap.model.SinglesAggregate;
 import trap.model.SinglesTeamAggregate;
 import trap.model.SkeetAggregate;
 import trap.model.SkeetTeamAggregate;
+import trap.repository.AllDataRepository;
 import trap.repository.DoublesDataRepository;
 import trap.repository.DoublesDataTeamRepository;
 import trap.repository.HandicapDataRepository;
@@ -24,6 +31,10 @@ import trap.repository.SinglesDataTeamRepository;
 import trap.repository.SkeetDataRepository;
 import trap.repository.SkeetDataTeamRepository;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -40,10 +51,11 @@ public class ReportController {
     private final HandicapDataTeamRepository handicapDataTeamRepository;
     private final SkeetDataRepository skeetDataRepository;
     private final SkeetDataTeamRepository skeetDataTeamRepository;
+    private final AllDataRepository allDataRepository;
     private final List<String> classificationOptions = Stream.of(ClassificationsEnum.values()).map(ClassificationsEnum::name).collect(Collectors.toList());
 
     @Autowired
-    public ReportController(SinglesDataRepository singlesRepository, SinglesDataTeamRepository singlesDataTeamRepository, DoublesDataRepository doublesDataRepository, DoublesDataTeamRepository doublesDataTeamRepository, HandicapDataRepository handicapDataRepository, HandicapDataTeamRepository handicapDataTeamRepository, SkeetDataRepository skeetDataRepository, SkeetDataTeamRepository skeetDataTeamRepository) {
+    public ReportController(SinglesDataRepository singlesRepository, SinglesDataTeamRepository singlesDataTeamRepository, DoublesDataRepository doublesDataRepository, DoublesDataTeamRepository doublesDataTeamRepository, HandicapDataRepository handicapDataRepository, HandicapDataTeamRepository handicapDataTeamRepository, SkeetDataRepository skeetDataRepository, SkeetDataTeamRepository skeetDataTeamRepository, AllDataRepository allDataRepository) {
         this.singlesRepository = singlesRepository;
         this.singlesDataTeamRepository = singlesDataTeamRepository;
         this.doublesDataRepository = doublesDataRepository;
@@ -52,6 +64,7 @@ public class ReportController {
         this.handicapDataTeamRepository = handicapDataTeamRepository;
         this.skeetDataRepository = skeetDataRepository;
         this.skeetDataTeamRepository = skeetDataTeamRepository;
+        this.allDataRepository = allDataRepository;
     }
 
     @RequestMapping(method = RequestMethod.GET, value = "/individual/{gender}")
@@ -174,6 +187,106 @@ public class ReportController {
 
     private static void joinSkeetTeamData(List<SkeetTeamAggregate> data, StringBuilder results) {
         results.append(data.stream().map(SkeetTeamAggregate::toString).limit(10).collect(Collectors.joining("<br>")));
+    }
+
+    @RequestMapping("/export")
+    public String export() throws IOException {
+        StringBuilder result = new StringBuilder();
+        ClassLoader classLoader = getClass().getClassLoader();
+        File file = new File(classLoader.getResource("template.xls").getFile());
+        Workbook workbook = WorkbookFactory.create(file);
+
+        result.append("Workbook has ").append(workbook.getNumberOfSheets()).append(" sheets");
+        Iterator<Sheet> sheetIterator = workbook.sheetIterator();
+        workbook.forEach(sheet -> result.append("<br>").append(sheet.getSheetName()));
+
+        List<AllData> allData = allDataRepository.findAll();
+
+        Sheet sheet = workbook.getSheet("Clean Data");
+        int rows = sheet.getLastRowNum();
+
+        long start = System.currentTimeMillis();
+        Cell cell;
+        Row row;
+        for (AllData rowData : allData) {
+            row = sheet.createRow(++rows);
+            cell = row.createCell(0);
+            cell.setCellValue(rowData.getEventid());
+            cell = row.createCell(1);
+            cell.setCellValue(rowData.getEvent());
+            cell = row.createCell(2);
+            cell.setCellValue(rowData.getLocationid());
+            cell = row.createCell(3);
+            cell.setCellValue(rowData.getLocation());
+            cell = row.createCell(4);
+            cell.setCellValue(rowData.getEventdate());
+            cell = row.createCell(5);
+            cell.setCellValue(rowData.getSquadname());
+            cell = row.createCell(6);
+            cell.setCellValue(rowData.getStation());
+            cell = row.createCell(7);
+            cell.setCellValue(rowData.getTeam());
+            cell = row.createCell(8);
+            cell.setCellValue(rowData.getAthlete());
+            cell = row.createCell(9);
+            cell.setCellValue(rowData.getClassification());
+            cell = row.createCell(10);
+            cell.setCellValue(rowData.getGender());
+            cell = row.createCell(11);
+            cell.setCellValue(rowData.getRound1());
+            cell = row.createCell(12);
+            cell.setCellValue(rowData.getRound2());
+            cell = row.createCell(13);
+            cell.setCellValue(rowData.getRound3());
+            cell = row.createCell(14);
+            cell.setCellValue(rowData.getRound4());
+            cell = row.createCell(15);
+            cell.setCellValue(rowData.getRound5());
+            cell = row.createCell(16);
+            cell.setCellValue(rowData.getRound6());
+            cell = row.createCell(17);
+            cell.setCellValue(rowData.getRound7());
+            cell = row.createCell(18);
+            cell.setCellValue(rowData.getRound8());
+            cell = row.createCell(19);
+            cell.setCellValue(rowData.getFrontrun());
+            cell = row.createCell(20);
+            cell.setCellValue(rowData.getBackrun());
+            cell = row.createCell(21);
+            cell.setCellValue(rowData.getRegisterdate());
+            cell = row.createCell(22);
+            cell.setCellValue(rowData.getRegisteredby());
+            cell = row.createCell(23);
+            cell.setCellValue(rowData.getShirtsize());
+            cell = row.createCell(24);
+            cell.setCellValue(rowData.getAtaid());
+            cell = row.createCell(25);
+            cell.setCellValue(rowData.getNssaid());
+            cell = row.createCell(26);
+            cell.setCellValue(rowData.getNscaid());
+            cell = row.createCell(27);
+            cell.setCellValue(rowData.getSctppayment());
+            cell = row.createCell(28);
+            cell.setCellValue(rowData.getSctpconsent());
+            cell = row.createCell(29);
+            cell.setCellValue(rowData.getAtapayment());
+            cell = row.createCell(30);
+            cell.setCellValue(rowData.getNscapayment());
+            cell = row.createCell(31);
+            cell.setCellValue(rowData.getNssapayment());
+            cell = row.createCell(32);
+            cell.setCellValue(rowData.getType());
+
+        }
+
+        result.append("<br>Looped in ").append(System.currentTimeMillis() - start).append("ms");
+        FileOutputStream fileOutputStream = new FileOutputStream("updated.xls");
+        workbook.write(fileOutputStream);
+        fileOutputStream.close();
+
+        workbook.close();
+
+        return result.toString();
     }
 
 }
