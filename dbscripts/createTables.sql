@@ -399,3 +399,20 @@ CREATE TABLE IF NOT EXISTS clays (
     NSCAPayment VARCHAR(16),
     NSSAPaymenT VARCHAR(16)
 );
+
+
+CREATE OR REPLACE VIEW allData AS
+SELECT *, 'singles' as type
+FROM singles
+UNION
+SELECT *, 'doubles' as type
+FROM doubles
+UNION
+SELECT *, 'handicap' as type
+FROM handicap
+UNION
+SELECT *, 'skeet' as type
+FROM skeet
+UNION
+SELECT *, 'clays' as type
+FROM clays;
