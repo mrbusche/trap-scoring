@@ -36,6 +36,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -193,7 +194,7 @@ public class ReportController {
     public String export() throws IOException {
         StringBuilder result = new StringBuilder();
         ClassLoader classLoader = getClass().getClassLoader();
-        File file = new File(classLoader.getResource("template.xls").getFile());
+        File file = new File(Objects.requireNonNull(classLoader.getResource("template.xls")).getFile());
         Workbook workbook = WorkbookFactory.create(file);
 
         result.append("Workbook has ").append(workbook.getNumberOfSheets()).append(" sheets");
