@@ -1,11 +1,11 @@
 package trap.enums;
 
-public enum GendersEnum {
+public enum Genders {
     FEMALE("F"), MALE("M");
 
     public final String value;
 
-    GendersEnum(String value1) {
+    Genders(String value1) {
         value = value1;
     }
 
