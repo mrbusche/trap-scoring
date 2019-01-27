@@ -34,6 +34,8 @@ import trap.repository.SkeetDataTeamRepository;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
@@ -312,6 +314,7 @@ public class ReportController {
 
         int updateRow = rows;
         List<SinglesTeamAggregate> singlesTeamData = singlesDataTeamRepository.getAllByClassificationOrderByTotalDesc(teamType);
+        Collections.sort(singlesTeamData, Comparator.comparingInt(SinglesTeamAggregate::getTotal).reversed());
         for (SinglesTeamAggregate rowData : singlesTeamData) {
             row = sheet.createRow(++updateRow);
             cell = row.createCell(0);
@@ -322,6 +325,7 @@ public class ReportController {
 
         updateRow = rows;
         List<HandicapTeamAggregate> handicapTeamData = handicapDataTeamRepository.getAllByClassificationOrderByTotalDesc(teamType);
+        Collections.sort(handicapTeamData, Comparator.comparingInt(HandicapTeamAggregate::getTotal).reversed());
         for (HandicapTeamAggregate rowData : handicapTeamData) {
             row = sheet.getRow(++updateRow);
             cell = row.createCell(3);
@@ -332,6 +336,7 @@ public class ReportController {
 
         updateRow = rows;
         List<DoublesTeamAggregate> doublesTeamData = doublesDataTeamRepository.getAllByClassificationOrderByTotalDesc(teamType);
+        Collections.sort(doublesTeamData, Comparator.comparingInt(DoublesTeamAggregate::getTotal).reversed());
         for (DoublesTeamAggregate rowData : doublesTeamData) {
             row = sheet.getRow(++updateRow);
             cell = row.createCell(6);
@@ -342,6 +347,7 @@ public class ReportController {
 
         updateRow = rows;
         List<SkeetTeamAggregate> skeetTeamData = skeetDataTeamRepository.getAllByClassificationOrderByTotalDesc(teamType);
+        Collections.sort(skeetTeamData, Comparator.comparingInt(SkeetTeamAggregate::getTotal).reversed());
         for (SkeetTeamAggregate rowData : skeetTeamData) {
             row = sheet.getRow(++updateRow);
             cell = row.createCell(9);
