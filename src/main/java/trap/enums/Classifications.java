@@ -1,7 +1,8 @@
 package trap.enums;
 
 public enum Classifications {
-    Varsity("Varsity"), Intermediate("Intermediate/Advanced"), IntermediateEntry("Intermediate/Entry Level"), Collegiate("Collegiate"), Rookie("Rookie");
+    Senior("Senior"), Intermediate("Intermediate Rookie");
+    //, IntermediateEntry("Intermediate/Entry Level"), Collegiate("Collegiate"), Rookie("Rookie");
 
     public final String value;
 

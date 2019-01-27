@@ -144,28 +144,28 @@ public class ReportController {
         StringBuilder results = new StringBuilder();
         results.append("<h1>Singles</h1>");
         for (String classification : classificationOptions) {
-            List<SinglesTeamAggregate> data = singlesDataTeamRepository.getAllByClassificationAndGenderOrderByTotalDesc(Classifications.valueOf(classification).value, Genders.valueOf(gender.toUpperCase()).value);
+            List<SinglesTeamAggregate> data = singlesDataTeamRepository.getAllByClassificationOrderByTotalDesc(Classifications.valueOf(classification).value);
             //results.append("<h2>").append(Classifications.valueOf(classification)).append("</h2>");
             joinTeamData(data, results);
         }
 
         results.append("<h1>Doubles</h1>");
         for (String classification : classificationOptions) {
-            List<DoublesTeamAggregate> data = doublesDataTeamRepository.getAllByClassificationAndGenderOrderByTotalDesc(Classifications.valueOf(classification).value, Genders.valueOf(gender.toUpperCase()).value);
+            List<DoublesTeamAggregate> data = doublesDataTeamRepository.getAllByClassificationOrderByTotalDesc(Classifications.valueOf(classification).value);
             //results.append("<h2>").append(Classifications.valueOf(classification)).append("</h2>");
             joinDoublesTeamData(data, results);
         }
 
         results.append("<h1>Handicap</h1>");
         for (String classification : classificationOptions) {
-            List<HandicapTeamAggregate> data = handicapDataTeamRepository.getAllByClassificationAndGenderOrderByTotalDesc(Classifications.valueOf(classification).value, Genders.valueOf(gender.toUpperCase()).value);
+            List<HandicapTeamAggregate> data = handicapDataTeamRepository.getAllByClassificationOrderByTotalDesc(Classifications.valueOf(classification).value);
             //results.append("<h2>").append(Classifications.valueOf(classification)).append("</h2>");
             joinHandicapTeamData(data, results);
         }
 
         results.append("<h1>Skeet</h1>");
         for (String classification : classificationOptions) {
-            List<SkeetTeamAggregate> data = skeetDataTeamRepository.getAllByClassificationAndGenderOrderByTotalDesc(Classifications.valueOf(classification).value, Genders.valueOf(gender.toUpperCase()).value);
+            List<SkeetTeamAggregate> data = skeetDataTeamRepository.getAllByClassificationOrderByTotalDesc(Classifications.valueOf(classification).value);
             //results.append("<h2>").append(Classifications.valueOf(classification)).append("</h2>");
             joinSkeetTeamData(data, results);
         }
@@ -204,8 +204,12 @@ public class ReportController {
         result.append("<br>Clean data populated in ").append(System.currentTimeMillis() - start).append("ms");
 
         start = System.currentTimeMillis();
-        populateSeniorData(workbook);
+        populateTeamData(workbook, "Senior");
         result.append("<br>Senior data populated in ").append(System.currentTimeMillis() - start).append("ms");
+
+        start = System.currentTimeMillis();
+        populateTeamData(workbook, "Intermediate Rookie");
+        result.append("<br>Intermediate Rookie data populated in ").append(System.currentTimeMillis() - start).append("ms");
 
         start = System.currentTimeMillis();
         //autoSizeColumns(workbook);
@@ -299,15 +303,15 @@ public class ReportController {
         }
     }
 
-    private void populateSeniorData(Workbook workbook) {
-        Sheet sheet = workbook.getSheet("Senior");
+    private void populateTeamData(Workbook workbook, String teamType) {
+        Sheet sheet = workbook.getSheet(teamType);
         int rows = sheet.getLastRowNum();
         Cell cell;
         Row row;
 
         int updateRow = rows;
-        List<SinglesTeamAggregate> seniorsTeamData = singlesDataTeamRepository.getAllByClassificationOrderByTotalDesc(Classifications.valueOf("Varsity").value);
-        for (SinglesTeamAggregate rowData : seniorsTeamData) {
+        List<SinglesTeamAggregate> singlesTeamData = singlesDataTeamRepository.getAllByClassificationOrderByTotalDesc(teamType);
+        for (SinglesTeamAggregate rowData : singlesTeamData) {
             row = sheet.createRow(++updateRow);
             cell = row.createCell(0);
             cell.setCellValue(rowData.getTeam());
@@ -316,7 +320,7 @@ public class ReportController {
         }
 
         updateRow = rows;
-        List<HandicapTeamAggregate> handicapTeamData = handicapDataTeamRepository.getAllByClassificationOrderByTotalDesc(Classifications.valueOf("Varsity").value);
+        List<HandicapTeamAggregate> handicapTeamData = handicapDataTeamRepository.getAllByClassificationOrderByTotalDesc(teamType);
         for (HandicapTeamAggregate rowData : handicapTeamData) {
             row = sheet.getRow(++updateRow);
             cell = row.createCell(3);
@@ -326,7 +330,7 @@ public class ReportController {
         }
 
         updateRow = rows;
-        List<DoublesTeamAggregate> doublesTeamData = doublesDataTeamRepository.getAllByClassificationOrderByTotalDesc(Classifications.valueOf("Varsity").value);
+        List<DoublesTeamAggregate> doublesTeamData = doublesDataTeamRepository.getAllByClassificationOrderByTotalDesc(teamType);
         for (DoublesTeamAggregate rowData : doublesTeamData) {
             row = sheet.getRow(++updateRow);
             cell = row.createCell(6);
@@ -336,7 +340,7 @@ public class ReportController {
         }
 
         updateRow = rows;
-        List<SkeetTeamAggregate> skeetTeamData = skeetDataTeamRepository.getAllByClassificationOrderByTotalDesc(Classifications.valueOf("Varsity").value);
+        List<SkeetTeamAggregate> skeetTeamData = skeetDataTeamRepository.getAllByClassificationOrderByTotalDesc(teamType);
         for (SkeetTeamAggregate rowData : skeetTeamData) {
             row = sheet.getRow(++updateRow);
             cell = row.createCell(9);

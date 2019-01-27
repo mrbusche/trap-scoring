@@ -13,7 +13,6 @@ public class DoublesTeamAggregate {
     @Id
     String team;
     String classification;
-    String gender;
     Integer total;
 
     @Override

@@ -6,7 +6,5 @@ import trap.model.SinglesTeamAggregate;
 import java.util.List;
 
 public interface SinglesDataTeamRepository extends Repository<SinglesTeamAggregate, String> {
-    List<SinglesTeamAggregate> getAllByClassificationAndGenderOrderByTotalDesc(String classification, String gender);
-
     List<SinglesTeamAggregate> getAllByClassificationOrderByTotalDesc(String classification);
 }

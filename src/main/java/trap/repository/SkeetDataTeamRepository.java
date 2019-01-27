@@ -6,7 +6,5 @@ import trap.model.SkeetTeamAggregate;
 import java.util.List;
 
 public interface SkeetDataTeamRepository extends Repository<SkeetTeamAggregate, String> {
-    List<SkeetTeamAggregate> getAllByClassificationAndGenderOrderByTotalDesc(String classification, String gender);
-
     List<SkeetTeamAggregate> getAllByClassificationOrderByTotalDesc(String classification);
 }

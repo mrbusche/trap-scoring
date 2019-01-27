@@ -40,7 +40,7 @@ CREATE TABLE IF NOT EXISTS singles (
 CREATE OR REPLACE VIEW singlesData AS
 WITH s AS (
   SELECT s.eventid, s.event, s.locationid, s.location, s.squadname, replace(s.team, 'Club', 'Team') AS team, s.athlete, s.gender
-    , CASE WHEN s.classification IN ('Senior/Varsity','Senior/Jr. Varsity') THEN 'Varsity' ELSE s.classification END classification
+    , CASE WHEN s.classification IN ('Senior/Varsity','Senior/Jr. Varsity') THEN 'Senior' WHEN s.classification IN ('Intermediate/Advanced', 'Intermediate/Entry Level', 'Rookie') THEN 'Intermediate Rookie' ELSE s.classification END classification
   , s.round1, s.round2, s.round3, s.round4
   , GREATEST(GREATEST(GREATEST(GREATEST(GREATEST(GREATEST(s.round1 + s.round2, s.round2 + s.round3), s.round3 + s.round4), s.round4 + s.round5), s.round5 + s.round6), s.round6 + s.round7), s.round7 + s.round8) total
   , row_number() OVER (PARTITION BY athlete ORDER BY GREATEST(GREATEST(GREATEST(GREATEST(GREATEST(GREATEST(s.round1 + s.round2, s.round2 + s.round3), s.round3 + s.round4), s.round4 + s.round5), s.round5 + s.round6), s.round6 + s.round7), s.round7 + s.round8) DESC) AS seqnum
@@ -82,14 +82,14 @@ GROUP BY athlete, classification, gender
 ORDER BY total DESC;
 
 CREATE OR REPLACE VIEW singlesTeamAggregate AS
-SELECT team, gender, classification, SUM(total) total
+SELECT team, classification, SUM(total) total
 FROM (
-  SELECT team, gender, classification, total, row_number() OVER (PARTITION BY team, gender, classification ORDER BY total DESC ) AS segnum
+  SELECT team, classification, total, row_number() OVER (PARTITION BY team, classification ORDER BY total DESC ) AS segnum
   FROM singlesaggregate
-  ORDER BY team, gender, classification, total DESC
+  ORDER BY team, classification, total DESC
 ) a
 WHERE segnum <= 5
-GROUP BY team, gender, classification
+GROUP BY team, classification
 ORDER BY total DESC;
 
 CREATE TABLE IF NOT EXISTS doubles (
@@ -131,7 +131,7 @@ CREATE TABLE IF NOT EXISTS doubles (
 CREATE OR REPLACE VIEW doublesData AS
 WITH s AS (
   SELECT s.eventid, s.event, s.locationid, s.location, s.squadname, replace(s.team, 'Club', 'Team') AS team, s.athlete, s.gender
-    , CASE WHEN s.classification IN ('Senior/Varsity','Senior/Jr. Varsity') THEN 'Varsity' ELSE s.classification END classification
+  , CASE WHEN s.classification IN ('Senior/Varsity','Senior/Jr. Varsity') THEN 'Senior' WHEN s.classification IN ('Intermediate/Advanced', 'Intermediate/Entry Level', 'Rookie') THEN 'Intermediate Rookie' ELSE s.classification END classification
   , s.round1, s.round2, s.round3, s.round4
   , GREATEST(GREATEST(GREATEST(GREATEST(GREATEST(GREATEST(GREATEST(s.round1, s.round2), s.round3), s.round4), s.round5), s.round6), s.round7), s.round8) total
   , row_number() OVER (PARTITION BY athlete ORDER BY GREATEST(GREATEST(GREATEST(GREATEST(GREATEST(GREATEST(GREATEST(s.round1, s.round2), s.round3), s.round4), s.round5), s.round6), s.round7), s.round8) DESC) AS seqnum
@@ -173,14 +173,14 @@ GROUP BY athlete, classification, gender
 ORDER BY total DESC;
 
 CREATE OR REPLACE VIEW doublesTeamAggregate AS
-SELECT team, gender, classification, SUM(total) total
+SELECT team, classification, SUM(total) total
 FROM (
-  SELECT team, gender, classification, total, row_number() OVER (PARTITION BY team, gender, classification ORDER BY total DESC ) AS segnum
+  SELECT team, classification, total, row_number() OVER (PARTITION BY team, classification ORDER BY total DESC ) AS segnum
   FROM doublesaggregate
-  ORDER BY team, gender, classification, total DESC
+  ORDER BY team, classification, total DESC
 ) a
 WHERE segnum <= 5
-GROUP BY team, gender, classification
+GROUP BY team, classification
 ORDER BY total DESC;
 
 CREATE TABLE IF NOT EXISTS handicap (
@@ -218,11 +218,11 @@ CREATE TABLE IF NOT EXISTS handicap (
     NSSAPaymenT VARCHAR(16)
 );
 
---top 4 scores
+-- top 4 scores
 CREATE OR REPLACE VIEW handicapData AS
 WITH s AS (
   SELECT s.eventid, s.event, s.locationid, s.location, s.squadname, replace(s.team, 'Club', 'Team') AS team, s.athlete, s.gender
-    , CASE WHEN s.classification IN ('Senior/Varsity','Senior/Jr. Varsity') THEN 'Varsity' ELSE s.classification END classification
+  , CASE WHEN s.classification IN ('Senior/Varsity','Senior/Jr. Varsity') THEN 'Senior' WHEN s.classification IN ('Intermediate/Advanced', 'Intermediate/Entry Level', 'Rookie') THEN 'Intermediate Rookie' ELSE s.classification END classification
   , s.round1, s.round2, s.round3, s.round4
   , GREATEST(GREATEST(GREATEST(GREATEST(GREATEST(GREATEST(s.round1 + s.round2, s.round2 + s.round3), s.round3 + s.round4), s.round4 + s.round5), s.round5 + s.round6), s.round6 + s.round7), s.round7 + s.round8) total
   , row_number() OVER (PARTITION BY athlete ORDER BY GREATEST(GREATEST(GREATEST(GREATEST(GREATEST(GREATEST(s.round1 + s.round2, s.round2 + s.round3), s.round3 + s.round4), s.round4 + s.round5), s.round5 + s.round6), s.round6 + s.round7), s.round7 + s.round8) DESC) AS seqnum
@@ -264,14 +264,14 @@ GROUP BY athlete, classification, gender
 ORDER BY total DESC;
 
 CREATE OR REPLACE VIEW handicapTeamAggregate AS
-SELECT team, gender, classification, SUM(total) total
+SELECT team, classification, SUM(total) total
 FROM (
-  SELECT team, gender, classification, total, row_number() OVER (PARTITION BY team, gender, classification ORDER BY total DESC ) AS segnum
+  SELECT team, classification, total, row_number() OVER (PARTITION BY team, classification ORDER BY total DESC ) AS segnum
   FROM handicapaggregate
-  ORDER BY team, gender, classification, total DESC
+  ORDER BY team, classification, total DESC
 ) a
 WHERE segnum <= 5
-GROUP BY team, gender, classification
+GROUP BY team, classification
 ORDER BY total DESC;
 
 CREATE TABLE IF NOT EXISTS skeet (
@@ -313,7 +313,7 @@ CREATE TABLE IF NOT EXISTS skeet (
 CREATE OR REPLACE VIEW skeetData AS
 WITH s AS (
   SELECT s.eventid, s.event, s.locationid, s.location, s.squadname, replace(s.team, 'Club', 'Team') AS team, s.athlete, s.gender
-    , CASE WHEN s.classification IN ('Senior/Varsity','Senior/Jr. Varsity') THEN 'Varsity' ELSE s.classification END classification
+    , CASE WHEN s.classification IN ('Senior/Varsity','Senior/Jr. Varsity') THEN 'Senior' WHEN s.classification IN ('Intermediate/Advanced', 'Intermediate/Entry Level', 'Rookie') THEN 'Intermediate Rookie' ELSE s.classification END classification
   , s.round1, s.round2, s.round3, s.round4
   , GREATEST(GREATEST(GREATEST(GREATEST(GREATEST(GREATEST(s.round1 + s.round2, s.round2 + s.round3), s.round3 + s.round4), s.round4 + s.round5), s.round5 + s.round6), s.round6 + s.round7), s.round7 + s.round8) total
   , row_number() OVER (PARTITION BY athlete ORDER BY GREATEST(GREATEST(GREATEST(GREATEST(GREATEST(GREATEST(s.round1 + s.round2, s.round2 + s.round3), s.round3 + s.round4), s.round4 + s.round5), s.round5 + s.round6), s.round6 + s.round7), s.round7 + s.round8) DESC) AS seqnum
@@ -355,14 +355,14 @@ GROUP BY athlete, classification, gender
 ORDER BY total DESC;
 
 CREATE OR REPLACE VIEW skeetTeamAggregate AS
-SELECT team, gender, classification, SUM(total) total
+SELECT team, classification, SUM(total) total
 FROM (
-  SELECT team, gender, classification, total, row_number() OVER (PARTITION BY team, gender, classification ORDER BY total DESC ) AS segnum
+  SELECT team, classification, total, row_number() OVER (PARTITION BY team, classification ORDER BY total DESC ) AS segnum
   FROM skeetaggregate
-  ORDER BY team, gender, classification, total DESC
+  ORDER BY team, classification, total DESC
 ) a
 WHERE segnum <= 3
-GROUP BY team, gender, classification
+GROUP BY team, classification
 ORDER BY total DESC;
 
 CREATE TABLE IF NOT EXISTS clays (
