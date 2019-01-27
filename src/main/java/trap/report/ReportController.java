@@ -200,12 +200,26 @@ public class ReportController {
         Iterator<Sheet> sheetIterator = workbook.sheetIterator();
         workbook.forEach(sheet -> result.append("<br>").append(sheet.getSheetName()));
 
+        long start = System.currentTimeMillis();
+
+        populateCleanData(workbook);
+        result.append("<br>Clean data populated in ").append(System.currentTimeMillis() - start).append("ms");
+
+        FileOutputStream fileOutputStream = new FileOutputStream("updated.xls");
+        workbook.write(fileOutputStream);
+        fileOutputStream.close();
+
+        workbook.close();
+
+        return result.toString();
+    }
+
+    private void populateCleanData(Workbook workbook) {
         List<AllData> allData = allDataRepository.findAll();
 
         Sheet sheet = workbook.getSheet("Clean Data");
         int rows = sheet.getLastRowNum();
 
-        long start = System.currentTimeMillis();
         Cell cell;
         Row row;
         for (AllData rowData : allData) {
@@ -276,17 +290,7 @@ public class ReportController {
             cell.setCellValue(rowData.getNssapayment());
             cell = row.createCell(32);
             cell.setCellValue(rowData.getType());
-
         }
-
-        result.append("<br>Looped in ").append(System.currentTimeMillis() - start).append("ms");
-        FileOutputStream fileOutputStream = new FileOutputStream("updated.xls");
-        workbook.write(fileOutputStream);
-        fileOutputStream.close();
-
-        workbook.close();
-
-        return result.toString();
     }
 
 }
