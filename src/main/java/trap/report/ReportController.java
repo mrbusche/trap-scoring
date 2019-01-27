@@ -73,7 +73,7 @@ public class ReportController {
         results.append("<h1>Singles</h1>");
         for (String classification : classificationOptions) {
             List<SinglesAggregate> data = singlesRepository.getAllByClassificationAndGenderOrderByTotalDescAthleteAsc(Classifications.valueOf(classification).value, Genders.valueOf(gender.toUpperCase()).value);
-            //results.append("<h2>").append(Classifications.valueOf(classification)).append("</h2>");
+            results.append("<h2>").append(Classifications.valueOf(classification)).append("</h2>");
             joinSinglesData(data, results);
         }
 
@@ -197,13 +197,19 @@ public class ReportController {
         Workbook workbook = WorkbookFactory.create(file);
 
         result.append("Workbook has ").append(workbook.getNumberOfSheets()).append(" sheets");
-        Iterator<Sheet> sheetIterator = workbook.sheetIterator();
         workbook.forEach(sheet -> result.append("<br>").append(sheet.getSheetName()));
 
         long start = System.currentTimeMillis();
-
         populateCleanData(workbook);
         result.append("<br>Clean data populated in ").append(System.currentTimeMillis() - start).append("ms");
+
+        start = System.currentTimeMillis();
+        populateSeniorData(workbook);
+        result.append("<br>Senior data populated in ").append(System.currentTimeMillis() - start).append("ms");
+
+        start = System.currentTimeMillis();
+        //autoSizeColumns(workbook);
+        result.append("<br>Auto sized all columns in ").append(System.currentTimeMillis() - start).append("ms");
 
         FileOutputStream fileOutputStream = new FileOutputStream("updated.xls");
         workbook.write(fileOutputStream);
@@ -290,6 +296,69 @@ public class ReportController {
             cell.setCellValue(rowData.getNssapayment());
             cell = row.createCell(32);
             cell.setCellValue(rowData.getType());
+        }
+    }
+
+    private void populateSeniorData(Workbook workbook) {
+        Sheet sheet = workbook.getSheet("Senior");
+        int rows = sheet.getLastRowNum();
+        Cell cell;
+        Row row;
+
+        int updateRow = rows;
+        List<SinglesTeamAggregate> seniorsTeamData = singlesDataTeamRepository.getAllByClassificationOrderByTotalDesc(Classifications.valueOf("Varsity").value);
+        for (SinglesTeamAggregate rowData : seniorsTeamData) {
+            row = sheet.createRow(++updateRow);
+            cell = row.createCell(0);
+            cell.setCellValue(rowData.getTeam());
+            cell = row.createCell(1);
+            cell.setCellValue(rowData.getTotal());
+        }
+
+        updateRow = rows;
+        List<HandicapTeamAggregate> handicapTeamData = handicapDataTeamRepository.getAllByClassificationOrderByTotalDesc(Classifications.valueOf("Varsity").value);
+        for (HandicapTeamAggregate rowData : handicapTeamData) {
+            row = sheet.getRow(++updateRow);
+            cell = row.createCell(3);
+            cell.setCellValue(rowData.getTeam());
+            cell = row.createCell(4);
+            cell.setCellValue(rowData.getTotal());
+        }
+
+        updateRow = rows;
+        List<DoublesTeamAggregate> doublesTeamData = doublesDataTeamRepository.getAllByClassificationOrderByTotalDesc(Classifications.valueOf("Varsity").value);
+        for (DoublesTeamAggregate rowData : doublesTeamData) {
+            row = sheet.getRow(++updateRow);
+            cell = row.createCell(6);
+            cell.setCellValue(rowData.getTeam());
+            cell = row.createCell(7);
+            cell.setCellValue(rowData.getTotal());
+        }
+
+        updateRow = rows;
+        List<SkeetTeamAggregate> skeetTeamData = skeetDataTeamRepository.getAllByClassificationOrderByTotalDesc(Classifications.valueOf("Varsity").value);
+        for (SkeetTeamAggregate rowData : skeetTeamData) {
+            row = sheet.getRow(++updateRow);
+            cell = row.createCell(9);
+            cell.setCellValue(rowData.getTeam());
+            cell = row.createCell(10);
+            cell.setCellValue(rowData.getTotal());
+        }
+    }
+
+    private static void autoSizeColumns(Workbook workbook) {
+        int numberOfSheets = workbook.getNumberOfSheets();
+        for (int sheetNum = 0; sheetNum < numberOfSheets; sheetNum++) {
+            Sheet sheet = workbook.getSheetAt(sheetNum);
+            if (sheet.getPhysicalNumberOfRows() > 0) {
+                Row row = sheet.getRow(sheet.getFirstRowNum());
+                Iterator<Cell> cellIterator = row.cellIterator();
+                while (cellIterator.hasNext()) {
+                    Cell cell = cellIterator.next();
+                    int columnIndex = cell.getColumnIndex();
+                    sheet.autoSizeColumn(columnIndex);
+                }
+            }
         }
     }
 

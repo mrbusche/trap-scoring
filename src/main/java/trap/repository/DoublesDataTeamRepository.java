@@ -7,4 +7,6 @@ import java.util.List;
 
 public interface DoublesDataTeamRepository extends Repository<DoublesTeamAggregate, String> {
     List<DoublesTeamAggregate> getAllByClassificationAndGenderOrderByTotalDesc(String classification, String gender);
+
+    List<DoublesTeamAggregate> getAllByClassificationOrderByTotalDesc(String classification);
 }
