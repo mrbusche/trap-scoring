@@ -7,12 +7,8 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
-import trap.enums.Classifications;
-import trap.enums.Genders;
 import trap.model.AllData;
 import trap.model.DoublesAggregate;
 import trap.model.DoublesTeamAggregate;
@@ -38,8 +34,6 @@ import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @RestController
 @RequestMapping("/reports")
@@ -54,7 +48,6 @@ public class ReportController {
     private final SkeetDataRepository skeetDataRepository;
     private final SkeetDataTeamRepository skeetDataTeamRepository;
     private final AllDataRepository allDataRepository;
-    private final List<String> classificationOptions = Stream.of(Classifications.values()).map(Classifications::name).collect(Collectors.toList());
 
     @Autowired
     public ReportController(SinglesDataRepository singlesRepository, SinglesDataTeamRepository singlesDataTeamRepository, DoublesDataRepository doublesDataRepository, DoublesDataTeamRepository doublesDataTeamRepository, HandicapDataRepository handicapDataRepository, HandicapDataTeamRepository handicapDataTeamRepository, SkeetDataRepository skeetDataRepository, SkeetDataTeamRepository skeetDataTeamRepository, AllDataRepository allDataRepository) {
@@ -67,128 +60,6 @@ public class ReportController {
         this.skeetDataRepository = skeetDataRepository;
         this.skeetDataTeamRepository = skeetDataTeamRepository;
         this.allDataRepository = allDataRepository;
-    }
-
-    @RequestMapping(method = RequestMethod.GET, value = "/individual/{gender}")
-    public String individualReports(@PathVariable(name = "gender") String gender) {
-        StringBuilder results = new StringBuilder();
-        results.append("<h1>Singles</h1>");
-        for (String classification : classificationOptions) {
-            List<SinglesAggregate> data = singlesRepository.getAllByClassificationAndGenderOrderByTotalDescAthleteAsc(Classifications.valueOf(classification).value, Genders.valueOf(gender.toUpperCase()).value);
-            results.append("<h2>").append(Classifications.valueOf(classification)).append("</h2>");
-            joinSinglesData(data, results);
-        }
-
-        results.append("<h1>Doubles</h1>");
-        for (String classification : classificationOptions) {
-            List<DoublesAggregate> data = doublesDataRepository.getAllByClassificationAndGenderOrderByTotalDescAthleteAsc(Classifications.valueOf(classification).value, Genders.valueOf(gender.toUpperCase()).value);
-            //results.append("<h2>").append(Classifications.valueOf(classification)).append("</h2>");
-            joinDoublesData(data, results);
-        }
-
-        results.append("<h1>Handicap</h1>");
-        for (String classification : classificationOptions) {
-            List<HandicapAggregate> data = handicapDataRepository.getAllByClassificationAndGenderOrderByTotalDescAthleteAsc(Classifications.valueOf(classification).value, Genders.valueOf(gender.toUpperCase()).value);
-            //results.append("<h2>").append(Classifications.valueOf(classification)).append("</h2>");
-            joinHandicapData(data, results);
-        }
-
-        results.append("<h1>Skeet</h1>");
-        for (String classification : classificationOptions) {
-            List<SkeetAggregate> data = skeetDataRepository.getAllByClassificationAndGenderOrderByTotalDescAthleteAsc(Classifications.valueOf(classification).value, Genders.valueOf(gender.toUpperCase()).value);
-            //results.append("<h2>").append(Classifications.valueOf(classification)).append("</h2>");
-            joinSkeetData(data, results);
-        }
-
-        return results.toString();
-    }
-
-    @RequestMapping(method = RequestMethod.GET, value = "/school/{schoolName}")
-    public String school(@PathVariable(name = "schoolName") String schoolName) {
-        StringBuilder results = new StringBuilder();
-        results.append("<h1>Singles</h1>");
-        List<SinglesAggregate> data = singlesRepository.getAllByTeam(schoolName);
-        joinSinglesData(data, results);
-
-        results.append("<h1>Doubles</h1>");
-        List<DoublesAggregate> doublesData = doublesDataRepository.getAllByTeam(schoolName);
-        joinDoublesData(doublesData, results);
-
-        results.append("<h1>Handicap</h1>");
-        List<HandicapAggregate> handicapData = handicapDataRepository.getAllByTeam(schoolName);
-        joinHandicapData(handicapData, results);
-
-        results.append("<h1>Skeet</h1>");
-        List<SkeetAggregate> skeetData = skeetDataRepository.getAllByTeam(schoolName);
-        joinSkeetData(skeetData, results);
-
-        return results.toString();
-    }
-
-    private static void joinSinglesData(List<SinglesAggregate> data, StringBuilder results) {
-        results.append(data.stream().map(SinglesAggregate::toString).limit(25).collect(Collectors.joining("<br>")));
-    }
-
-    private static void joinDoublesData(List<DoublesAggregate> data, StringBuilder results) {
-        results.append(data.stream().map(DoublesAggregate::toString).limit(25).collect(Collectors.joining("<br>")));
-    }
-
-    private static void joinHandicapData(List<HandicapAggregate> data, StringBuilder results) {
-        results.append(data.stream().map(HandicapAggregate::toString).limit(25).collect(Collectors.joining("<br>")));
-    }
-
-    private static void joinSkeetData(List<SkeetAggregate> data, StringBuilder results) {
-        results.append(data.stream().map(SkeetAggregate::toString).limit(25).collect(Collectors.joining("<br>")));
-    }
-
-    @RequestMapping(method = RequestMethod.GET, value = "/team/{gender}")
-    public String teamReports(@PathVariable(name = "gender") String gender) {
-        StringBuilder results = new StringBuilder();
-        results.append("<h1>Singles</h1>");
-        for (String classification : classificationOptions) {
-            List<SinglesTeamAggregate> data = singlesDataTeamRepository.getAllByClassificationOrderByTotalDesc(Classifications.valueOf(classification).value);
-            //results.append("<h2>").append(Classifications.valueOf(classification)).append("</h2>");
-            joinTeamData(data, results);
-        }
-
-        results.append("<h1>Doubles</h1>");
-        for (String classification : classificationOptions) {
-            List<DoublesTeamAggregate> data = doublesDataTeamRepository.getAllByClassificationOrderByTotalDesc(Classifications.valueOf(classification).value);
-            //results.append("<h2>").append(Classifications.valueOf(classification)).append("</h2>");
-            joinDoublesTeamData(data, results);
-        }
-
-        results.append("<h1>Handicap</h1>");
-        for (String classification : classificationOptions) {
-            List<HandicapTeamAggregate> data = handicapDataTeamRepository.getAllByClassificationOrderByTotalDesc(Classifications.valueOf(classification).value);
-            //results.append("<h2>").append(Classifications.valueOf(classification)).append("</h2>");
-            joinHandicapTeamData(data, results);
-        }
-
-        results.append("<h1>Skeet</h1>");
-        for (String classification : classificationOptions) {
-            List<SkeetTeamAggregate> data = skeetDataTeamRepository.getAllByClassificationOrderByTotalDesc(Classifications.valueOf(classification).value);
-            //results.append("<h2>").append(Classifications.valueOf(classification)).append("</h2>");
-            joinSkeetTeamData(data, results);
-        }
-
-        return results.toString();
-    }
-
-    private static void joinTeamData(List<SinglesTeamAggregate> data, StringBuilder results) {
-        results.append(data.stream().map(SinglesTeamAggregate::toString).limit(10).collect(Collectors.joining("<br>")));
-    }
-
-    private static void joinDoublesTeamData(List<DoublesTeamAggregate> data, StringBuilder results) {
-        results.append(data.stream().map(DoublesTeamAggregate::toString).limit(10).collect(Collectors.joining("<br>")));
-    }
-
-    private static void joinHandicapTeamData(List<HandicapTeamAggregate> data, StringBuilder results) {
-        results.append(data.stream().map(HandicapTeamAggregate::toString).limit(10).collect(Collectors.joining("<br>")));
-    }
-
-    private static void joinSkeetTeamData(List<SkeetTeamAggregate> data, StringBuilder results) {
-        results.append(data.stream().map(SkeetTeamAggregate::toString).limit(10).collect(Collectors.joining("<br>")));
     }
 
     @RequestMapping("/export")
