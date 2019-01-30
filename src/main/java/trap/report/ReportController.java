@@ -192,42 +192,42 @@ public class ReportController {
 
         int updateRow = rows;
         List<SinglesTeamAggregate> singlesTeamData = singlesDataTeamRepository.getAllByClassificationOrderByTotalDesc(teamType);
-        for (SinglesTeamAggregate rowData : singlesTeamData) {
+        for (SinglesTeamAggregate singlesTeamRowData : singlesTeamData) {
             row = sheet.createRow(++updateRow);
             cell = row.createCell(0);
-            cell.setCellValue(rowData.getTeam());
+            cell.setCellValue(singlesTeamRowData.getTeam());
             cell = row.createCell(1);
-            cell.setCellValue(rowData.getTotal());
+            cell.setCellValue(singlesTeamRowData.getTotal());
         }
 
         updateRow = rows;
         List<HandicapTeamAggregate> handicapTeamData = handicapDataTeamRepository.getAllByClassificationOrderByTotalDesc(teamType);
-        for (HandicapTeamAggregate rowData : handicapTeamData) {
+        for (HandicapTeamAggregate handicapTeamRowData : handicapTeamData) {
             row = sheet.getRow(++updateRow);
             cell = row.createCell(3);
-            cell.setCellValue(rowData.getTeam());
+            cell.setCellValue(handicapTeamRowData.getTeam());
             cell = row.createCell(4);
-            cell.setCellValue(rowData.getTotal());
+            cell.setCellValue(handicapTeamRowData.getTotal());
         }
 
         updateRow = rows;
         List<DoublesTeamAggregate> doublesTeamData = doublesDataTeamRepository.getAllByClassificationOrderByTotalDesc(teamType);
-        for (DoublesTeamAggregate rowData : doublesTeamData) {
+        for (DoublesTeamAggregate doublesTeamRowData : doublesTeamData) {
             row = sheet.getRow(++updateRow);
             cell = row.createCell(6);
-            cell.setCellValue(rowData.getTeam());
+            cell.setCellValue(doublesTeamRowData.getTeam());
             cell = row.createCell(7);
-            cell.setCellValue(rowData.getTotal());
+            cell.setCellValue(doublesTeamRowData.getTotal());
         }
 
         updateRow = rows;
         List<SkeetTeamAggregate> skeetTeamData = skeetDataTeamRepository.getAllByClassificationOrderByTotalDesc(teamType);
-        for (SkeetTeamAggregate rowData : skeetTeamData) {
+        for (SkeetTeamAggregate skeetTeamRowData : skeetTeamData) {
             row = sheet.getRow(++updateRow);
             cell = row.createCell(9);
-            cell.setCellValue(rowData.getTeam());
+            cell.setCellValue(skeetTeamRowData.getTeam());
             cell = row.createCell(10);
-            cell.setCellValue(rowData.getTotal());
+            cell.setCellValue(skeetTeamRowData.getTotal());
         }
     }
 
