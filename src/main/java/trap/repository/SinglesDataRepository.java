@@ -9,4 +9,6 @@ public interface SinglesDataRepository extends Repository<SinglesAggregate, Stri
     List<SinglesAggregate> getAllByClassificationAndGenderOrderByTotalDescAthleteAsc(String classification, String gender);
 
     List<SinglesAggregate> getAllByTeam(String team);
+
+    List<SinglesAggregate> getAllByGender(String gender);
 }

@@ -9,4 +9,6 @@ public interface DoublesDataRepository extends Repository<DoublesAggregate, Stri
     List<DoublesAggregate> getAllByClassificationAndGenderOrderByTotalDescAthleteAsc(String classification, String gender);
 
     List<DoublesAggregate> getAllByTeam(String team);
+
+    List<DoublesAggregate> getAllByGender(String gender);
 }

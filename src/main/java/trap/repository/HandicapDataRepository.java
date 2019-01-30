@@ -9,4 +9,6 @@ public interface HandicapDataRepository extends Repository<HandicapAggregate, St
     List<HandicapAggregate> getAllByClassificationAndGenderOrderByTotalDescAthleteAsc(String classification, String gender);
 
     List<HandicapAggregate> getAllByTeam(String team);
+
+    List<HandicapAggregate> getAllByGender(String gender);
 }

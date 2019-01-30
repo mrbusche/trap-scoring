@@ -9,4 +9,6 @@ public interface SkeetDataRepository extends Repository<SkeetAggregate, String> 
     List<SkeetAggregate> getAllByClassificationAndGenderOrderByTotalDescAthleteAsc(String classification, String gender);
 
     List<SkeetAggregate> getAllByTeam(String team);
+
+    List<SkeetAggregate> getAllByGender(String gender);
 }
