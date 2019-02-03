@@ -40,7 +40,7 @@ CREATE TABLE IF NOT EXISTS singles (
 CREATE OR REPLACE VIEW singlesData AS
 WITH s AS (
   SELECT s.eventid, s.event, s.locationid, s.location, s.squadname, replace(s.team, 'Club', 'Team') AS team, s.athlete, s.gender
-    , CASE WHEN s.classification IN ('Senior/Varsity','Senior/Jr. Varsity') THEN 'Senior' WHEN s.classification IN ('Intermediate/Advanced', 'Intermediate/Entry Level', 'Rookie') THEN 'Intermediate Rookie' ELSE s.classification END classification
+    , CASE WHEN s.classification IN ('Senior/Varsity','Senior/Jr. Varsity') THEN 'Senior' WHEN s.classification IN ('Intermediate/Advanced', 'Intermediate/Entry Level') THEN 'Intermediate' WHEN s.classification = 'Rookie' THEN 'Rookie' ELSE s.classification END classification
   , s.round1, s.round2, s.round3, s.round4
   , GREATEST(GREATEST(GREATEST(GREATEST(GREATEST(GREATEST(s.round1 + s.round2, s.round2 + s.round3), s.round3 + s.round4), s.round4 + s.round5), s.round5 + s.round6), s.round6 + s.round7), s.round7 + s.round8) total
   , row_number() OVER (PARTITION BY athlete ORDER BY GREATEST(GREATEST(GREATEST(GREATEST(GREATEST(GREATEST(s.round1 + s.round2, s.round2 + s.round3), s.round3 + s.round4), s.round4 + s.round5), s.round5 + s.round6), s.round6 + s.round7), s.round7 + s.round8) DESC) AS seqnum
@@ -131,7 +131,7 @@ CREATE TABLE IF NOT EXISTS doubles (
 CREATE OR REPLACE VIEW doublesData AS
 WITH s AS (
   SELECT s.eventid, s.event, s.locationid, s.location, s.squadname, replace(s.team, 'Club', 'Team') AS team, s.athlete, s.gender
-  , CASE WHEN s.classification IN ('Senior/Varsity','Senior/Jr. Varsity') THEN 'Senior' WHEN s.classification IN ('Intermediate/Advanced', 'Intermediate/Entry Level', 'Rookie') THEN 'Intermediate Rookie' ELSE s.classification END classification
+  , CASE WHEN s.classification IN ('Senior/Varsity','Senior/Jr. Varsity') THEN 'Senior' WHEN s.classification IN ('Intermediate/Advanced', 'Intermediate/Entry Level') THEN 'Intermediate' WHEN s.classification = 'Rookie' THEN 'Rookie' ELSE s.classification END classification
   , s.round1, s.round2, s.round3, s.round4
   , GREATEST(GREATEST(GREATEST(GREATEST(GREATEST(GREATEST(GREATEST(s.round1, s.round2), s.round3), s.round4), s.round5), s.round6), s.round7), s.round8) total
   , row_number() OVER (PARTITION BY athlete ORDER BY GREATEST(GREATEST(GREATEST(GREATEST(GREATEST(GREATEST(GREATEST(s.round1, s.round2), s.round3), s.round4), s.round5), s.round6), s.round7), s.round8) DESC) AS seqnum
@@ -222,7 +222,7 @@ CREATE TABLE IF NOT EXISTS handicap (
 CREATE OR REPLACE VIEW handicapData AS
 WITH s AS (
   SELECT s.eventid, s.event, s.locationid, s.location, s.squadname, replace(s.team, 'Club', 'Team') AS team, s.athlete, s.gender
-  , CASE WHEN s.classification IN ('Senior/Varsity','Senior/Jr. Varsity') THEN 'Senior' WHEN s.classification IN ('Intermediate/Advanced', 'Intermediate/Entry Level', 'Rookie') THEN 'Intermediate Rookie' ELSE s.classification END classification
+  , CASE WHEN s.classification IN ('Senior/Varsity','Senior/Jr. Varsity') THEN 'Senior' WHEN s.classification IN ('Intermediate/Advanced', 'Intermediate/Entry Level') THEN 'Intermediate' WHEN s.classification = 'Rookie' THEN 'Rookie' ELSE s.classification END classification
   , s.round1, s.round2, s.round3, s.round4
   , GREATEST(GREATEST(GREATEST(GREATEST(GREATEST(GREATEST(s.round1 + s.round2, s.round2 + s.round3), s.round3 + s.round4), s.round4 + s.round5), s.round5 + s.round6), s.round6 + s.round7), s.round7 + s.round8) total
   , row_number() OVER (PARTITION BY athlete ORDER BY GREATEST(GREATEST(GREATEST(GREATEST(GREATEST(GREATEST(s.round1 + s.round2, s.round2 + s.round3), s.round3 + s.round4), s.round4 + s.round5), s.round5 + s.round6), s.round6 + s.round7), s.round7 + s.round8) DESC) AS seqnum
@@ -313,7 +313,7 @@ CREATE TABLE IF NOT EXISTS skeet (
 CREATE OR REPLACE VIEW skeetData AS
 WITH s AS (
   SELECT s.eventid, s.event, s.locationid, s.location, s.squadname, replace(s.team, 'Club', 'Team') AS team, s.athlete, s.gender
-    , CASE WHEN s.classification IN ('Senior/Varsity','Senior/Jr. Varsity') THEN 'Senior' WHEN s.classification IN ('Intermediate/Advanced', 'Intermediate/Entry Level', 'Rookie') THEN 'Intermediate Rookie' ELSE s.classification END classification
+    , CASE WHEN s.classification IN ('Senior/Varsity','Senior/Jr. Varsity') THEN 'Senior' WHEN s.classification IN ('Intermediate/Advanced', 'Intermediate/Entry Level') THEN 'Intermediate' WHEN s.classification = 'Rookie' THEN 'Rookie' ELSE s.classification END classification
   , s.round1, s.round2, s.round3, s.round4
   , GREATEST(GREATEST(GREATEST(GREATEST(GREATEST(GREATEST(s.round1 + s.round2, s.round2 + s.round3), s.round3 + s.round4), s.round4 + s.round5), s.round5 + s.round6), s.round6 + s.round7), s.round7 + s.round8) total
   , row_number() OVER (PARTITION BY athlete ORDER BY GREATEST(GREATEST(GREATEST(GREATEST(GREATEST(GREATEST(s.round1 + s.round2, s.round2 + s.round3), s.round3 + s.round4), s.round4 + s.round5), s.round5 + s.round6), s.round6 + s.round7), s.round7 + s.round8) DESC) AS seqnum
