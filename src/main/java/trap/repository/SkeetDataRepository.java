@@ -7,4 +7,6 @@ import java.util.List;
 
 public interface SkeetDataRepository extends Repository<SkeetAggregate, String> {
     List<SkeetAggregate> getAllByGender(String gender);
+
+    List<SkeetAggregate> getAllByGenderAndClassification(String gender, String classification);
 }

@@ -7,4 +7,6 @@ import java.util.List;
 
 public interface SinglesDataRepository extends Repository<SinglesAggregate, String> {
     List<SinglesAggregate> getAllByGender(String gender);
+
+    List<SinglesAggregate> getAllByGenderAndClassification(String gender, String classification);
 }
