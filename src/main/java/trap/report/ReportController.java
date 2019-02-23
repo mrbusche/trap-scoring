@@ -251,12 +251,20 @@ public class ReportController {
         int maxRow = rows;
         System.out.println("max row being set::" + rows);
         int classificationStartRow;
+        boolean secondRow = false;
         for (String classification : classificationList) {
             System.out.println("classification::" + classification);
             System.out.println("maxRow var::" + maxRow);
             int column = 1;
             updateRow = maxRow;
             classificationStartRow = updateRow;
+            //Add blank row
+            if (secondRow) {
+                row = sheet.createRow(++updateRow);
+                cell = row.createCell(column);
+                cell.setCellValue("");
+            }
+            secondRow = true;
             //Add row headers
             row = sheet.createRow(++updateRow);
             cell = row.createCell(column);
