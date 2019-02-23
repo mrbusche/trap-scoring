@@ -31,7 +31,9 @@ import trap.repository.SkeetDataTeamRepository;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
@@ -51,6 +53,7 @@ public class ReportController {
     private final AllDataRepository allDataRepository;
 
     private final List<String> classificationList = Arrays.asList("Varsity", "Junior Varsity", "Intermediate Advanced", "Intermediate Entry", "Rookie");
+    private final String currentDate = new SimpleDateFormat("MM/dd/yyyy").format(Calendar.getInstance().getTime());
 
     @Autowired
     public ReportController(SinglesDataRepository singlesRepository, SinglesDataTeamRepository singlesDataTeamRepository, DoublesDataRepository doublesDataRepository, DoublesDataTeamRepository doublesDataTeamRepository, HandicapDataRepository handicapDataRepository, HandicapDataTeamRepository handicapDataTeamRepository, SkeetDataRepository skeetDataRepository, SkeetDataTeamRepository skeetDataTeamRepository, AllDataRepository allDataRepository) {
@@ -193,8 +196,9 @@ public class ReportController {
     }
 
     private void populateTeamData(Sheet sheet, String teamType) {
+        setCurrentDateHeader(sheet);
+
         int rows = sheet.getLastRowNum();
-        Cell cell;
         Row row;
 
         int updateRow = rows;
@@ -202,10 +206,7 @@ public class ReportController {
         List<SinglesTeamAggregate> singlesTeamData = singlesDataTeamRepository.getAllByClassificationOrderByTotalDesc(teamType);
         for (SinglesTeamAggregate singlesTeamRowData : singlesTeamData) {
             row = sheet.createRow(++updateRow);
-            cell = row.createCell(startColumn);
-            cell.setCellValue(singlesTeamRowData.getTeam());
-            cell = row.createCell(startColumn + 1);
-            cell.setCellValue(singlesTeamRowData.getTotal());
+            addTeamData(row, startColumn, singlesTeamRowData.getTeam(), singlesTeamRowData.getTotal());
         }
         startColumn += 3;
 
@@ -213,10 +214,7 @@ public class ReportController {
         List<HandicapTeamAggregate> handicapTeamData = handicapDataTeamRepository.getAllByClassificationOrderByTotalDesc(teamType);
         for (HandicapTeamAggregate handicapTeamRowData : handicapTeamData) {
             row = sheet.getRow(++updateRow);
-            cell = row.createCell(startColumn);
-            cell.setCellValue(handicapTeamRowData.getTeam());
-            cell = row.createCell(startColumn + 1);
-            cell.setCellValue(handicapTeamRowData.getTotal());
+            addTeamData(row, startColumn, handicapTeamRowData.getTeam(), handicapTeamRowData.getTotal());
         }
         startColumn += 3;
 
@@ -224,10 +222,7 @@ public class ReportController {
         List<DoublesTeamAggregate> doublesTeamData = doublesDataTeamRepository.getAllByClassificationOrderByTotalDesc(teamType);
         for (DoublesTeamAggregate doublesTeamRowData : doublesTeamData) {
             row = sheet.getRow(++updateRow);
-            cell = row.createCell(startColumn);
-            cell.setCellValue(doublesTeamRowData.getTeam());
-            cell = row.createCell(startColumn + 1);
-            cell.setCellValue(doublesTeamRowData.getTotal());
+            addTeamData(row, startColumn, doublesTeamRowData.getTeam(), doublesTeamRowData.getTotal());
         }
         startColumn += 3;
 
@@ -235,14 +230,13 @@ public class ReportController {
         List<SkeetTeamAggregate> skeetTeamData = skeetDataTeamRepository.getAllByClassificationOrderByTotalDesc(teamType);
         for (SkeetTeamAggregate skeetTeamRowData : skeetTeamData) {
             row = sheet.getRow(++updateRow);
-            cell = row.createCell(startColumn);
-            cell.setCellValue(skeetTeamRowData.getTeam());
-            cell = row.createCell(startColumn + 1);
-            cell.setCellValue(skeetTeamRowData.getTotal());
+            addTeamData(row, startColumn, skeetTeamRowData.getTeam(), skeetTeamRowData.getTotal());
         }
     }
 
     private void populateIndividualData(Sheet sheet, String gender) {
+        setCurrentDateHeader(sheet);
+
         int rows = sheet.getLastRowNum();
         Cell cell;
         Row row;
@@ -279,12 +273,7 @@ public class ReportController {
 
             for (SinglesAggregate singlesRowData : individualSinglesData) {
                 row = sheet.createRow(++updateRow);
-                cell = row.createCell(column);
-                cell.setCellValue(singlesRowData.getAthlete());
-                cell = row.createCell(column + 1);
-                cell.setCellValue(singlesRowData.getTotal());
-                cell = row.createCell(column + 2);
-                cell.setCellValue(singlesRowData.getTeam());
+                addPlayerData(row, column, singlesRowData.getAthlete(), singlesRowData.getTotal(), singlesRowData.getTeam());
             }
             column += 4;
             maxRow = Math.max(maxRow, updateRow);
@@ -294,45 +283,50 @@ public class ReportController {
             List<HandicapAggregate> individualHandicapData = handicapDataRepository.getAllByGenderAndClassification(gender, classification);
             for (HandicapAggregate handicapRowData : individualHandicapData) {
                 row = sheet.getRow(++updateRow);
-                cell = row.createCell(column);
-                cell.setCellValue(handicapRowData.getAthlete());
-                cell = row.createCell(column + 1);
-                cell.setCellValue(handicapRowData.getTotal());
-                cell = row.createCell(column + 2);
-                cell.setCellValue(handicapRowData.getTeam());
+                addPlayerData(row, column, handicapRowData.getAthlete(), handicapRowData.getTotal(), handicapRowData.getTeam());
             }
             column += 4;
 
             updateRow = classificationStartRow;
             updateRow++;
             List<DoublesAggregate> doublesIndividualData = doublesDataRepository.getAllByGenderAndClassification(gender, classification);
-            for (DoublesAggregate handicapRowData : doublesIndividualData) {
+            for (DoublesAggregate doublesRowData : doublesIndividualData) {
                 row = sheet.getRow(++updateRow);
-                cell = row.createCell(column);
-                cell.setCellValue(handicapRowData.getAthlete());
-                cell = row.createCell(column + 1);
-                cell.setCellValue(handicapRowData.getTotal());
-                cell = row.createCell(column + 2);
-                cell.setCellValue(handicapRowData.getTeam());
+                addPlayerData(row, column, doublesRowData.getAthlete(), doublesRowData.getTotal(), doublesRowData.getTeam());
             }
             column += 4;
 
             updateRow = classificationStartRow;
             updateRow++;
             List<SkeetAggregate> skeetIndividualData = skeetDataRepository.getAllByGenderAndClassification(gender, classification);
-            for (SkeetAggregate handicapRowData : skeetIndividualData) {
+            for (SkeetAggregate skeetRowData : skeetIndividualData) {
                 row = sheet.getRow(++updateRow);
-                cell = row.createCell(column);
-                cell.setCellValue(handicapRowData.getAthlete());
-                cell = row.createCell(column + 1);
-                cell.setCellValue(handicapRowData.getTotal());
-                cell = row.createCell(column + 2);
-                cell.setCellValue(handicapRowData.getTeam());
+                addPlayerData(row, column, skeetRowData.getAthlete(), skeetRowData.getTotal(), skeetRowData.getTeam());
             }
             maxRow = Math.max(maxRow, updateRow);
         }
 
-        sheet.setAutoFilter(CellRangeAddress.valueOf("A2:X2"));
+        sheet.setAutoFilter(CellRangeAddress.valueOf("A13:X13"));
+    }
+
+    private void setCurrentDateHeader(Sheet sheet) {
+        sheet.getRow(9).getCell(1).setCellValue(sheet.getRow(9).getCell(1).getStringCellValue() + currentDate);
+    }
+
+    private static void addTeamData(Row row, int startColumn, String team, Integer total) {
+        Cell cell = row.createCell(startColumn);
+        cell.setCellValue(team);
+        cell = row.createCell(startColumn + 1);
+        cell.setCellValue(total);
+    }
+
+    private static void addPlayerData(Row row, int column, String athlete, Integer total, String team) {
+        Cell cell = row.createCell(column);
+        cell.setCellValue(athlete);
+        cell = row.createCell(column + 1);
+        cell.setCellValue(total);
+        cell = row.createCell(column + 2);
+        cell.setCellValue(team);
     }
 
     private static void autoSizeColumns(Workbook workbook) {
