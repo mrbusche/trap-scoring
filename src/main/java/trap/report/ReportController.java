@@ -249,22 +249,19 @@ public class ReportController {
 
         int updateRow;
         int maxRow = rows;
-        System.out.println("max row being set::" + rows);
         int classificationStartRow;
-        boolean secondRow = false;
+        boolean addBlankRowForHeader = false;
         for (String classification : classificationList) {
-            System.out.println("classification::" + classification);
-            System.out.println("maxRow var::" + maxRow);
             int column = 1;
             updateRow = maxRow;
-            classificationStartRow = updateRow;
             //Add blank row
-            if (secondRow) {
+            if (addBlankRowForHeader) {
                 row = sheet.createRow(++updateRow);
                 cell = row.createCell(column);
                 cell.setCellValue("");
             }
-            secondRow = true;
+            addBlankRowForHeader = true;
+            classificationStartRow = updateRow;
             //Add row headers
             row = sheet.createRow(++updateRow);
             cell = row.createCell(column);
@@ -278,7 +275,6 @@ public class ReportController {
             cell = row.createCell(column + 16);
             cell.setCellValue(classification);
 
-            System.out.println("updateRow equal maxRow::" + updateRow);
             List<SinglesAggregate> individualSinglesData = singlesRepository.getAllByGenderAndClassification(gender, classification);
 
             for (SinglesAggregate singlesRowData : individualSinglesData) {
@@ -295,7 +291,6 @@ public class ReportController {
 
             updateRow = classificationStartRow;
             updateRow++;
-
             List<HandicapAggregate> individualHandicapData = handicapDataRepository.getAllByGenderAndClassification(gender, classification);
             for (HandicapAggregate handicapRowData : individualHandicapData) {
                 row = sheet.getRow(++updateRow);
