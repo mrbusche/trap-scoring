@@ -8,8 +8,8 @@ spring:
     #show-sql: true
     open-in-view: false
 trap:
-  singles: C:/Users/buschm3/Desktop/trap/singles.csv
-  doubles: C:/Users/buschm3/Desktop/trap/doubles.csv
-  handicap: C:/Users/buschm3/Desktop/trap/handicap.csv
-  skeet: C:/Users/buschm3/Desktop/trap/skeet.csv
-  clays: C:/Users/buschm3/Desktop/trap/clays.csv
+  singles: C:/trap/singles.csv
+  doubles: C:/trap/doubles.csv
+  handicap: C:/trap/handicap.csv
+  skeet: C:/trap/skeet.csv
+  clays: C:/trap/clays.csv
