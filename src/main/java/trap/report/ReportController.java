@@ -50,8 +50,7 @@ public class ReportController {
     private final SkeetDataTeamRepository skeetDataTeamRepository;
     private final AllDataRepository allDataRepository;
 
-    //Senior, Intermediate, Rookie, Collegiate
-    private final List<String> classificationList = Arrays.asList("Senior", "Intermediate", "Rookie", "Collegiate");
+    private final List<String> classificationList = Arrays.asList("Varsity", "Junior Varsity", "Intermediate Advanced", "Intermediate Entry", "Rookie");
 
     @Autowired
     public ReportController(SinglesDataRepository singlesRepository, SinglesDataTeamRepository singlesDataTeamRepository, DoublesDataRepository doublesDataRepository, DoublesDataTeamRepository doublesDataTeamRepository, HandicapDataRepository handicapDataRepository, HandicapDataTeamRepository handicapDataTeamRepository, SkeetDataRepository skeetDataRepository, SkeetDataTeamRepository skeetDataTeamRepository, AllDataRepository allDataRepository) {
@@ -81,11 +80,11 @@ public class ReportController {
         result.append("<br>Clean data populated in ").append(System.currentTimeMillis() - start).append("ms");
 
         start = System.currentTimeMillis();
-        populateTeamData(workbook.getSheet("Team-Senior"), "Senior");
+        populateTeamData(workbook.getSheet("Team-Senior"), "Varsity");
         result.append("<br>Senior data populated in ").append(System.currentTimeMillis() - start).append("ms");
 
         start = System.currentTimeMillis();
-        populateTeamData(workbook.getSheet("Team-Intermediate"), "Intermediate");
+        populateTeamData(workbook.getSheet("Team-Intermediate"), "Intermediate Entry");
         result.append("<br>Intermediate data populated in ").append(System.currentTimeMillis() - start).append("ms");
 
         start = System.currentTimeMillis();
@@ -261,19 +260,18 @@ public class ReportController {
             //Add row headers
             row = sheet.createRow(++updateRow);
             cell = row.createCell(column);
-            cell.setCellValue(classification + " Division");
+            cell.setCellValue(classification);
             cell = row.createCell(column + 4);
-            cell.setCellValue(classification + " Division");
+            cell.setCellValue(classification);
             cell = row.createCell(column + 8);
-            cell.setCellValue(classification + " Division");
+            cell.setCellValue(classification);
             cell = row.createCell(column + 12);
-            cell.setCellValue(classification + " Division");
+            cell.setCellValue(classification);
             cell = row.createCell(column + 16);
-            cell.setCellValue(classification + " Division");
+            cell.setCellValue(classification);
 
             System.out.println("updateRow equal maxRow::" + updateRow);
             List<SinglesAggregate> individualSinglesData = singlesRepository.getAllByGenderAndClassification(gender, classification);
-            System.out.println("individualSinglesData count::" + individualSinglesData.size());
 
             for (SinglesAggregate singlesRowData : individualSinglesData) {
                 row = sheet.createRow(++updateRow);
@@ -291,7 +289,6 @@ public class ReportController {
             updateRow++;
 
             List<HandicapAggregate> individualHandicapData = handicapDataRepository.getAllByGenderAndClassification(gender, classification);
-            System.out.println("individualHandicapData count::" + individualHandicapData.size());
             for (HandicapAggregate handicapRowData : individualHandicapData) {
                 row = sheet.getRow(++updateRow);
                 cell = row.createCell(column);
@@ -300,14 +297,12 @@ public class ReportController {
                 cell.setCellValue(handicapRowData.getTotal());
                 cell = row.createCell(column + 2);
                 cell.setCellValue(handicapRowData.getTeam());
-
             }
             column += 4;
 
             updateRow = classificationStartRow;
             updateRow++;
             List<DoublesAggregate> doublesIndividualData = doublesDataRepository.getAllByGenderAndClassification(gender, classification);
-            System.out.println("doublesIndividualData count::" + doublesIndividualData.size());
             for (DoublesAggregate handicapRowData : doublesIndividualData) {
                 row = sheet.getRow(++updateRow);
                 cell = row.createCell(column);
@@ -322,7 +317,6 @@ public class ReportController {
             updateRow = classificationStartRow;
             updateRow++;
             List<SkeetAggregate> skeetIndividualData = skeetDataRepository.getAllByGenderAndClassification(gender, classification);
-            System.out.println("skeetIndividualData count::" + skeetIndividualData.size());
             for (SkeetAggregate handicapRowData : skeetIndividualData) {
                 row = sheet.getRow(++updateRow);
                 cell = row.createCell(column);
