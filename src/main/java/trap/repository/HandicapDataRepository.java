@@ -6,7 +6,5 @@ import trap.model.HandicapAggregate;
 import java.util.List;
 
 public interface HandicapDataRepository extends Repository<HandicapAggregate, String> {
-    List<HandicapAggregate> getAllByGender(String gender);
-
     List<HandicapAggregate> getAllByGenderAndClassification(String gender, String classification);
 }
