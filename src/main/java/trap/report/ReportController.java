@@ -103,7 +103,7 @@ public class ReportController {
         result.append("<br>Individual Women data populated in ").append(System.currentTimeMillis() - start).append("ms");
 
         start = System.currentTimeMillis();
-        autoSizeColumns(workbook);
+        //autoSizeColumns(workbook);
         result.append("<br>Auto sized all columns in ").append(System.currentTimeMillis() - start).append("ms");
 
         FileOutputStream fileOutputStream = new FileOutputStream("updated.xls");
