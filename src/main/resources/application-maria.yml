@@ -1,0 +1,23 @@
+trap:
+  singles: C:/trap/singles.csv
+  doubles: C:/trap/doubles.csv
+  handicap: C:/trap/handicap.csv
+  skeet: C:/trap/skeet.csv
+  clays: C:/trap/clays.csv
+
+mariaDB4j:
+  dataDir: ./data/local
+  port: 3307
+app:
+  mariaDB4j:
+    databaseName: trap
+spring:
+  datasource:
+    url: jdbc:mariadb://localhost:3307/
+    username: root
+    password:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    initialization-mode: always
+  jpa:
+    database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
+    generate-ddl: true
