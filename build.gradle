@@ -31,10 +31,9 @@ allprojects {
     apply plugin: 'war'
     apply plugin: 'org.springframework.boot'
     apply plugin: 'io.spring.dependency-management'
-    //apply plugin: 'groovy'
 
-    sourceCompatibility = 1.8
-    targetCompatibility = 1.8
+    sourceCompatibility = 1.11
+    targetCompatibility = 1.11
 
     dependencies {
         compile 'org.springframework.boot:spring-boot-starter-web'
