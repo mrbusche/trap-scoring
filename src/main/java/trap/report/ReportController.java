@@ -10,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import trap.model.AllData;
+import trap.model.ClaysAggregate;
+import trap.model.ClaysTeamAggregate;
 import trap.model.DoublesAggregate;
 import trap.model.DoublesTeamAggregate;
 import trap.model.HandicapAggregate;
@@ -19,6 +21,8 @@ import trap.model.SinglesTeamAggregate;
 import trap.model.SkeetAggregate;
 import trap.model.SkeetTeamAggregate;
 import trap.repository.AllDataRepository;
+import trap.repository.ClaysDataRepository;
+import trap.repository.ClaysDataTeamRepository;
 import trap.repository.DoublesDataRepository;
 import trap.repository.DoublesDataTeamRepository;
 import trap.repository.HandicapDataRepository;
@@ -50,13 +54,15 @@ public class ReportController {
     private final HandicapDataTeamRepository handicapDataTeamRepository;
     private final SkeetDataRepository skeetDataRepository;
     private final SkeetDataTeamRepository skeetDataTeamRepository;
+    private final ClaysDataRepository claysDataRepository;
+    private final ClaysDataTeamRepository claysDataTeamRepository;
     private final AllDataRepository allDataRepository;
 
     private final List<String> classificationList = Arrays.asList("Varsity", "Junior Varsity", "Intermediate Advanced", "Intermediate Entry", "Rookie");
     private final String currentDate = new SimpleDateFormat("MM/dd/yyyy").format(Calendar.getInstance().getTime());
 
     @Autowired
-    public ReportController(SinglesDataRepository singlesRepository, SinglesDataTeamRepository singlesDataTeamRepository, DoublesDataRepository doublesDataRepository, DoublesDataTeamRepository doublesDataTeamRepository, HandicapDataRepository handicapDataRepository, HandicapDataTeamRepository handicapDataTeamRepository, SkeetDataRepository skeetDataRepository, SkeetDataTeamRepository skeetDataTeamRepository, AllDataRepository allDataRepository) {
+    public ReportController(SinglesDataRepository singlesRepository, SinglesDataTeamRepository singlesDataTeamRepository, DoublesDataRepository doublesDataRepository, DoublesDataTeamRepository doublesDataTeamRepository, HandicapDataRepository handicapDataRepository, HandicapDataTeamRepository handicapDataTeamRepository, SkeetDataRepository skeetDataRepository, SkeetDataTeamRepository skeetDataTeamRepository, ClaysDataRepository claysDataRepository, ClaysDataTeamRepository claysDataTeamRepository, AllDataRepository allDataRepository) {
         this.singlesRepository = singlesRepository;
         this.singlesDataTeamRepository = singlesDataTeamRepository;
         this.doublesDataRepository = doublesDataRepository;
@@ -65,6 +71,8 @@ public class ReportController {
         this.handicapDataTeamRepository = handicapDataTeamRepository;
         this.skeetDataRepository = skeetDataRepository;
         this.skeetDataTeamRepository = skeetDataTeamRepository;
+        this.claysDataRepository = claysDataRepository;
+        this.claysDataTeamRepository = claysDataTeamRepository;
         this.allDataRepository = allDataRepository;
     }
 
@@ -103,7 +111,7 @@ public class ReportController {
         result.append("<br>Individual Women data populated in ").append(System.currentTimeMillis() - start).append("ms");
 
         start = System.currentTimeMillis();
-        //autoSizeColumns(workbook);
+        autoSizeColumns(workbook);
         result.append("<br>Auto sized all columns in ").append(System.currentTimeMillis() - start).append("ms");
 
         FileOutputStream fileOutputStream = new FileOutputStream("updated.xls");
@@ -234,6 +242,14 @@ public class ReportController {
                 row = sheet.getRow(++updateRow);
                 addTeamData(row, startColumn, skeetTeamRowData.getTeam(), skeetTeamRowData.getTotal());
             }
+            startColumn += 3;
+
+            updateRow = rows;
+            List<ClaysTeamAggregate> claysTeamData = claysDataTeamRepository.getAllByClassificationOrderByTotalDesc(teamType);
+            for (ClaysTeamAggregate claysTeamRowData : claysTeamData) {
+                row = sheet.getRow(++updateRow);
+                addTeamData(row, startColumn, claysTeamRowData.getTeam(), claysTeamRowData.getTotal());
+            }
         }
     }
 
@@ -306,10 +322,19 @@ public class ReportController {
                 row = sheet.getRow(++updateRow);
                 addPlayerData(row, column, skeetRowData.getAthlete(), skeetRowData.getTotal(), skeetRowData.getTeam());
             }
+            column += 4;
+
+            updateRow = classificationStartRow;
+            updateRow++;
+            List<ClaysAggregate> claysIndividualData = claysDataRepository.getAllByGenderAndClassification(gender, classification);
+            for (ClaysAggregate claysRowData : claysIndividualData) {
+                row = sheet.getRow(++updateRow);
+                addPlayerData(row, column, claysRowData.getAthlete(), claysRowData.getTotal(), claysRowData.getTeam());
+            }
             maxRow = Math.max(maxRow, updateRow);
         }
 
-        sheet.setAutoFilter(CellRangeAddress.valueOf("A13:X13"));
+        sheet.setAutoFilter(CellRangeAddress.valueOf("A13:T13"));
     }
 
     private void setCurrentDateHeader(Sheet sheet) {

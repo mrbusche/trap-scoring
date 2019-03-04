@@ -400,6 +400,61 @@ CREATE TABLE IF NOT EXISTS clays (
     NSSAPaymenT VARCHAR(16)
 );
 
+-- top 3 scores only
+CREATE OR REPLACE VIEW claysData AS
+  WITH s AS (
+    SELECT s.eventid, s.event, s.locationid, s.location, s.squadname, replace(s.team, 'Club', 'Team') AS team, s.athlete, s.gender
+         , CASE WHEN s.classification = 'Senior/Varsity' THEN 'Varsity' WHEN s.classification = 'Senior/Jr. Varsity' THEN 'Junior Varsity' WHEN s.classification = 'Intermediate/Advanced' THEN 'Intermediate Advanced' WHEN s.classification = 'Intermediate/Entry Level' THEN 'Intermediate Entry' WHEN s.classification = 'Rookie' THEN 'Rookie' ELSE s.classification END classification
+         , s.round1, s.round2, s.round3, s.round4
+         , GREATEST(GREATEST(GREATEST(GREATEST(GREATEST(GREATEST(s.round1 + s.round2, s.round2 + s.round3), s.round3 + s.round4), s.round4 + s.round5), s.round5 + s.round6), s.round6 + s.round7), s.round7 + s.round8) total
+         , row_number() OVER (PARTITION BY athlete ORDER BY GREATEST(GREATEST(GREATEST(GREATEST(GREATEST(GREATEST(s.round1 + s.round2, s.round2 + s.round3), s.round3 + s.round4), s.round4 + s.round5), s.round5 + s.round6), s.round6 + s.round7), s.round7 + s.round8) DESC) AS seqnum
+    FROM clays s
+    WHERE s.locationid > 0
+    ORDER BY athlete, total DESC
+    ),
+    s3 AS (
+      SELECT s.*
+      FROM s
+      where seqnum <= 2
+      )
+    SELECT *
+    FROM s3
+    UNION ALL
+    (
+      SELECT eventid, event, locationid, location, squadname, team, athlete, gender, classification, round1, round2, round3, round4, total, fourth
+      FROM (
+             SELECT eventid, event, locationid, location, squadname, team, unreal.athlete, gender, classification, round1, round2, round3, round4, total, seqnum, row_number() OVER (PARTITION BY unreal.athlete ORDER BY total DESC) AS fourth
+             FROM s,
+                  (SELECT s3.athlete, CASE WHEN COUNT(DISTINCT s3.locationid) = 1 THEN 'Next' ELSE 'Four' END numberfour, (SELECT DISTINCT s3.locationid) dontuselocid
+                   FROM s
+                          INNER JOIN s3 ON s.athlete = s3.athlete
+                   GROUP BY s.athlete) unreal
+             WHERE s.athlete = unreal.athlete
+               AND seqnum > 2
+               AND CASE WHEN numberfour = 'four' THEN seqnum = 3 ELSE locationid != dontuselocid END
+           ) bananas
+      WHERE fourth = 1
+    );
+
+CREATE OR REPLACE VIEW claysAggregate AS
+SELECT athlete, classification, gender, team, SUM(total) total
+FROM (
+       SELECT athlete, classification, gender, total, team
+       FROM claysdata
+     ) a
+GROUP BY athlete, classification, gender
+ORDER BY total DESC;
+
+CREATE OR REPLACE VIEW claysTeamAggregate AS
+SELECT team, classification, SUM(total) total
+FROM (
+       SELECT team, classification, total, row_number() OVER (PARTITION BY team, classification ORDER BY total DESC ) AS segnum
+       FROM claysaggregate
+       ORDER BY team, classification, total DESC
+     ) a
+WHERE segnum <= 3
+GROUP BY team, classification
+ORDER BY total DESC;
 
 CREATE OR REPLACE VIEW allData AS
 SELECT *, 'singles' as type
