@@ -38,7 +38,6 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Calendar;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 
@@ -361,15 +360,7 @@ public class ReportController {
         int numberOfSheets = workbook.getNumberOfSheets();
         for (int sheetNum = 0; sheetNum < numberOfSheets; sheetNum++) {
             Sheet sheet = workbook.getSheetAt(sheetNum);
-            if (sheet.getPhysicalNumberOfRows() > 0) {
-                Row row = sheet.getRow(sheet.getFirstRowNum());
-                Iterator<Cell> cellIterator = row.cellIterator();
-                while (cellIterator.hasNext()) {
-                    Cell cell = cellIterator.next();
-                    int columnIndex = cell.getColumnIndex();
-                    sheet.autoSizeColumn(columnIndex);
-                }
-            }
+            sheet.autoSizeColumn(sheetNum);
         }
     }
 
