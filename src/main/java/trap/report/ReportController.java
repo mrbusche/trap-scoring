@@ -372,7 +372,7 @@ public class ReportController {
 
     private static void autoSizeColumns(Workbook workbook) {
         int numberOfSheets = workbook.getNumberOfSheets();
-        for (int sheetNum = 0; sheetNum < numberOfSheets; sheetNum++) {
+        for (int sheetNum = 1; sheetNum < numberOfSheets; sheetNum++) {
             Sheet sheet = workbook.getSheetAt(sheetNum);
             if (sheet.getPhysicalNumberOfRows() > 0) {
                 Row row = sheet.getRow(sheet.getFirstRowNum());
