@@ -112,14 +112,37 @@ CREATE TABLE IF NOT EXISTS doubles (
 -- top 4 scores for individual rounds
 CREATE OR REPLACE VIEW doublesData AS
 WITH s AS (
+  SELECT eventid, event, locationid, location, squadname, team, athlete, gender, classification, round1, round2, round3, round4, total, row_number() OVER (PARTITION BY athlete ORDER BY total DESC) AS seqnum
+  FROM (
   SELECT s.eventid, s.event, s.locationid, s.location, s.squadname, replace(s.team, 'Club', 'Team') AS team, s.athlete, s.gender
-  , CASE WHEN s.classification = 'Senior/Varsity' THEN 'Varsity' WHEN s.classification = 'Senior/Jr. Varsity' THEN 'Junior Varsity' WHEN s.classification = 'Intermediate/Advanced' THEN 'Intermediate Advanced' WHEN s.classification = 'Intermediate/Entry Level' THEN 'Intermediate Entry' WHEN s.classification = 'Rookie' THEN 'Rookie' ELSE s.classification END classification
-  , s.round1, s.round2, s.round3, s.round4
-  , GREATEST(GREATEST(GREATEST(GREATEST(GREATEST(GREATEST(GREATEST(s.round1, s.round2), s.round3), s.round4), s.round5), s.round6), s.round7), s.round8) total
-  , row_number() OVER (PARTITION BY athlete ORDER BY GREATEST(GREATEST(GREATEST(GREATEST(GREATEST(GREATEST(GREATEST(s.round1, s.round2), s.round3), s.round4), s.round5), s.round6), s.round7), s.round8) DESC) AS seqnum
+       , CASE WHEN s.classification = 'Senior/Varsity' THEN 'Varsity' WHEN s.classification = 'Senior/Jr. Varsity' THEN 'Junior Varsity' WHEN s.classification = 'Intermediate/Advanced' THEN 'Intermediate Advanced' WHEN s.classification = 'Intermediate/Entry Level' THEN 'Intermediate Entry' WHEN s.classification = 'Rookie' THEN 'Rookie' ELSE s.classification END classification
+       , s.round1, s.round2, s.round3, s.round4
+       , s.round1 total
   FROM doubles s
-    WHERE s.locationid > 0
-    ORDER BY athlete, total DESC
+  WHERE s.locationid > 0
+  UNION
+  SELECT s.eventid, s.event, s.locationid, s.location, s.squadname, replace(s.team, 'Club', 'Team') AS team, s.athlete, s.gender
+       , CASE WHEN s.classification = 'Senior/Varsity' THEN 'Varsity' WHEN s.classification = 'Senior/Jr. Varsity' THEN 'Junior Varsity' WHEN s.classification = 'Intermediate/Advanced' THEN 'Intermediate Advanced' WHEN s.classification = 'Intermediate/Entry Level' THEN 'Intermediate Entry' WHEN s.classification = 'Rookie' THEN 'Rookie' ELSE s.classification END classification
+       , s.round1, s.round2, s.round3, s.round4
+       , s.round2 total
+  FROM doubles s
+  WHERE s.locationid > 0
+  UNION
+  SELECT s.eventid, s.event, s.locationid, s.location, s.squadname, replace(s.team, 'Club', 'Team') AS team, s.athlete, s.gender
+       , CASE WHEN s.classification = 'Senior/Varsity' THEN 'Varsity' WHEN s.classification = 'Senior/Jr. Varsity' THEN 'Junior Varsity' WHEN s.classification = 'Intermediate/Advanced' THEN 'Intermediate Advanced' WHEN s.classification = 'Intermediate/Entry Level' THEN 'Intermediate Entry' WHEN s.classification = 'Rookie' THEN 'Rookie' ELSE s.classification END classification
+       , s.round1, s.round2, s.round3, s.round4
+       , s.round3 total
+  FROM doubles s
+  WHERE s.locationid > 0
+  UNION
+  SELECT s.eventid, s.event, s.locationid, s.location, s.squadname, replace(s.team, 'Club', 'Team') AS team, s.athlete, s.gender
+       , CASE WHEN s.classification = 'Senior/Varsity' THEN 'Varsity' WHEN s.classification = 'Senior/Jr. Varsity' THEN 'Junior Varsity' WHEN s.classification = 'Intermediate/Advanced' THEN 'Intermediate Advanced' WHEN s.classification = 'Intermediate/Entry Level' THEN 'Intermediate Entry' WHEN s.classification = 'Rookie' THEN 'Rookie' ELSE s.classification END classification
+       , s.round1, s.round2, s.round3, s.round4
+       , s.round4 total
+  FROM doubles s
+  WHERE s.locationid > 0
+  ) a
+  ORDER BY athlete, total DESC
 ),
 s3 AS (
   SELECT s.*
