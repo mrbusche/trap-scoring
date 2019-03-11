@@ -187,6 +187,8 @@ public class ReportController {
             cell = row.createCell(22);
             cell.setCellValue(rowData.getRegisteredby());
             cell = row.createCell(23);
+            cell.setCellValue(rowData.getFivestand());
+            cell = row.createCell(24);
             cell.setCellValue(rowData.getType());
         }
         sheet.setAutoFilter(CellRangeAddress.valueOf("A1:X1"));

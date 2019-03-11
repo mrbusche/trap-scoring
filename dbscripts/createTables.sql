@@ -415,16 +415,16 @@ GROUP BY team, classification
 ORDER BY total DESC;
 
 CREATE OR REPLACE VIEW allData AS
-SELECT *, 0 as fivestand, 'singles' as type
+SELECT *, 'N' as fivestand, 'singles' as type
 FROM singles
 UNION
-SELECT *, 0, 'doubles' as type
+SELECT *, 'N', 'doubles' as type
 FROM doubles
 UNION
-SELECT *, 0, 'handicap' as type
+SELECT *, 'N', 'handicap' as type
 FROM handicap
 UNION
-SELECT *, 0, 'skeet' as type
+SELECT *, 'N', 'skeet' as type
 FROM skeet
 UNION
 SELECT *, 'clays' as type
