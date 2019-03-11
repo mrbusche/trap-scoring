@@ -187,27 +187,9 @@ public class ReportController {
             cell = row.createCell(22);
             cell.setCellValue(rowData.getRegisteredby());
             cell = row.createCell(23);
-            cell.setCellValue(rowData.getShirtsize());
-            cell = row.createCell(24);
-            cell.setCellValue(rowData.getAtaid());
-            cell = row.createCell(25);
-            cell.setCellValue(rowData.getNssaid());
-            cell = row.createCell(26);
-            cell.setCellValue(rowData.getNscaid());
-            cell = row.createCell(27);
-            cell.setCellValue(rowData.getSctppayment());
-            cell = row.createCell(28);
-            cell.setCellValue(rowData.getSctpconsent());
-            cell = row.createCell(29);
-            cell.setCellValue(rowData.getAtapayment());
-            cell = row.createCell(30);
-            cell.setCellValue(rowData.getNscapayment());
-            cell = row.createCell(31);
-            cell.setCellValue(rowData.getNssapayment());
-            cell = row.createCell(32);
             cell.setCellValue(rowData.getType());
         }
-        sheet.setAutoFilter(CellRangeAddress.valueOf("A1:AG1"));
+        sheet.setAutoFilter(CellRangeAddress.valueOf("A1:X1"));
 
     }
 
