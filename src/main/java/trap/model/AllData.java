@@ -43,15 +43,6 @@ public class AllData {
     Integer backrun;
     String registerdate;
     String registeredby;
-    String shirtsize;
-    String ataid;
-    String nssaid;
-    String nscaid;
-    String sctppayment;
-    String sctpconsent;
-    String atapayment;
-    String nscapayment;
-    String nssapayment;
+    String fivestand;
     String type;
-
 }

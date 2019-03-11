@@ -415,7 +415,7 @@ GROUP BY team, classification
 ORDER BY total DESC;
 
 CREATE OR REPLACE VIEW allData AS
-SELECT *, 0, 'singles' as type
+SELECT *, 0 as fivestand, 'singles' as type
 FROM singles
 UNION
 SELECT *, 0, 'doubles' as type
