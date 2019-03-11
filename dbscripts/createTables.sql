@@ -364,7 +364,7 @@ CREATE OR REPLACE VIEW claysData AS
          , s.round1, s.round2, s.round3, s.round4
          , GREATEST(GREATEST(GREATEST(GREATEST(GREATEST(GREATEST(s.round1 + s.round2, s.round2 + s.round3), s.round3 + s.round4), s.round4 + s.round5), s.round5 + s.round6), s.round6 + s.round7), s.round7 + s.round8) total
          , row_number() OVER (PARTITION BY athlete ORDER BY GREATEST(GREATEST(GREATEST(GREATEST(GREATEST(GREATEST(s.round1 + s.round2, s.round2 + s.round3), s.round3 + s.round4), s.round4 + s.round5), s.round5 + s.round6), s.round6 + s.round7), s.round7 + s.round8) DESC) AS seqnum
-        , CASE WHEN fivestand = 'Y' THEN 1 ELSE 0 END fivestand
+        , CASE WHEN fivestand = 'Y' THEN 1 ELSE 0 END AS fivestand
     FROM clays s
     WHERE s.locationid > 0
     ORDER BY athlete, total DESC
@@ -378,10 +378,10 @@ CREATE OR REPLACE VIEW claysData AS
     FROM s3
     UNION ALL
     (
-      SELECT eventid, event, locationid, location, squadname, team, athlete, gender, classification, round1, round2, round3, round4, total, fourth, CASE WHEN fivestand = 'Y' THEN 1 ELSE 0 END fivestand
+      SELECT eventid, event, locationid, location, squadname, team, athlete, gender, classification, round1, round2, round3, round4, total, fourth, CASE WHEN fivestand = 'Y' THEN 1 ELSE 0 END AS fivestand
       FROM (
              SELECT eventid, event, locationid, location, squadname, team, unreal.athlete, gender, classification, round1, round2, round3, round4, total, seqnum, row_number() OVER (PARTITION BY unreal.athlete ORDER BY total DESC) AS fourth
-            , CASE WHEN fivestand = 'Y' THEN 1 ELSE 0 END fivestand
+            , CASE WHEN fivestand = 'Y' THEN 1 ELSE 0 END AS fivestand
              FROM s,
                   (SELECT s3.athlete, CASE WHEN COUNT(DISTINCT s3.locationid) = 1 THEN 'Next' ELSE 'Four' END numberfour, (SELECT DISTINCT s3.locationid) dontuselocid
                    FROM s
