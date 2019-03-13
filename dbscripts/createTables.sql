@@ -1,6 +1,6 @@
-set global local_infile=1;
+-- set global local_infile=1;
 
-USE trap;
+-- USE trap;
 CREATE TABLE IF NOT EXISTS singles (
     EventId VARCHAR(6),
     Event VARCHAR(50),
@@ -406,13 +406,13 @@ CREATE OR REPLACE VIEW claysData AS
              SELECT eventid, event, locationid, location, squadname, team, unreal.athlete, gender, classification, round1, round2, round3, round4, total, seqnum, row_number() OVER (PARTITION BY unreal.athlete ORDER BY total DESC) AS fourth
             , CASE WHEN fivestand = 'Y' THEN 1 ELSE 0 END AS fivestand
              FROM s,
-                  (SELECT s3.athlete, CASE WHEN COUNT(DISTINCT s3.locationid) = 1 THEN 'Next' ELSE 'Four' END numberfour, (SELECT DISTINCT s3.locationid) dontuselocid
+                  (SELECT s3.athlete, CASE WHEN COUNT(DISTINCT s3.locationid) = 1 THEN 'Next' WHEN SUM(s3.fivestand) > 0 THEN 'fivestandused' ELSE 'Four' END numberfour, (SELECT DISTINCT s3.locationid) dontuselocid
                    FROM s
                           INNER JOIN s3 ON s.athlete = s3.athlete
                    GROUP BY s.athlete) unreal
              WHERE s.athlete = unreal.athlete
                AND seqnum > 2
-               AND CASE WHEN numberfour = 'four' THEN seqnum = 3 ELSE locationid != dontuselocid END
+               AND CASE WHEN unreal.numberfour = 'four' THEN seqnum = 3 WHEN unreal.numberfour = 'fivestandused' THEN fivestand = 0 AND seqnum >= 3 ELSE locationid != dontuselocid END
            ) bananas
       WHERE fourth = 1
     );
