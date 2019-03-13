@@ -95,9 +95,16 @@ public class ReportController {
 
         Map<String, String> types = Map.of("Team-Senior", "Varsity", "Team-Intermediate", "Intermediate Entry", "Team-Rookie", "Rookie", "Team-Collegiate", "Collegiate");
 
+        //Set font for mainText
+        Font mainText = workbook.createFont();
+        mainText.setFontName("Calibri");
+        mainText.setFontHeightInPoints((short) 12);
+        CellStyle mainTextStyle = workbook.createCellStyle();
+        mainTextStyle.setFont(mainText);
+
         for (Map.Entry<String, String> entry : types.entrySet()) {
             start = System.currentTimeMillis();
-            populateTeamData(workbook.getSheet(entry.getKey()), entry.getValue());
+            populateTeamData(workbook.getSheet(entry.getKey()), entry.getValue(), mainTextStyle);
             result.append("<br>").append(entry.getKey()).append(" data populated in ").append(System.currentTimeMillis() - start).append("ms");
         }
 
@@ -111,11 +118,11 @@ public class ReportController {
         style.setFont(font);
 
         start = System.currentTimeMillis();
-        populateIndividualData(workbook.getSheet("Individual-Men"), "M", style);
+        populateIndividualData(workbook.getSheet("Individual-Men"), "M", style, mainTextStyle);
         result.append("<br>Individual Men data populated in ").append(System.currentTimeMillis() - start).append("ms");
 
         start = System.currentTimeMillis();
-        populateIndividualData(workbook.getSheet("Individual-Ladies"), "F", style);
+        populateIndividualData(workbook.getSheet("Individual-Ladies"), "F", style, mainTextStyle);
         result.append("<br>Individual Women data populated in ").append(System.currentTimeMillis() - start).append("ms");
 
         start = System.currentTimeMillis();
@@ -195,7 +202,7 @@ public class ReportController {
 
     }
 
-    private void populateTeamData(Sheet sheet, String teamType) {
+    private void populateTeamData(Sheet sheet, String teamType, CellStyle mainTextStyle) {
         setCurrentDateHeader(sheet);
 
         int rows = sheet.getLastRowNum();
@@ -206,7 +213,7 @@ public class ReportController {
         List<SinglesTeamAggregate> singlesTeamData = singlesDataTeamRepository.getAllByClassificationOrderByTotalDesc(teamType);
         for (SinglesTeamAggregate singlesTeamRowData : singlesTeamData) {
             row = sheet.createRow(++updateRow);
-            addTeamData(row, startColumn, singlesTeamRowData.getTeam(), singlesTeamRowData.getTotal());
+            addTeamData(row, startColumn, singlesTeamRowData.getTeam(), singlesTeamRowData.getTotal(), mainTextStyle);
         }
 
         if (!"Rookie".equals(teamType)) {
@@ -216,7 +223,7 @@ public class ReportController {
             List<HandicapTeamAggregate> handicapTeamData = handicapDataTeamRepository.getAllByClassificationOrderByTotalDesc(teamType);
             for (HandicapTeamAggregate handicapTeamRowData : handicapTeamData) {
                 row = sheet.getRow(++updateRow);
-                addTeamData(row, startColumn, handicapTeamRowData.getTeam(), handicapTeamRowData.getTotal());
+                addTeamData(row, startColumn, handicapTeamRowData.getTeam(), handicapTeamRowData.getTotal(), mainTextStyle);
             }
             startColumn += 3;
 
@@ -224,7 +231,7 @@ public class ReportController {
             List<DoublesTeamAggregate> doublesTeamData = doublesDataTeamRepository.getAllByClassificationOrderByTotalDesc(teamType);
             for (DoublesTeamAggregate doublesTeamRowData : doublesTeamData) {
                 row = sheet.getRow(++updateRow);
-                addTeamData(row, startColumn, doublesTeamRowData.getTeam(), doublesTeamRowData.getTotal());
+                addTeamData(row, startColumn, doublesTeamRowData.getTeam(), doublesTeamRowData.getTotal(), mainTextStyle);
             }
             startColumn += 3;
 
@@ -232,7 +239,7 @@ public class ReportController {
             List<SkeetTeamAggregate> skeetTeamData = skeetDataTeamRepository.getAllByClassificationOrderByTotalDesc(teamType);
             for (SkeetTeamAggregate skeetTeamRowData : skeetTeamData) {
                 row = sheet.getRow(++updateRow);
-                addTeamData(row, startColumn, skeetTeamRowData.getTeam(), skeetTeamRowData.getTotal());
+                addTeamData(row, startColumn, skeetTeamRowData.getTeam(), skeetTeamRowData.getTotal(), mainTextStyle);
             }
             startColumn += 3;
 
@@ -240,12 +247,12 @@ public class ReportController {
             List<ClaysTeamAggregate> claysTeamData = claysDataTeamRepository.getAllByClassificationOrderByTotalDesc(teamType);
             for (ClaysTeamAggregate claysTeamRowData : claysTeamData) {
                 row = sheet.getRow(++updateRow);
-                addTeamData(row, startColumn, claysTeamRowData.getTeam(), claysTeamRowData.getTotal());
+                addTeamData(row, startColumn, claysTeamRowData.getTeam(), claysTeamRowData.getTotal(), mainTextStyle);
             }
         }
     }
 
-    private void populateIndividualData(Sheet sheet, String gender, CellStyle style) {
+    private void populateIndividualData(Sheet sheet, String gender, CellStyle style, CellStyle mainTextStyle) {
         setCurrentDateHeader(sheet);
 
         int rows = sheet.getLastRowNum();
@@ -289,7 +296,7 @@ public class ReportController {
 
             for (SinglesAggregate singlesRowData : individualSinglesData) {
                 row = sheet.createRow(++updateRow);
-                addPlayerData(row, column, singlesRowData.getAthlete(), singlesRowData.getTotal(), singlesRowData.getTeam());
+                addPlayerData(row, column, singlesRowData.getAthlete(), singlesRowData.getTotal(), singlesRowData.getTeam(), mainTextStyle);
             }
             column += 4;
             maxRow = Math.max(maxRow, updateRow);
@@ -299,7 +306,7 @@ public class ReportController {
             List<HandicapAggregate> individualHandicapData = handicapDataRepository.getAllByGenderAndClassification(gender, classification);
             for (HandicapAggregate handicapRowData : individualHandicapData) {
                 row = sheet.getRow(++updateRow);
-                addPlayerData(row, column, handicapRowData.getAthlete(), handicapRowData.getTotal(), handicapRowData.getTeam());
+                addPlayerData(row, column, handicapRowData.getAthlete(), handicapRowData.getTotal(), handicapRowData.getTeam(), mainTextStyle);
             }
             column += 4;
 
@@ -308,7 +315,7 @@ public class ReportController {
             List<DoublesAggregate> doublesIndividualData = doublesDataRepository.getAllByGenderAndClassification(gender, classification);
             for (DoublesAggregate doublesRowData : doublesIndividualData) {
                 row = sheet.getRow(++updateRow);
-                addPlayerData(row, column, doublesRowData.getAthlete(), doublesRowData.getTotal(), doublesRowData.getTeam());
+                addPlayerData(row, column, doublesRowData.getAthlete(), doublesRowData.getTotal(), doublesRowData.getTeam(), mainTextStyle);
             }
             column += 4;
 
@@ -317,7 +324,7 @@ public class ReportController {
             List<SkeetAggregate> skeetIndividualData = skeetDataRepository.getAllByGenderAndClassification(gender, classification);
             for (SkeetAggregate skeetRowData : skeetIndividualData) {
                 row = sheet.getRow(++updateRow);
-                addPlayerData(row, column, skeetRowData.getAthlete(), skeetRowData.getTotal(), skeetRowData.getTeam());
+                addPlayerData(row, column, skeetRowData.getAthlete(), skeetRowData.getTotal(), skeetRowData.getTeam(), mainTextStyle);
             }
             column += 4;
 
@@ -326,7 +333,7 @@ public class ReportController {
             List<ClaysAggregate> claysIndividualData = claysDataRepository.getAllByGenderAndClassification(gender, classification);
             for (ClaysAggregate claysRowData : claysIndividualData) {
                 row = sheet.getRow(++updateRow);
-                addPlayerData(row, column, claysRowData.getAthlete(), claysRowData.getTotal(), claysRowData.getTeam());
+                addPlayerData(row, column, claysRowData.getAthlete(), claysRowData.getTotal(), claysRowData.getTeam(), mainTextStyle);
             }
             maxRow = Math.max(maxRow, updateRow);
         }
@@ -338,20 +345,25 @@ public class ReportController {
         sheet.getRow(9).getCell(1).setCellValue(sheet.getRow(9).getCell(1).getStringCellValue() + currentDate);
     }
 
-    private static void addTeamData(Row row, int startColumn, String team, Integer total) {
+    private static void addTeamData(Row row, int startColumn, String team, Integer total, CellStyle mainTextStyle) {
         Cell cell = row.createCell(startColumn);
         cell.setCellValue(team);
+        cell.setCellStyle(mainTextStyle);
         cell = row.createCell(startColumn + 1);
         cell.setCellValue(total);
+        cell.setCellStyle(mainTextStyle);
     }
 
-    private static void addPlayerData(Row row, int column, String athlete, Integer total, String team) {
+    private static void addPlayerData(Row row, int column, String athlete, Integer total, String team, CellStyle mainTextStyle) {
         Cell cell = row.createCell(column);
         cell.setCellValue(athlete);
+        cell.setCellStyle(mainTextStyle);
         cell = row.createCell(column + 1);
         cell.setCellValue(total);
+        cell.setCellStyle(mainTextStyle);
         cell = row.createCell(column + 2);
         cell.setCellValue(team);
+        cell.setCellStyle(mainTextStyle);
     }
 
     private static void autoSizeColumns(Workbook workbook) {
