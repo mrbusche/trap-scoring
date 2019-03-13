@@ -38,7 +38,7 @@ public class DataController {
 
     @RequestMapping("/checkFileImport")
     public String checkFileImport() {
-        return jdbc.query("show global variables like 'local_infile'", new Object[0], rs -> rs.next() ? rs.getString(1) + "=" + rs.getString(2) : "Count not determine value of local_infile");
+        return jdbc.query("SHOW GLOBAL VARIABLES LIKE 'local_infile'", new Object[0], rs -> rs.next() ? rs.getString(1) + "=" + rs.getString(2) : "Count not determine value of local_infile");
     }
 
     @RequestMapping("/addData")
@@ -64,23 +64,23 @@ public class DataController {
         jdbc.execute("TRUNCATE TABLE clays;");
 
         StringBuilder results = new StringBuilder();
-        String singlesSql = "load data local infile '" + singles + "' into table singles fields terminated by ',' lines terminated by '\n';";
+        String singlesSql = "load data local infile '" + singles + "' into table singles fields terminated by ',' OPTIONALLY ENCLOSED BY '\"' lines terminated by '\n' IGNORE 1 LINES;";
         int singlesCount = jdbc.update(con -> con.prepareStatement(singlesSql));
         results.append("Added ").append(singlesCount).append(" new records to database in singles table.<br>");
 
-        String doublesSql = "load data local infile '" + doubles + "' into table doubles fields terminated by ',' lines terminated by '\n';";
+        String doublesSql = "load data local infile '" + doubles + "' into table doubles fields terminated by ',' OPTIONALLY ENCLOSED BY '\"' lines terminated by '\n' IGNORE 1 LINES;";
         int doublesCount = jdbc.update(con -> con.prepareStatement(doublesSql));
         results.append("Added ").append(doublesCount).append(" new records to database in doubles table.<br>");
 
-        String handicapSql = "load data local infile '" + handicap + "' into table handicap fields terminated by ',' lines terminated by '\n';";
+        String handicapSql = "load data local infile '" + handicap + "' into table handicap fields terminated by ',' OPTIONALLY ENCLOSED BY '\"' lines terminated by '\n' IGNORE 1 LINES;";
         int handicapCount = jdbc.update(con -> con.prepareStatement(handicapSql));
         results.append("Added ").append(handicapCount).append(" new records to database in handicap table.<br>");
 
-        String skeetSql = "load data local infile '" + skeet + "' into table skeet fields terminated by ',' lines terminated by '\n';";
+        String skeetSql = "load data local infile '" + skeet + "' into table skeet fields terminated by ',' OPTIONALLY ENCLOSED BY '\"' lines terminated by '\n' IGNORE 1 LINES;";
         int skeetCount = jdbc.update(con -> con.prepareStatement(skeetSql));
         results.append("Added ").append(skeetCount).append(" new records to database in skeet table.<br>");
 
-        String claysSql = "load data local infile '" + clays + "' into table clays fields terminated by ',' lines terminated by '\n';";
+        String claysSql = "load data local infile '" + clays + "' into table clays fields terminated by ',' OPTIONALLY ENCLOSED BY '\"' lines terminated by '\n' IGNORE 1 LINES;";
         int claysCount = jdbc.update(con -> con.prepareStatement(claysSql));
         results.append("Added ").append(claysCount).append(" new records to database in clays table.<br>");
 
