@@ -1,6 +1,6 @@
-set global local_infile=1;
+-- set global local_infile=1;
 
-USE trap;
+-- USE trap;
 CREATE TABLE IF NOT EXISTS singles (
     EventId VARCHAR(6),
     Event VARCHAR(50),
@@ -24,16 +24,7 @@ CREATE TABLE IF NOT EXISTS singles (
     FrontRun TINYINT,
     BackRun TINYINT,
     RegisterDate VARCHAR(16),
-    RegisteredBy VARCHAR(50),
-    ShirtSize VARCHAR(5),
-    ATAId VARCHAR(50),
-    NSSAId VARCHAR(8),
-    NSCAId VARCHAR(8),
-    SCTPPayment VARCHAR(16),
-    SCTPConsent VARCHAR(16),
-    ATAPayment VARCHAR(16),
-    NSCAPayment VARCHAR(16),
-    NSSAPaymenT VARCHAR(16)
+    RegisteredBy VARCHAR(50)
 );
 
 -- top 4 scores
@@ -115,29 +106,43 @@ CREATE TABLE IF NOT EXISTS doubles (
     FrontRun TINYINT,
     BackRun TINYINT,
     RegisterDate VARCHAR(16),
-    RegisteredBy VARCHAR(50),
-    ShirtSize VARCHAR(5),
-    ATAId VARCHAR(50),
-    NSSAId VARCHAR(8),
-    NSCAId VARCHAR(8),
-    SCTPPayment VARCHAR(16),
-    SCTPConsent VARCHAR(16),
-    ATAPayment VARCHAR(16),
-    NSCAPayment VARCHAR(16),
-    NSSAPaymenT VARCHAR(16)
+    RegisteredBy VARCHAR(50)
 );
 
 -- top 4 scores for individual rounds
 CREATE OR REPLACE VIEW doublesData AS
 WITH s AS (
+  SELECT eventid, event, locationid, location, squadname, team, athlete, gender, classification, round1, round2, round3, round4, total, row_number() OVER (PARTITION BY athlete ORDER BY total DESC) AS seqnum
+  FROM (
   SELECT s.eventid, s.event, s.locationid, s.location, s.squadname, replace(s.team, 'Club', 'Team') AS team, s.athlete, s.gender
-  , CASE WHEN s.classification = 'Senior/Varsity' THEN 'Varsity' WHEN s.classification = 'Senior/Jr. Varsity' THEN 'Junior Varsity' WHEN s.classification = 'Intermediate/Advanced' THEN 'Intermediate Advanced' WHEN s.classification = 'Intermediate/Entry Level' THEN 'Intermediate Entry' WHEN s.classification = 'Rookie' THEN 'Rookie' ELSE s.classification END classification
-  , s.round1, s.round2, s.round3, s.round4
-  , GREATEST(GREATEST(GREATEST(GREATEST(GREATEST(GREATEST(GREATEST(s.round1, s.round2), s.round3), s.round4), s.round5), s.round6), s.round7), s.round8) total
-  , row_number() OVER (PARTITION BY athlete ORDER BY GREATEST(GREATEST(GREATEST(GREATEST(GREATEST(GREATEST(GREATEST(s.round1, s.round2), s.round3), s.round4), s.round5), s.round6), s.round7), s.round8) DESC) AS seqnum
+       , CASE WHEN s.classification = 'Senior/Varsity' THEN 'Varsity' WHEN s.classification = 'Senior/Jr. Varsity' THEN 'Junior Varsity' WHEN s.classification = 'Intermediate/Advanced' THEN 'Intermediate Advanced' WHEN s.classification = 'Intermediate/Entry Level' THEN 'Intermediate Entry' WHEN s.classification = 'Rookie' THEN 'Rookie' ELSE s.classification END classification
+       , s.round1, s.round2, s.round3, s.round4
+       , s.round1 total
   FROM doubles s
-    WHERE s.locationid > 0
-    ORDER BY athlete, total DESC
+  WHERE s.locationid > 0
+  UNION
+  SELECT s.eventid, s.event, s.locationid, s.location, s.squadname, replace(s.team, 'Club', 'Team') AS team, s.athlete, s.gender
+       , CASE WHEN s.classification = 'Senior/Varsity' THEN 'Varsity' WHEN s.classification = 'Senior/Jr. Varsity' THEN 'Junior Varsity' WHEN s.classification = 'Intermediate/Advanced' THEN 'Intermediate Advanced' WHEN s.classification = 'Intermediate/Entry Level' THEN 'Intermediate Entry' WHEN s.classification = 'Rookie' THEN 'Rookie' ELSE s.classification END classification
+       , s.round1, s.round2, s.round3, s.round4
+       , s.round2 total
+  FROM doubles s
+  WHERE s.locationid > 0
+  UNION
+  SELECT s.eventid, s.event, s.locationid, s.location, s.squadname, replace(s.team, 'Club', 'Team') AS team, s.athlete, s.gender
+       , CASE WHEN s.classification = 'Senior/Varsity' THEN 'Varsity' WHEN s.classification = 'Senior/Jr. Varsity' THEN 'Junior Varsity' WHEN s.classification = 'Intermediate/Advanced' THEN 'Intermediate Advanced' WHEN s.classification = 'Intermediate/Entry Level' THEN 'Intermediate Entry' WHEN s.classification = 'Rookie' THEN 'Rookie' ELSE s.classification END classification
+       , s.round1, s.round2, s.round3, s.round4
+       , s.round3 total
+  FROM doubles s
+  WHERE s.locationid > 0
+  UNION
+  SELECT s.eventid, s.event, s.locationid, s.location, s.squadname, replace(s.team, 'Club', 'Team') AS team, s.athlete, s.gender
+       , CASE WHEN s.classification = 'Senior/Varsity' THEN 'Varsity' WHEN s.classification = 'Senior/Jr. Varsity' THEN 'Junior Varsity' WHEN s.classification = 'Intermediate/Advanced' THEN 'Intermediate Advanced' WHEN s.classification = 'Intermediate/Entry Level' THEN 'Intermediate Entry' WHEN s.classification = 'Rookie' THEN 'Rookie' ELSE s.classification END classification
+       , s.round1, s.round2, s.round3, s.round4
+       , s.round4 total
+  FROM doubles s
+  WHERE s.locationid > 0
+  ) a
+  ORDER BY athlete, total DESC
 ),
 s3 AS (
   SELECT s.*
@@ -206,16 +211,7 @@ CREATE TABLE IF NOT EXISTS handicap (
     FrontRun TINYINT,
     BackRun TINYINT,
     RegisterDate VARCHAR(16),
-    RegisteredBy VARCHAR(50),
-    ShirtSize VARCHAR(5),
-    ATAId VARCHAR(50),
-    NSSAId VARCHAR(8),
-    NSCAId VARCHAR(8),
-    SCTPPayment VARCHAR(16),
-    SCTPConsent VARCHAR(16),
-    ATAPayment VARCHAR(16),
-    NSCAPayment VARCHAR(16),
-    NSSAPaymenT VARCHAR(16)
+    RegisteredBy VARCHAR(50)
 );
 
 -- top 4 scores
@@ -297,19 +293,10 @@ CREATE TABLE IF NOT EXISTS skeet (
     FrontRun TINYINT,
     BackRun TINYINT,
     RegisterDate VARCHAR(16),
-    RegisteredBy VARCHAR(50),
-    ShirtSize VARCHAR(5),
-    ATAId VARCHAR(50),
-    NSSAId VARCHAR(8),
-    NSCAId VARCHAR(8),
-    SCTPPayment VARCHAR(16),
-    SCTPConsent VARCHAR(16),
-    ATAPayment VARCHAR(16),
-    NSCAPayment VARCHAR(16),
-    NSSAPaymenT VARCHAR(16)
+    RegisteredBy VARCHAR(50)
 );
 
--- top 4 scores only
+-- top 3 scores only
 CREATE OR REPLACE VIEW skeetData AS
 WITH s AS (
   SELECT s.eventid, s.event, s.locationid, s.location, s.squadname, replace(s.team, 'Club', 'Team') AS team, s.athlete, s.gender
@@ -324,7 +311,7 @@ WITH s AS (
 s3 AS (
   SELECT s.*
   FROM s
-  where seqnum <= 3
+  where seqnum <= 2
 )
 SELECT *
 FROM s3
@@ -339,8 +326,8 @@ UNION ALL
           INNER JOIN s3 ON s.athlete = s3.athlete
         GROUP BY s.athlete) unreal
       WHERE s.athlete = unreal.athlete
-      AND seqnum > 3
-      AND CASE WHEN numberfour = 'four' THEN seqnum = 4 ELSE locationid != dontuselocid END
+      AND seqnum > 2
+      AND CASE WHEN numberfour = 'four' THEN seqnum = 3 ELSE locationid != dontuselocid END
     ) bananas
     WHERE fourth = 1
 );
@@ -389,29 +376,78 @@ CREATE TABLE IF NOT EXISTS clays (
     BackRun TINYINT,
     RegisterDate VARCHAR(16),
     RegisteredBy VARCHAR(50),
-    ShirtSize VARCHAR(5),
-    ATAId VARCHAR(50),
-    NSSAId VARCHAR(8),
-    NSCAId VARCHAR(8),
-    SCTPPayment VARCHAR(16),
-    SCTPConsent VARCHAR(16),
-    ATAPayment VARCHAR(16),
-    NSCAPayment VARCHAR(16),
-    NSSAPaymenT VARCHAR(16)
+    FiveStand VARCHAR(1)
 );
 
+-- top 3 scores only
+CREATE OR REPLACE VIEW claysData AS
+  WITH s AS (
+    SELECT s.eventid, s.event, s.locationid, s.location, s.squadname, replace(s.team, 'Club', 'Team') AS team, s.athlete, s.gender
+         , CASE WHEN s.classification = 'Senior/Varsity' THEN 'Varsity' WHEN s.classification = 'Senior/Jr. Varsity' THEN 'Junior Varsity' WHEN s.classification = 'Intermediate/Advanced' THEN 'Intermediate Advanced' WHEN s.classification = 'Intermediate/Entry Level' THEN 'Intermediate Entry' WHEN s.classification = 'Rookie' THEN 'Rookie' ELSE s.classification END classification
+         , s.round1, s.round2, s.round3, s.round4
+         , GREATEST(GREATEST(GREATEST(GREATEST(GREATEST(GREATEST(s.round1 + s.round2, s.round2 + s.round3), s.round3 + s.round4), s.round4 + s.round5), s.round5 + s.round6), s.round6 + s.round7), s.round7 + s.round8) total
+         , row_number() OVER (PARTITION BY athlete ORDER BY GREATEST(GREATEST(GREATEST(GREATEST(GREATEST(GREATEST(s.round1 + s.round2, s.round2 + s.round3), s.round3 + s.round4), s.round4 + s.round5), s.round5 + s.round6), s.round6 + s.round7), s.round7 + s.round8) DESC) AS seqnum
+        , CASE WHEN fivestand = 'Y' THEN 1 ELSE 0 END AS fivestand
+    FROM clays s
+    WHERE s.locationid > 0
+    ORDER BY athlete, total DESC
+    ),
+    s3 AS (
+      SELECT s.*
+      FROM s
+      where seqnum <= 2
+      )
+    SELECT *
+    FROM s3
+    UNION ALL
+    (
+      SELECT eventid, event, locationid, location, squadname, team, athlete, gender, classification, round1, round2, round3, round4, total, fourth, CASE WHEN fivestand = 'Y' THEN 1 ELSE 0 END AS fivestand
+      FROM (
+             SELECT eventid, event, locationid, location, squadname, team, unreal.athlete, gender, classification, round1, round2, round3, round4, total, seqnum, row_number() OVER (PARTITION BY unreal.athlete ORDER BY total DESC) AS fourth
+            , CASE WHEN fivestand = 'Y' THEN 1 ELSE 0 END AS fivestand
+             FROM s,
+                  (SELECT s3.athlete, CASE WHEN COUNT(DISTINCT s3.locationid) = 1 THEN 'Next' WHEN SUM(s3.fivestand) > 0 THEN 'fivestandused' ELSE 'Four' END numberfour, (SELECT DISTINCT s3.locationid) dontuselocid
+                   FROM s
+                          INNER JOIN s3 ON s.athlete = s3.athlete
+                   GROUP BY s.athlete) unreal
+             WHERE s.athlete = unreal.athlete
+               AND seqnum > 2
+               AND CASE WHEN unreal.numberfour = 'four' THEN seqnum = 3 WHEN unreal.numberfour = 'fivestandused' THEN fivestand = 0 AND seqnum >= 3 ELSE locationid != dontuselocid END
+           ) bananas
+      WHERE fourth = 1
+    );
+
+CREATE OR REPLACE VIEW claysAggregate AS
+SELECT athlete, classification, gender, team, SUM(total) total
+FROM (
+       SELECT athlete, classification, gender, total, team
+       FROM claysdata
+     ) a
+GROUP BY athlete, classification, gender
+ORDER BY total DESC;
+
+CREATE OR REPLACE VIEW claysTeamAggregate AS
+SELECT team, classification, SUM(total) total
+FROM (
+       SELECT team, classification, total, row_number() OVER (PARTITION BY team, classification ORDER BY total DESC ) AS segnum
+       FROM claysaggregate
+       ORDER BY team, classification, total DESC
+     ) a
+WHERE segnum <= 3
+GROUP BY team, classification
+ORDER BY total DESC;
 
 CREATE OR REPLACE VIEW allData AS
-SELECT *, 'singles' as type
+SELECT *, 'N' as fivestand, 'singles' as type
 FROM singles
 UNION
-SELECT *, 'doubles' as type
+SELECT *, 'N', 'doubles' as type
 FROM doubles
 UNION
-SELECT *, 'handicap' as type
+SELECT *, 'N', 'handicap' as type
 FROM handicap
 UNION
-SELECT *, 'skeet' as type
+SELECT *, 'N', 'skeet' as type
 FROM skeet
 UNION
 SELECT *, 'clays' as type

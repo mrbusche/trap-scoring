@@ -1,6 +1,8 @@
 package trap.report;
 
 import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.Font;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -10,6 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import trap.model.AllData;
+import trap.model.ClaysAggregate;
+import trap.model.ClaysTeamAggregate;
 import trap.model.DoublesAggregate;
 import trap.model.DoublesTeamAggregate;
 import trap.model.HandicapAggregate;
@@ -19,6 +23,8 @@ import trap.model.SinglesTeamAggregate;
 import trap.model.SkeetAggregate;
 import trap.model.SkeetTeamAggregate;
 import trap.repository.AllDataRepository;
+import trap.repository.ClaysDataRepository;
+import trap.repository.ClaysDataTeamRepository;
 import trap.repository.DoublesDataRepository;
 import trap.repository.DoublesDataTeamRepository;
 import trap.repository.HandicapDataRepository;
@@ -36,6 +42,7 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 @RestController
@@ -50,13 +57,15 @@ public class ReportController {
     private final HandicapDataTeamRepository handicapDataTeamRepository;
     private final SkeetDataRepository skeetDataRepository;
     private final SkeetDataTeamRepository skeetDataTeamRepository;
+    private final ClaysDataRepository claysDataRepository;
+    private final ClaysDataTeamRepository claysDataTeamRepository;
     private final AllDataRepository allDataRepository;
 
-    private final List<String> classificationList = Arrays.asList("Varsity", "Junior Varsity", "Intermediate Advanced", "Intermediate Entry", "Rookie");
+    private final List<String> classificationList = Arrays.asList("Varsity", "Junior Varsity", "Intermediate Advanced", "Intermediate Entry", "Rookie", "Collegiate");
     private final String currentDate = new SimpleDateFormat("MM/dd/yyyy").format(Calendar.getInstance().getTime());
 
     @Autowired
-    public ReportController(SinglesDataRepository singlesRepository, SinglesDataTeamRepository singlesDataTeamRepository, DoublesDataRepository doublesDataRepository, DoublesDataTeamRepository doublesDataTeamRepository, HandicapDataRepository handicapDataRepository, HandicapDataTeamRepository handicapDataTeamRepository, SkeetDataRepository skeetDataRepository, SkeetDataTeamRepository skeetDataTeamRepository, AllDataRepository allDataRepository) {
+    public ReportController(SinglesDataRepository singlesRepository, SinglesDataTeamRepository singlesDataTeamRepository, DoublesDataRepository doublesDataRepository, DoublesDataTeamRepository doublesDataTeamRepository, HandicapDataRepository handicapDataRepository, HandicapDataTeamRepository handicapDataTeamRepository, SkeetDataRepository skeetDataRepository, SkeetDataTeamRepository skeetDataTeamRepository, ClaysDataRepository claysDataRepository, ClaysDataTeamRepository claysDataTeamRepository, AllDataRepository allDataRepository) {
         this.singlesRepository = singlesRepository;
         this.singlesDataTeamRepository = singlesDataTeamRepository;
         this.doublesDataRepository = doublesDataRepository;
@@ -65,6 +74,8 @@ public class ReportController {
         this.handicapDataTeamRepository = handicapDataTeamRepository;
         this.skeetDataRepository = skeetDataRepository;
         this.skeetDataTeamRepository = skeetDataTeamRepository;
+        this.claysDataRepository = claysDataRepository;
+        this.claysDataTeamRepository = claysDataTeamRepository;
         this.allDataRepository = allDataRepository;
     }
 
@@ -82,28 +93,40 @@ public class ReportController {
         populateCleanData(workbook.getSheet("Clean Data"));
         result.append("<br>Clean data populated in ").append(System.currentTimeMillis() - start).append("ms");
 
-        start = System.currentTimeMillis();
-        populateTeamData(workbook.getSheet("Team-Senior"), "Varsity");
-        result.append("<br>Senior data populated in ").append(System.currentTimeMillis() - start).append("ms");
+        Map<String, String> types = Map.of("Team-Senior", "Varsity", "Team-Intermediate", "Intermediate Entry", "Team-Rookie", "Rookie", "Team-Collegiate", "Collegiate");
+
+        //Set font for mainText
+        Font mainText = workbook.createFont();
+        mainText.setFontName("Calibri");
+        mainText.setFontHeightInPoints((short) 12);
+        CellStyle mainTextStyle = workbook.createCellStyle();
+        mainTextStyle.setFont(mainText);
+
+        for (Map.Entry<String, String> entry : types.entrySet()) {
+            start = System.currentTimeMillis();
+            populateTeamData(workbook.getSheet(entry.getKey()), entry.getValue(), mainTextStyle);
+            result.append("<br>").append(entry.getKey()).append(" data populated in ").append(System.currentTimeMillis() - start).append("ms");
+        }
+
+        //Set font for headers
+        Font font = workbook.createFont();
+        font.setFontName("Calibri");
+        font.setItalic(true);
+        font.setBold(true);
+        font.setFontHeightInPoints((short) 14);
+        CellStyle style = workbook.createCellStyle();
+        style.setFont(font);
 
         start = System.currentTimeMillis();
-        populateTeamData(workbook.getSheet("Team-Intermediate"), "Intermediate Entry");
-        result.append("<br>Intermediate data populated in ").append(System.currentTimeMillis() - start).append("ms");
-
-        start = System.currentTimeMillis();
-        populateTeamData(workbook.getSheet("Team-Rookie"), "Rookie");
-        result.append("<br>Rookie data populated in ").append(System.currentTimeMillis() - start).append("ms");
-
-        start = System.currentTimeMillis();
-        populateIndividualData(workbook.getSheet("Individual-Men"), "M");
+        populateIndividualData(workbook.getSheet("Individual-Men"), "M", style, mainTextStyle);
         result.append("<br>Individual Men data populated in ").append(System.currentTimeMillis() - start).append("ms");
 
         start = System.currentTimeMillis();
-        populateIndividualData(workbook.getSheet("Individual-Ladies"), "F");
+        populateIndividualData(workbook.getSheet("Individual-Ladies"), "F", style, mainTextStyle);
         result.append("<br>Individual Women data populated in ").append(System.currentTimeMillis() - start).append("ms");
 
         start = System.currentTimeMillis();
-        //autoSizeColumns(workbook);
+        autoSizeColumns(workbook);
         result.append("<br>Auto sized all columns in ").append(System.currentTimeMillis() - start).append("ms");
 
         FileOutputStream fileOutputStream = new FileOutputStream("updated.xls");
@@ -171,31 +194,15 @@ public class ReportController {
             cell = row.createCell(22);
             cell.setCellValue(rowData.getRegisteredby());
             cell = row.createCell(23);
-            cell.setCellValue(rowData.getShirtsize());
+            cell.setCellValue(rowData.getFivestand());
             cell = row.createCell(24);
-            cell.setCellValue(rowData.getAtaid());
-            cell = row.createCell(25);
-            cell.setCellValue(rowData.getNssaid());
-            cell = row.createCell(26);
-            cell.setCellValue(rowData.getNscaid());
-            cell = row.createCell(27);
-            cell.setCellValue(rowData.getSctppayment());
-            cell = row.createCell(28);
-            cell.setCellValue(rowData.getSctpconsent());
-            cell = row.createCell(29);
-            cell.setCellValue(rowData.getAtapayment());
-            cell = row.createCell(30);
-            cell.setCellValue(rowData.getNscapayment());
-            cell = row.createCell(31);
-            cell.setCellValue(rowData.getNssapayment());
-            cell = row.createCell(32);
             cell.setCellValue(rowData.getType());
         }
-        sheet.setAutoFilter(CellRangeAddress.valueOf("A1:AG1"));
+        sheet.setAutoFilter(CellRangeAddress.valueOf("A1:X1"));
 
     }
 
-    private void populateTeamData(Sheet sheet, String teamType) {
+    private void populateTeamData(Sheet sheet, String teamType, CellStyle mainTextStyle) {
         setCurrentDateHeader(sheet);
 
         int rows = sheet.getLastRowNum();
@@ -206,7 +213,7 @@ public class ReportController {
         List<SinglesTeamAggregate> singlesTeamData = singlesDataTeamRepository.getAllByClassificationOrderByTotalDesc(teamType);
         for (SinglesTeamAggregate singlesTeamRowData : singlesTeamData) {
             row = sheet.createRow(++updateRow);
-            addTeamData(row, startColumn, singlesTeamRowData.getTeam(), singlesTeamRowData.getTotal());
+            addTeamData(row, startColumn, singlesTeamRowData.getTeam(), singlesTeamRowData.getTotal(), mainTextStyle);
         }
 
         if (!"Rookie".equals(teamType)) {
@@ -216,7 +223,7 @@ public class ReportController {
             List<HandicapTeamAggregate> handicapTeamData = handicapDataTeamRepository.getAllByClassificationOrderByTotalDesc(teamType);
             for (HandicapTeamAggregate handicapTeamRowData : handicapTeamData) {
                 row = sheet.getRow(++updateRow);
-                addTeamData(row, startColumn, handicapTeamRowData.getTeam(), handicapTeamRowData.getTotal());
+                addTeamData(row, startColumn, handicapTeamRowData.getTeam(), handicapTeamRowData.getTotal(), mainTextStyle);
             }
             startColumn += 3;
 
@@ -224,7 +231,7 @@ public class ReportController {
             List<DoublesTeamAggregate> doublesTeamData = doublesDataTeamRepository.getAllByClassificationOrderByTotalDesc(teamType);
             for (DoublesTeamAggregate doublesTeamRowData : doublesTeamData) {
                 row = sheet.getRow(++updateRow);
-                addTeamData(row, startColumn, doublesTeamRowData.getTeam(), doublesTeamRowData.getTotal());
+                addTeamData(row, startColumn, doublesTeamRowData.getTeam(), doublesTeamRowData.getTotal(), mainTextStyle);
             }
             startColumn += 3;
 
@@ -232,12 +239,20 @@ public class ReportController {
             List<SkeetTeamAggregate> skeetTeamData = skeetDataTeamRepository.getAllByClassificationOrderByTotalDesc(teamType);
             for (SkeetTeamAggregate skeetTeamRowData : skeetTeamData) {
                 row = sheet.getRow(++updateRow);
-                addTeamData(row, startColumn, skeetTeamRowData.getTeam(), skeetTeamRowData.getTotal());
+                addTeamData(row, startColumn, skeetTeamRowData.getTeam(), skeetTeamRowData.getTotal(), mainTextStyle);
+            }
+            startColumn += 3;
+
+            updateRow = rows;
+            List<ClaysTeamAggregate> claysTeamData = claysDataTeamRepository.getAllByClassificationOrderByTotalDesc(teamType);
+            for (ClaysTeamAggregate claysTeamRowData : claysTeamData) {
+                row = sheet.getRow(++updateRow);
+                addTeamData(row, startColumn, claysTeamRowData.getTeam(), claysTeamRowData.getTotal(), mainTextStyle);
             }
         }
     }
 
-    private void populateIndividualData(Sheet sheet, String gender) {
+    private void populateIndividualData(Sheet sheet, String gender, CellStyle style, CellStyle mainTextStyle) {
         setCurrentDateHeader(sheet);
 
         int rows = sheet.getLastRowNum();
@@ -263,20 +278,25 @@ public class ReportController {
             row = sheet.createRow(++updateRow);
             cell = row.createCell(column);
             cell.setCellValue(classification);
+            cell.setCellStyle(style);
             cell = row.createCell(column + 4);
             cell.setCellValue(classification);
+            cell.setCellStyle(style);
             cell = row.createCell(column + 8);
             cell.setCellValue(classification);
+            cell.setCellStyle(style);
             cell = row.createCell(column + 12);
             cell.setCellValue(classification);
+            cell.setCellStyle(style);
             cell = row.createCell(column + 16);
             cell.setCellValue(classification);
+            cell.setCellStyle(style);
 
             List<SinglesAggregate> individualSinglesData = singlesRepository.getAllByGenderAndClassification(gender, classification);
 
             for (SinglesAggregate singlesRowData : individualSinglesData) {
                 row = sheet.createRow(++updateRow);
-                addPlayerData(row, column, singlesRowData.getAthlete(), singlesRowData.getTotal(), singlesRowData.getTeam());
+                addPlayerData(row, column, singlesRowData.getAthlete(), singlesRowData.getTotal(), singlesRowData.getTeam(), mainTextStyle);
             }
             column += 4;
             maxRow = Math.max(maxRow, updateRow);
@@ -286,7 +306,7 @@ public class ReportController {
             List<HandicapAggregate> individualHandicapData = handicapDataRepository.getAllByGenderAndClassification(gender, classification);
             for (HandicapAggregate handicapRowData : individualHandicapData) {
                 row = sheet.getRow(++updateRow);
-                addPlayerData(row, column, handicapRowData.getAthlete(), handicapRowData.getTotal(), handicapRowData.getTeam());
+                addPlayerData(row, column, handicapRowData.getAthlete(), handicapRowData.getTotal(), handicapRowData.getTeam(), mainTextStyle);
             }
             column += 4;
 
@@ -295,7 +315,7 @@ public class ReportController {
             List<DoublesAggregate> doublesIndividualData = doublesDataRepository.getAllByGenderAndClassification(gender, classification);
             for (DoublesAggregate doublesRowData : doublesIndividualData) {
                 row = sheet.getRow(++updateRow);
-                addPlayerData(row, column, doublesRowData.getAthlete(), doublesRowData.getTotal(), doublesRowData.getTeam());
+                addPlayerData(row, column, doublesRowData.getAthlete(), doublesRowData.getTotal(), doublesRowData.getTeam(), mainTextStyle);
             }
             column += 4;
 
@@ -304,37 +324,51 @@ public class ReportController {
             List<SkeetAggregate> skeetIndividualData = skeetDataRepository.getAllByGenderAndClassification(gender, classification);
             for (SkeetAggregate skeetRowData : skeetIndividualData) {
                 row = sheet.getRow(++updateRow);
-                addPlayerData(row, column, skeetRowData.getAthlete(), skeetRowData.getTotal(), skeetRowData.getTeam());
+                addPlayerData(row, column, skeetRowData.getAthlete(), skeetRowData.getTotal(), skeetRowData.getTeam(), mainTextStyle);
+            }
+            column += 4;
+
+            updateRow = classificationStartRow;
+            updateRow++;
+            List<ClaysAggregate> claysIndividualData = claysDataRepository.getAllByGenderAndClassification(gender, classification);
+            for (ClaysAggregate claysRowData : claysIndividualData) {
+                row = sheet.getRow(++updateRow);
+                addPlayerData(row, column, claysRowData.getAthlete(), claysRowData.getTotal(), claysRowData.getTeam(), mainTextStyle);
             }
             maxRow = Math.max(maxRow, updateRow);
         }
 
-        sheet.setAutoFilter(CellRangeAddress.valueOf("A13:X13"));
+        sheet.setAutoFilter(CellRangeAddress.valueOf("A13:T13"));
     }
 
     private void setCurrentDateHeader(Sheet sheet) {
         sheet.getRow(9).getCell(1).setCellValue(sheet.getRow(9).getCell(1).getStringCellValue() + currentDate);
     }
 
-    private static void addTeamData(Row row, int startColumn, String team, Integer total) {
+    private static void addTeamData(Row row, int startColumn, String team, Integer total, CellStyle mainTextStyle) {
         Cell cell = row.createCell(startColumn);
         cell.setCellValue(team);
+        cell.setCellStyle(mainTextStyle);
         cell = row.createCell(startColumn + 1);
         cell.setCellValue(total);
+        cell.setCellStyle(mainTextStyle);
     }
 
-    private static void addPlayerData(Row row, int column, String athlete, Integer total, String team) {
+    private static void addPlayerData(Row row, int column, String athlete, Integer total, String team, CellStyle mainTextStyle) {
         Cell cell = row.createCell(column);
         cell.setCellValue(athlete);
+        cell.setCellStyle(mainTextStyle);
         cell = row.createCell(column + 1);
         cell.setCellValue(total);
+        cell.setCellStyle(mainTextStyle);
         cell = row.createCell(column + 2);
         cell.setCellValue(team);
+        cell.setCellStyle(mainTextStyle);
     }
 
     private static void autoSizeColumns(Workbook workbook) {
         int numberOfSheets = workbook.getNumberOfSheets();
-        for (int sheetNum = 0; sheetNum < numberOfSheets; sheetNum++) {
+        for (int sheetNum = 1; sheetNum < numberOfSheets; sheetNum++) {
             Sheet sheet = workbook.getSheetAt(sheetNum);
             if (sheet.getPhysicalNumberOfRows() > 0) {
                 Row row = sheet.getRow(sheet.getFirstRowNum());
@@ -343,6 +377,7 @@ public class ReportController {
                     Cell cell = cellIterator.next();
                     int columnIndex = cell.getColumnIndex();
                     sheet.autoSizeColumn(columnIndex);
+                    System.out.println(sheetNum + " column " + columnIndex);
                 }
             }
         }
