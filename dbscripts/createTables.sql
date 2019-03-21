@@ -452,3 +452,9 @@ FROM skeet
 UNION
 SELECT *, 'clays' as type
 FROM clays;
+
+UPDATE singles SET team = 'North Scott Trap Club' WHERE team = 'North Scott Trap Team';
+UPDATE doubles SET team = 'North Scott Trap Club' WHERE team = 'North Scott Trap Team';
+UPDATE handicap SET team = 'North Scott Trap Club' WHERE team = 'North Scott Trap Team';
+UPDATE skeet SET team = 'North Scott Trap Club' WHERE team = 'North Scott Trap Team';
+UPDATE clays SET team = 'North Scott Trap Club' WHERE team = 'North Scott Trap Team';
