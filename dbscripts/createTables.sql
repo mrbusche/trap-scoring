@@ -75,7 +75,7 @@ ORDER BY total DESC;
 CREATE OR REPLACE VIEW singlesTeamAggregate AS
 SELECT team, classification, SUM(total) total
 FROM (
-  SELECT team, classification, total, row_number() OVER (PARTITION BY team, classification ORDER BY total DESC ) AS segnum
+  SELECT team, CASE WHEN classification IN ('Senior/Jr. Varsity', 'Senior/Varsity') THEN 'Varsity' WHEN classification IN ('Intermediate Entry', 'Intermediate Advanced') THEN 'Intermediate Entry' ELSE classification END classification, total, row_number() OVER (PARTITION BY team, CASE WHEN classification IN ('Senior/Jr. Varsity', 'Senior/Varsity') THEN 'Varsity' WHEN classification IN ('Intermediate Entry', 'Intermediate Advanced') THEN 'Intermediate Entry' ELSE classification END ORDER BY total DESC ) AS segnum
   FROM singlesaggregate
   ORDER BY team, classification, total DESC
 ) a
@@ -180,7 +180,7 @@ ORDER BY total DESC;
 CREATE OR REPLACE VIEW doublesTeamAggregate AS
 SELECT team, classification, SUM(total) total
 FROM (
-  SELECT team, classification, total, row_number() OVER (PARTITION BY team, classification ORDER BY total DESC ) AS segnum
+  SELECT team, CASE WHEN classification IN ('Senior/Jr. Varsity', 'Senior/Varsity') THEN 'Varsity' WHEN classification IN ('Intermediate Entry', 'Intermediate Advanced') THEN 'Intermediate Entry' ELSE classification END classification, total, row_number() OVER (PARTITION BY team, CASE WHEN classification IN ('Senior/Jr. Varsity', 'Senior/Varsity') THEN 'Varsity' WHEN classification IN ('Intermediate Entry', 'Intermediate Advanced') THEN 'Intermediate Entry' ELSE classification END ORDER BY total DESC ) AS segnum
   FROM doublesaggregate
   ORDER BY team, classification, total DESC
 ) a
@@ -262,7 +262,7 @@ ORDER BY total DESC;
 CREATE OR REPLACE VIEW handicapTeamAggregate AS
 SELECT team, classification, SUM(total) total
 FROM (
-  SELECT team, classification, total, row_number() OVER (PARTITION BY team, classification ORDER BY total DESC ) AS segnum
+  SELECT team, CASE WHEN classification IN ('Senior/Jr. Varsity', 'Senior/Varsity') THEN 'Varsity' WHEN classification IN ('Intermediate Entry', 'Intermediate Advanced') THEN 'Intermediate Entry' ELSE classification END classification, total, row_number() OVER (PARTITION BY team, CASE WHEN classification IN ('Senior/Jr. Varsity', 'Senior/Varsity') THEN 'Varsity' WHEN classification IN ('Intermediate Entry', 'Intermediate Advanced') THEN 'Intermediate Entry' ELSE classification END ORDER BY total DESC ) AS segnum
   FROM handicapaggregate
   ORDER BY team, classification, total DESC
 ) a
@@ -344,10 +344,10 @@ ORDER BY total DESC;
 CREATE OR REPLACE VIEW skeetTeamAggregate AS
 SELECT team, classification, SUM(total) total
 FROM (
-  SELECT team, classification, total, row_number() OVER (PARTITION BY team, classification ORDER BY total DESC ) AS segnum
-  FROM skeetaggregate
-  ORDER BY team, classification, total DESC
-) a
+       SELECT team, CASE WHEN classification IN ('Senior/Jr. Varsity', 'Senior/Varsity') THEN 'Varsity' WHEN classification IN ('Intermediate Entry', 'Intermediate Advanced') THEN 'Intermediate Entry' ELSE classification END classification, total, row_number() OVER (PARTITION BY team, CASE WHEN classification IN ('Senior/Jr. Varsity', 'Senior/Varsity') THEN 'Varsity' WHEN classification IN ('Intermediate Entry', 'Intermediate Advanced') THEN 'Intermediate Entry' ELSE classification END ORDER BY total DESC ) AS segnum
+       FROM skeetaggregate
+       ORDER BY team, classification, total DESC
+     ) a
 WHERE segnum <= 3
 GROUP BY team, classification
 ORDER BY total DESC;
@@ -429,7 +429,8 @@ ORDER BY total DESC;
 CREATE OR REPLACE VIEW claysTeamAggregate AS
 SELECT team, classification, SUM(total) total
 FROM (
-       SELECT team, classification, total, row_number() OVER (PARTITION BY team, classification ORDER BY total DESC ) AS segnum
+       SELECT team, CASE WHEN classification IN ('Senior/Jr. Varsity', 'Senior/Varsity') THEN 'Varsity' WHEN classification IN ('Intermediate Entry', 'Intermediate Advanced') THEN 'Intermediate Entry' ELSE classification END classification, total, row_number() OVER (PARTITION BY team, CASE WHEN classification IN ('Senior/Jr. Varsity', 'Senior/Varsity') THEN 'Varsity' WHEN classification IN ('Intermediate Entry', 'Intermediate Advanced') THEN 'Intermediate Entry' ELSE classification END ORDER
+         BY total DESC ) AS segnum
        FROM claysaggregate
        ORDER BY team, classification, total DESC
      ) a
