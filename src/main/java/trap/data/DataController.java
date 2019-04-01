@@ -44,6 +44,16 @@ public class DataController {
     @RequestMapping("/addData")
     public String addData() {
         try {
+//            File singles = new File("C:\\trap\\singles.xls");
+//            InputStream targetStream = new FileInputStream(singles);
+//
+//            InputStream singlesCsv = convertXlsToCSV(targetStream);
+//            byte[] buffer = new byte[singlesCsv.available()];
+//            singlesCsv.read(buffer);
+//            File targetFile = new File("C:\\trap\\singles.csv");
+//            OutputStream outputStream = new FileOutputStream(targetFile);
+//            outputStream.write(buffer);
+
             return saveDataToDatabase();
         } catch (BadSqlGrammarException e) {
             e.printStackTrace();
@@ -84,7 +94,41 @@ public class DataController {
         int claysCount = jdbc.update(con -> con.prepareStatement(claysSql));
         results.append("Added ").append(claysCount).append(" new records to database in clays table.<br>");
 
+        fixNames();
+
         return results.toString();
     }
+
+    private void fixNames() {
+        jdbc.execute("UPDATE singles SET team = 'North Scott Trap Club' WHERE team = 'North Scott Trap Team';");
+        jdbc.execute("UPDATE doubles SET team = 'North Scott Trap Club' WHERE team = 'North Scott Trap Team';");
+        jdbc.execute("UPDATE handicap SET team = 'North Scott Trap Club' WHERE team = 'North Scott Trap Team';");
+        jdbc.execute("UPDATE skeet SET team = 'North Scott Trap Club' WHERE team = 'North Scott Trap Team';");
+        jdbc.execute("UPDATE clays SET team = 'North Scott Trap Club' WHERE team = 'North Scott Trap Team';");
+    }
+
+//    private InputStream convertXlsToCSV(InputStream inputStream) throws IOException {
+//        Workbook wb = WorkbookFactory.create(inputStream);
+//        return csvConverter(wb.getSheetAt(0));
+//    }
+//
+//    private InputStream csvConverter(Sheet sheet) {
+//        Row row;
+//        StringBuilder str = new StringBuilder();
+//        for (int i = 0; i < sheet.getLastRowNum() + 1; i++) {
+//            row = sheet.getRow(i);
+//            StringBuilder rowString = new StringBuilder();
+//            for (int j = 0; j < 30; j++) {
+//                if (row.getCell(j) == null) {
+//                    rowString.append(" ").append(",");
+//                } else {
+//                    rowString.append(row.getCell(j).toString()).append(",");
+//                }
+//            }
+//            str.append(rowString.substring(0, rowString.length() - 1)).append(System.lineSeparator());
+//        }
+//        System.out.println(str);
+//        return new ByteArrayInputStream(str.toString().getBytes(StandardCharsets.UTF_8));
+//    }
 
 }
