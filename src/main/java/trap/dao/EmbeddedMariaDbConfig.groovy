@@ -30,7 +30,7 @@ class EmbeddedMariaDbConfig {
 
         DBConfigurationBuilder config = mariaDB4jSpringService.getConfiguration()
 
-        DataSourceBuilder
+        return DataSourceBuilder
             .create()
             .username(datasourceUsername)
             .password(datasourcePassword)

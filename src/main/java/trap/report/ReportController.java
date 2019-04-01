@@ -41,6 +41,7 @@ import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -94,7 +95,11 @@ public class ReportController {
         populateCleanData(workbook.getSheet("Clean Data"));
         result.append("<br>Clean data populated in ").append(System.currentTimeMillis() - start).append("ms");
 
-        Map<String, String> types = Map.of("Team-Senior", "Varsity", "Team-Intermediate", "Intermediate Entry", "Team-Rookie", "Rookie", "Team-Collegiate", "Collegiate");
+        Map<String, String> types = new HashMap<>();
+        types.put("Team-Senior", "Varsity");
+        types.put("Team-Intermediate", "Intermediate Entry");
+        types.put("Team-Rookie", "Rookie");
+        types.put("Team-Collegiate", "Collegiate");
 
         //Set font for mainText
         Font mainText = workbook.createFont();

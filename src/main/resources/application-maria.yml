@@ -21,3 +21,5 @@ spring:
   jpa:
     database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
     generate-ddl: true
+    hibernate:
+      ddl-auto: create

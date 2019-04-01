@@ -28,7 +28,7 @@ CREATE TABLE IF NOT EXISTS singles (
 );
 
 -- top 4 scores
-CREATE OR REPLACE VIEW singlesData AS
+CREATE VIEW IF NOT EXISTS  singlesData AS
 SELECT eventid, event, locationid, location, squadname, team, athlete, gender, classification, round1, round2, round3, round4, total, seqnum
 FROM (
          WITH s AS (
@@ -67,20 +67,20 @@ FROM (
      ) AS a
 WHERE total > 0;
 
-CREATE OR REPLACE VIEW singlesAggregate AS
+CREATE VIEW IF NOT EXISTS singlesAggregate AS
 SELECT athlete, classification, gender, team, SUM(total) total
 FROM (
   SELECT athlete, classification, gender, total, team
-  FROM singlesdata
-) a
+  FROM singlesData
+) AS a
 GROUP BY athlete, classification, gender
 ORDER BY total DESC;
 
-CREATE OR REPLACE VIEW singlesTeamAggregate AS
+CREATE VIEW IF NOT EXISTS  singlesTeamAggregate AS
 SELECT team, classification, SUM(total) total
 FROM (
   SELECT team, CASE WHEN classification IN ('Senior/Jr. Varsity', 'Senior/Varsity') THEN 'Varsity' WHEN classification IN ('Intermediate Entry', 'Intermediate Advanced') THEN 'Intermediate Entry' ELSE classification END classification, total, row_number() OVER (PARTITION BY team, CASE WHEN classification IN ('Senior/Jr. Varsity', 'Senior/Varsity') THEN 'Varsity' WHEN classification IN ('Intermediate Entry', 'Intermediate Advanced') THEN 'Intermediate Entry' ELSE classification END ORDER BY total DESC ) AS segnum
-  FROM singlesaggregate
+  FROM singlesAggregate
   ORDER BY team, classification, total DESC
 ) a
 WHERE segnum <= 5
@@ -114,7 +114,7 @@ CREATE TABLE IF NOT EXISTS doubles (
 );
 
 -- top 4 scores for individual rounds
-CREATE OR REPLACE VIEW doublesData AS
+CREATE VIEW IF NOT EXISTS  doublesData AS
 SELECT eventid, event, locationid, location, squadname, team, athlete, gender, classification, round1, round2, round3, round4, total, seqnum
 FROM (
 WITH s AS (
@@ -175,7 +175,7 @@ UNION ALL
 )) AS a
 WHERE total > 0;
 
-CREATE OR REPLACE VIEW doublesAggregate AS
+CREATE VIEW IF NOT EXISTS  doublesAggregate AS
 SELECT athlete, classification, gender, team, SUM(total) total
 FROM (
   SELECT athlete, classification, gender, total, team
@@ -184,7 +184,7 @@ FROM (
 GROUP BY athlete, classification, gender
 ORDER BY total DESC;
 
-CREATE OR REPLACE VIEW doublesTeamAggregate AS
+CREATE VIEW IF NOT EXISTS  doublesTeamAggregate AS
 SELECT team, classification, SUM(total) total
 FROM (
   SELECT team, CASE WHEN classification IN ('Senior/Jr. Varsity', 'Senior/Varsity') THEN 'Varsity' WHEN classification IN ('Intermediate Entry', 'Intermediate Advanced') THEN 'Intermediate Entry' ELSE classification END classification, total, row_number() OVER (PARTITION BY team, CASE WHEN classification IN ('Senior/Jr. Varsity', 'Senior/Varsity') THEN 'Varsity' WHEN classification IN ('Intermediate Entry', 'Intermediate Advanced') THEN 'Intermediate Entry' ELSE classification END ORDER BY total DESC ) AS segnum
@@ -222,7 +222,7 @@ CREATE TABLE IF NOT EXISTS handicap (
 );
 
 -- top 4 scores
-CREATE OR REPLACE VIEW handicapData AS
+CREATE VIEW IF NOT EXISTS  handicapData AS
 SELECT eventid, event, locationid, location, squadname, team, athlete, gender, classification, round1, round2, round3, round4, total, seqnum
 FROM (
 WITH s AS (
@@ -260,7 +260,7 @@ UNION ALL
 )) AS a
 WHERE total > 0;
 
-CREATE OR REPLACE VIEW handicapAggregate AS
+CREATE VIEW IF NOT EXISTS  handicapAggregate AS
 SELECT athlete, classification, gender, team, SUM(total) total
 FROM (
   SELECT athlete, classification, gender, total, team
@@ -269,7 +269,7 @@ FROM (
 GROUP BY athlete, classification, gender
 ORDER BY total DESC;
 
-CREATE OR REPLACE VIEW handicapTeamAggregate AS
+CREATE VIEW IF NOT EXISTS  handicapTeamAggregate AS
 SELECT team, classification, SUM(total) total
 FROM (
   SELECT team, CASE WHEN classification IN ('Senior/Jr. Varsity', 'Senior/Varsity') THEN 'Varsity' WHEN classification IN ('Intermediate Entry', 'Intermediate Advanced') THEN 'Intermediate Entry' ELSE classification END classification, total, row_number() OVER (PARTITION BY team, CASE WHEN classification IN ('Senior/Jr. Varsity', 'Senior/Varsity') THEN 'Varsity' WHEN classification IN ('Intermediate Entry', 'Intermediate Advanced') THEN 'Intermediate Entry' ELSE classification END ORDER BY total DESC ) AS segnum
@@ -307,7 +307,7 @@ CREATE TABLE IF NOT EXISTS skeet (
 );
 
 -- top 3 scores only
-CREATE OR REPLACE VIEW skeetData AS
+CREATE VIEW IF NOT EXISTS  skeetData AS
 SELECT eventid, event, locationid, location, squadname, team, athlete, gender, classification, round1, round2, round3, round4, total, seqnum
 FROM (
 WITH s AS (
@@ -345,7 +345,7 @@ UNION ALL
 )) AS a
 WHERE total > 0;
 
-CREATE OR REPLACE VIEW skeetAggregate AS
+CREATE VIEW IF NOT EXISTS  skeetAggregate AS
 SELECT athlete, classification, gender, team, SUM(total) total
 FROM (
   SELECT athlete, classification, gender, total, team
@@ -354,7 +354,7 @@ FROM (
 GROUP BY athlete, classification, gender
 ORDER BY total DESC;
 
-CREATE OR REPLACE VIEW skeetTeamAggregate AS
+CREATE VIEW IF NOT EXISTS  skeetTeamAggregate AS
 SELECT team, classification, SUM(total) total
 FROM (
        SELECT team, CASE WHEN classification IN ('Senior/Jr. Varsity', 'Senior/Varsity') THEN 'Varsity' WHEN classification IN ('Intermediate Entry', 'Intermediate Advanced') THEN 'Intermediate Entry' ELSE classification END classification, total, row_number() OVER (PARTITION BY team, CASE WHEN classification IN ('Senior/Jr. Varsity', 'Senior/Varsity') THEN 'Varsity' WHEN classification IN ('Intermediate Entry', 'Intermediate Advanced') THEN 'Intermediate Entry' ELSE classification END ORDER BY total DESC ) AS segnum
@@ -393,7 +393,7 @@ CREATE TABLE IF NOT EXISTS clays (
 );
 
 -- top 3 scores only
-CREATE OR REPLACE VIEW claysData AS
+CREATE VIEW IF NOT EXISTS  claysData AS
 SELECT eventid, event, locationid, location, squadname, team, athlete, gender, classification, round1, round2, round3, round4, total, seqnum
 FROM (
   WITH s AS (
@@ -434,7 +434,7 @@ FROM (
 ) AS a
 WHERE total > 0;
 
-CREATE OR REPLACE VIEW claysAggregate AS
+CREATE VIEW IF NOT EXISTS  claysAggregate AS
 SELECT athlete, classification, gender, team, SUM(total) total
 FROM (
        SELECT athlete, classification, gender, total, team
@@ -443,7 +443,7 @@ FROM (
 GROUP BY athlete, classification, gender
 ORDER BY total DESC;
 
-CREATE OR REPLACE VIEW claysTeamAggregate AS
+CREATE VIEW IF NOT EXISTS  claysTeamAggregate AS
 SELECT team, classification, SUM(total) total
 FROM (
        SELECT team, CASE WHEN classification IN ('Senior/Jr. Varsity', 'Senior/Varsity') THEN 'Varsity' WHEN classification IN ('Intermediate Entry', 'Intermediate Advanced') THEN 'Intermediate Entry' ELSE classification END classification, total, row_number() OVER (PARTITION BY team, CASE WHEN classification IN ('Senior/Jr. Varsity', 'Senior/Varsity') THEN 'Varsity' WHEN classification IN ('Intermediate Entry', 'Intermediate Advanced') THEN 'Intermediate Entry' ELSE classification END ORDER
@@ -455,7 +455,7 @@ WHERE segnum <= 3
 GROUP BY team, classification
 ORDER BY total DESC;
 
-CREATE OR REPLACE VIEW allData AS
+CREATE VIEW IF NOT EXISTS  allData AS
 SELECT *, 'N' as fivestand, 'singles' as type
 FROM singles
 UNION
