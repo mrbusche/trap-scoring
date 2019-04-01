@@ -40,6 +40,7 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -129,7 +130,11 @@ public class ReportController {
         autoSizeColumns(workbook);
         result.append("<br>Auto sized all columns in ").append(System.currentTimeMillis() - start).append("ms");
 
-        FileOutputStream fileOutputStream = new FileOutputStream("updated.xls");
+        Date date = new Date();
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmss");
+        String currentDate = formatter.format(date);
+
+        FileOutputStream fileOutputStream = new FileOutputStream(currentDate + ".xls");
         workbook.write(fileOutputStream);
         fileOutputStream.close();
 
