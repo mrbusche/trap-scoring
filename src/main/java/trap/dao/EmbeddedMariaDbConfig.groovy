@@ -36,6 +36,6 @@ class EmbeddedMariaDbConfig {
             .password(datasourcePassword)
             .url(config.getURL(databaseName))
             .driverClassName(datasourceDriver)
-            .build();
+            .build() as DataSource
     }
 }
