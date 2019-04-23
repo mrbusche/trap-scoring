@@ -9,6 +9,8 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import trap.model.AllData;
@@ -41,10 +43,12 @@ import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.logging.Logger;
 
 @RestController
 @RequestMapping("/reports")
@@ -65,8 +69,29 @@ public class ReportController {
     private final List<String> classificationList = Arrays.asList("Varsity", "Junior Varsity", "Intermediate Advanced", "Intermediate Entry", "Rookie", "Collegiate");
     private final String currentDate = new SimpleDateFormat("MM/dd/yyyy").format(Calendar.getInstance().getTime());
 
+    private static final Logger LOG = Logger.getLogger(ReportController.class.getName());
+
+    private final JdbcTemplate jdbc;
+
+    @Value("${trap.singles}")
+    private String singles;
+    @Value("${trap.doubles}")
+    private String doubles;
+    @Value("${trap.handicap}")
+    private String handicap;
+    @Value("${trap.skeet}")
+    private String skeet;
+    @Value("${trap.clays}")
+    private String clays;
+
     @Autowired
-    public ReportController(SinglesDataRepository singlesRepository, SinglesDataTeamRepository singlesDataTeamRepository, DoublesDataRepository doublesDataRepository, DoublesDataTeamRepository doublesDataTeamRepository, HandicapDataRepository handicapDataRepository, HandicapDataTeamRepository handicapDataTeamRepository, SkeetDataRepository skeetDataRepository, SkeetDataTeamRepository skeetDataTeamRepository, ClaysDataRepository claysDataRepository, ClaysDataTeamRepository claysDataTeamRepository, AllDataRepository allDataRepository) {
+    public ReportController(SinglesDataRepository singlesRepository, SinglesDataTeamRepository singlesDataTeamRepository, DoublesDataRepository doublesDataRepository, DoublesDataTeamRepository doublesDataTeamRepository, HandicapDataRepository handicapDataRepository, HandicapDataTeamRepository handicapDataTeamRepository, SkeetDataRepository skeetDataRepository, SkeetDataTeamRepository skeetDataTeamRepository, ClaysDataRepository claysDataRepository, ClaysDataTeamRepository claysDataTeamRepository, AllDataRepository allDataRepository, JdbcTemplate jdbcTemplate) {
+        jdbc = jdbcTemplate;
+        String result = checkFileImport();
+        if (result.contains("OFF")) {
+            ReportController.LOG.warning("local_infile is OFF.  File import is prohibited!");
+        }
+
         this.singlesRepository = singlesRepository;
         this.singlesDataTeamRepository = singlesDataTeamRepository;
         this.doublesDataRepository = doublesDataRepository;
@@ -80,9 +105,63 @@ public class ReportController {
         this.allDataRepository = allDataRepository;
     }
 
+    @RequestMapping("/checkFileImport")
+    public String checkFileImport() {
+        return jdbc.query("SHOW GLOBAL VARIABLES LIKE 'local_infile'", new Object[0], rs -> rs.next() ? rs.getString(1) + "=" + rs.getString(2) : "Count not determine value of local_infile");
+    }
+
+    private String saveDataToDatabase() {
+        ReportController.LOG.fine("Saving trap data to database");
+
+        jdbc.execute("TRUNCATE TABLE singles;");
+        jdbc.execute("TRUNCATE TABLE doubles;");
+        jdbc.execute("TRUNCATE TABLE handicap;");
+        jdbc.execute("TRUNCATE TABLE skeet;");
+        jdbc.execute("TRUNCATE TABLE clays;");
+
+        StringBuilder results = new StringBuilder();
+        String singlesSql = "load data local infile '" + singles + "' into table singles fields terminated by ',' OPTIONALLY ENCLOSED BY '\"' lines terminated by '\n' IGNORE 1 LINES;";
+        int singlesCount = jdbc.update(con -> con.prepareStatement(singlesSql));
+        results.append("Added ").append(singlesCount).append(" new records to database in singles table.<br>");
+
+        String doublesSql = "load data local infile '" + doubles + "' into table doubles fields terminated by ',' OPTIONALLY ENCLOSED BY '\"' lines terminated by '\n' IGNORE 1 LINES;";
+        int doublesCount = jdbc.update(con -> con.prepareStatement(doublesSql));
+        results.append("Added ").append(doublesCount).append(" new records to database in doubles table.<br>");
+
+        String handicapSql = "load data local infile '" + handicap + "' into table handicap fields terminated by ',' OPTIONALLY ENCLOSED BY '\"' lines terminated by '\n' IGNORE 1 LINES;";
+        int handicapCount = jdbc.update(con -> con.prepareStatement(handicapSql));
+        results.append("Added ").append(handicapCount).append(" new records to database in handicap table.<br>");
+
+        String skeetSql = "load data local infile '" + skeet + "' into table skeet fields terminated by ',' OPTIONALLY ENCLOSED BY '\"' lines terminated by '\n' IGNORE 1 LINES;";
+        int skeetCount = jdbc.update(con -> con.prepareStatement(skeetSql));
+        results.append("Added ").append(skeetCount).append(" new records to database in skeet table.<br>");
+
+        String claysSql = "load data local infile '" + clays + "' into table clays fields terminated by ',' OPTIONALLY ENCLOSED BY '\"' lines terminated by '\n' IGNORE 1 LINES;";
+        int claysCount = jdbc.update(con -> con.prepareStatement(claysSql));
+        results.append("Added ").append(claysCount).append(" new records to database in clays table.<br>");
+
+        jdbc.execute("COMMIT;");
+
+        fixNames();
+
+        return results.toString();
+    }
+
+    private void fixNames() {
+        jdbc.execute("UPDATE singles SET team = 'North Scott Trap Club' WHERE team = 'North Scott Trap Team';");
+        jdbc.execute("UPDATE doubles SET team = 'North Scott Trap Club' WHERE team = 'North Scott Trap Team';");
+        jdbc.execute("UPDATE handicap SET team = 'North Scott Trap Club' WHERE team = 'North Scott Trap Team';");
+        jdbc.execute("UPDATE skeet SET team = 'North Scott Trap Club' WHERE team = 'North Scott Trap Team';");
+        jdbc.execute("UPDATE clays SET team = 'North Scott Trap Club' WHERE team = 'North Scott Trap Team';");
+        jdbc.execute("COMMIT;");
+    }
+
     @RequestMapping("/export")
     public String export() throws IOException {
         StringBuilder result = new StringBuilder();
+
+        result.append(saveDataToDatabase());
+
         ClassLoader classLoader = getClass().getClassLoader();
         File file = new File(Objects.requireNonNull(classLoader.getResource("template.xls")).getFile());
         Workbook workbook = WorkbookFactory.create(file);
@@ -94,7 +173,11 @@ public class ReportController {
         populateCleanData(workbook.getSheet("Clean Data"));
         result.append("<br>Clean data populated in ").append(System.currentTimeMillis() - start).append("ms");
 
-        Map<String, String> types = Map.of("Team-Senior", "Varsity", "Team-Intermediate", "Intermediate Entry", "Team-Rookie", "Rookie", "Team-Collegiate", "Collegiate");
+        Map<String, String> types = new HashMap<>();
+        types.put("Team-Senior", "Varsity");
+        types.put("Team-Intermediate", "Intermediate Entry");
+        types.put("Team-Rookie", "Rookie");
+        types.put("Team-Collegiate", "Collegiate");
 
         //Set font for mainText
         Font mainText = workbook.createFont();
@@ -195,15 +278,11 @@ public class ReportController {
             cell = row.createCell(20);
             cell.setCellValue(rowData.getBackrun());
             cell = row.createCell(21);
-            cell.setCellValue(rowData.getRegisterdate());
-            cell = row.createCell(22);
-            cell.setCellValue(rowData.getRegisteredby());
-            cell = row.createCell(23);
             cell.setCellValue(rowData.getFivestand());
-            cell = row.createCell(24);
+            cell = row.createCell(22);
             cell.setCellValue(rowData.getType());
         }
-        sheet.setAutoFilter(CellRangeAddress.valueOf("A1:Y1"));
+        sheet.setAutoFilter(CellRangeAddress.valueOf("A1:W1"));
 
     }
 
