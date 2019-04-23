@@ -278,15 +278,11 @@ public class ReportController {
             cell = row.createCell(20);
             cell.setCellValue(rowData.getBackrun());
             cell = row.createCell(21);
-            cell.setCellValue(rowData.getRegisterdate());
-            cell = row.createCell(22);
-            cell.setCellValue(rowData.getRegisteredby());
-            cell = row.createCell(23);
             cell.setCellValue(rowData.getFivestand());
-            cell = row.createCell(24);
+            cell = row.createCell(22);
             cell.setCellValue(rowData.getType());
         }
-        sheet.setAutoFilter(CellRangeAddress.valueOf("A1:Y1"));
+        sheet.setAutoFilter(CellRangeAddress.valueOf("A1:W1"));
 
     }
 

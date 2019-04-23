@@ -3,29 +3,26 @@
 -- USE trap;
 DROP TABLE IF EXISTS singles;
 CREATE TABLE IF NOT EXISTS singles (
+    CompId MEDIUMINT,
     EventId VARCHAR(6),
     Event VARCHAR(50),
     LocationId MEDIUMINT,
     Location VARCHAR(50),
     EventDate VARCHAR(16),
     SquadName VARCHAR(50),
-    Station SMALLINT,
     Team VARCHAR(50),
     Athlete VARCHAR(50),
+    Athlete_Id MEDIUMINT,
     Classification VARCHAR(50),
     Gender VARCHAR(6),
-    Round1 TINYINT,
-    Round2 TINYINT,
-    Round3 TINYINT,
-    Round4 TINYINT,
-    Round5 TINYINT,
-    Round6 TINYINT,
-    Round7 TINYINT,
-    Round8 TINYINT,
-    FrontRun TINYINT DEFAULT 0,
-    BackRun TINYINT DEFAULT 0,
-    RegisterDate VARCHAR(16),
-    RegisteredBy VARCHAR(50)
+    Round1 TINYINT DEFAULT 0,
+    Round2 TINYINT DEFAULT 0,
+    Round3 TINYINT DEFAULT 0,
+    Round4 TINYINT DEFAULT 0,
+    Round5 TINYINT DEFAULT 0,
+    Round6 TINYINT DEFAULT 0,
+    Round7 TINYINT DEFAULT 0,
+    Round8 TINYINT DEFAULT 0
 );
 
 -- top 4 scores
@@ -110,9 +107,7 @@ CREATE TABLE IF NOT EXISTS doubles (
     Round7 TINYINT DEFAULT 0,
     Round8 TINYINT DEFAULT 0,
     FrontRun TINYINT DEFAULT 0,
-    BackRun TINYINT DEFAULT 0,
-    RegisterDate VARCHAR(16),
-    RegisteredBy VARCHAR(50)
+    BackRun TINYINT DEFAULT 0
 );
 
 -- top 4 scores for individual rounds
@@ -219,9 +214,7 @@ CREATE TABLE IF NOT EXISTS handicap (
     Round7 TINYINT DEFAULT 0,
     Round8 TINYINT DEFAULT 0,
     FrontRun TINYINT DEFAULT 0,
-    BackRun TINYINT DEFAULT 0,
-    RegisterDate VARCHAR(16),
-    RegisteredBy VARCHAR(50)
+    BackRun TINYINT DEFAULT 0
 );
 
 -- top 4 scores
@@ -305,9 +298,7 @@ CREATE TABLE IF NOT EXISTS skeet (
     Round7 TINYINT DEFAULT 0,
     Round8 TINYINT DEFAULT 0,
     FrontRun TINYINT DEFAULT 0,
-    BackRun TINYINT DEFAULT 0,
-    RegisterDate VARCHAR(16),
-    RegisteredBy VARCHAR(50)
+    BackRun TINYINT DEFAULT 0
 );
 
 -- top 3 scores only
@@ -392,8 +383,6 @@ CREATE TABLE IF NOT EXISTS clays (
     Round8 TINYINT DEFAULT 0,
     FrontRun TINYINT DEFAULT 0,
     BackRun TINYINT DEFAULT 0,
-    RegisterDate VARCHAR(16),
-    RegisteredBy VARCHAR(50),
     FiveStand VARCHAR(1)
 );
 
@@ -461,7 +450,7 @@ GROUP BY team, classification
 ORDER BY total DESC;
 
 CREATE OR REPLACE VIEW allData AS
-    SELECT *, 'N' as fivestand, 'singles' as type
+    SELECT eventid, event, locationid, location, eventdate, squadname, '' station, team, athlete, classification, gender, round1, round2, round3, round4, round5, round6, round7, round8, 0 as frontrun, 0 as backrun, 'N' as fivestand, 'singles' as type
     FROM singles
     UNION
     SELECT *, 'N', 'doubles' as type
@@ -475,9 +464,3 @@ CREATE OR REPLACE VIEW allData AS
     UNION
     SELECT *, 'clays' as type
     FROM clays;
-
-UPDATE singles SET team = 'North Scott Trap Club' WHERE team = 'North Scott Trap Team';
-UPDATE doubles SET team = 'North Scott Trap Club' WHERE team = 'North Scott Trap Team';
-UPDATE handicap SET team = 'North Scott Trap Club' WHERE team = 'North Scott Trap Team';
-UPDATE skeet SET team = 'North Scott Trap Club' WHERE team = 'North Scott Trap Team';
-UPDATE clays SET team = 'North Scott Trap Club' WHERE team = 'North Scott Trap Team';

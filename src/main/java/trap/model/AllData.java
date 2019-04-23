@@ -31,18 +31,16 @@ public class AllData {
     String athlete;
     String classification;
     String gender;
-    Integer round1;
-    Integer round2;
-    Integer round3;
-    Integer round4;
-    Integer round5;
-    Integer round6;
-    Integer round7;
-    Integer round8;
-    Integer frontrun;
-    Integer backrun;
-    String registerdate;
-    String registeredby;
+    Integer round1 = 0;
+    Integer round2 = 0;
+    Integer round3 = 0;
+    Integer round4 = 0;
+    Integer round5 = 0;
+    Integer round6 = 0;
+    Integer round7 = 0;
+    Integer round8 = 0;
+    Integer frontrun = 0;
+    Integer backrun = 0;
     String fivestand;
     String type;
 }
