@@ -66,7 +66,7 @@ public class ReportController {
     private final ClaysDataTeamRepository claysDataTeamRepository;
     private final AllDataRepository allDataRepository;
 
-    private final List<String> classificationList = Arrays.asList("Varsity", "Junior Varsity", "Intermediate Advanced", "Intermediate Entry", "Rookie", "Collegiate");
+    private final List<String> classificationList = Arrays.asList("Varsity", "Junior Varsity", "Intermediate Advanced", "Intermediate Entry", "Rookie");
     private final String currentDate = new SimpleDateFormat("MM/dd/yyyy").format(Calendar.getInstance().getTime());
 
     private static final Logger LOG = Logger.getLogger(ReportController.class.getName());
@@ -177,7 +177,6 @@ public class ReportController {
         types.put("Team-Senior", "Varsity");
         types.put("Team-Intermediate", "Intermediate Entry");
         types.put("Team-Rookie", "Rookie");
-        types.put("Team-Collegiate", "Collegiate");
 
         //Set font for mainText
         Font mainText = workbook.createFont();
