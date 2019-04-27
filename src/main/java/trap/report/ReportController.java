@@ -14,6 +14,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import trap.model.AllData;
+import trap.model.AllTeamScores;
 import trap.model.ClaysAggregate;
 import trap.model.ClaysTeamAggregate;
 import trap.model.DoublesAggregate;
@@ -25,6 +26,7 @@ import trap.model.SinglesTeamAggregate;
 import trap.model.SkeetAggregate;
 import trap.model.SkeetTeamAggregate;
 import trap.repository.AllDataRepository;
+import trap.repository.AllTeamScoresRepository;
 import trap.repository.ClaysDataRepository;
 import trap.repository.ClaysDataTeamRepository;
 import trap.repository.DoublesDataRepository;
@@ -65,6 +67,7 @@ public class ReportController {
     private final ClaysDataRepository claysDataRepository;
     private final ClaysDataTeamRepository claysDataTeamRepository;
     private final AllDataRepository allDataRepository;
+    private final AllTeamScoresRepository allTeamScoresRepository;
 
     private final List<String> classificationList = Arrays.asList("Varsity", "Junior Varsity", "Intermediate Advanced", "Intermediate Entry", "Rookie");
     private final String currentDate = new SimpleDateFormat("MM/dd/yyyy").format(Calendar.getInstance().getTime());
@@ -85,7 +88,7 @@ public class ReportController {
     private String clays;
 
     @Autowired
-    public ReportController(SinglesDataRepository singlesRepository, SinglesDataTeamRepository singlesDataTeamRepository, DoublesDataRepository doublesDataRepository, DoublesDataTeamRepository doublesDataTeamRepository, HandicapDataRepository handicapDataRepository, HandicapDataTeamRepository handicapDataTeamRepository, SkeetDataRepository skeetDataRepository, SkeetDataTeamRepository skeetDataTeamRepository, ClaysDataRepository claysDataRepository, ClaysDataTeamRepository claysDataTeamRepository, AllDataRepository allDataRepository, JdbcTemplate jdbcTemplate) {
+    public ReportController(SinglesDataRepository singlesRepository, SinglesDataTeamRepository singlesDataTeamRepository, DoublesDataRepository doublesDataRepository, DoublesDataTeamRepository doublesDataTeamRepository, HandicapDataRepository handicapDataRepository, HandicapDataTeamRepository handicapDataTeamRepository, SkeetDataRepository skeetDataRepository, SkeetDataTeamRepository skeetDataTeamRepository, ClaysDataRepository claysDataRepository, ClaysDataTeamRepository claysDataTeamRepository, AllDataRepository allDataRepository, AllTeamScoresRepository allTeamScoresRepository, JdbcTemplate jdbcTemplate) {
         jdbc = jdbcTemplate;
         String result = checkFileImport();
         if (result.contains("OFF")) {
@@ -103,6 +106,7 @@ public class ReportController {
         this.claysDataRepository = claysDataRepository;
         this.claysDataTeamRepository = claysDataTeamRepository;
         this.allDataRepository = allDataRepository;
+        this.allTeamScoresRepository = allTeamScoresRepository;
     }
 
     @RequestMapping("/checkFileImport")
@@ -211,6 +215,10 @@ public class ReportController {
         start = System.currentTimeMillis();
         autoSizeColumns(workbook);
         result.append("<br>Auto sized all columns in ").append(System.currentTimeMillis() - start).append("ms");
+
+        start = System.currentTimeMillis();
+        populateTeamIndividualData(workbook.getSheet("Team-Individual-Scores"));
+        result.append("<br>Team Individual Scores data populated in ").append(System.currentTimeMillis() - start).append("ms");
 
         Date date = new Date();
         SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmss");
@@ -447,6 +455,34 @@ public class ReportController {
         cell = row.createCell(column + 2);
         cell.setCellValue(team);
         cell.setCellStyle(mainTextStyle);
+    }
+
+
+    private void populateTeamIndividualData(Sheet sheet) {
+        List<AllTeamScores> allData = allTeamScoresRepository.findAll();
+
+        int rows = sheet.getLastRowNum();
+
+        Cell cell;
+        Row row;
+        for (AllTeamScores rowData : allData) {
+            row = sheet.createRow(++rows);
+            cell = row.createCell(0);
+            cell.setCellValue(rowData.getType());
+            cell = row.createCell(1);
+            cell.setCellValue(rowData.getTeam());
+            cell = row.createCell(2);
+            cell.setCellValue(rowData.getClassification());
+            cell = row.createCell(3);
+            cell.setCellValue(rowData.getAthlete());
+            cell = row.createCell(4);
+            cell.setCellValue(rowData.getIndtotal());
+            cell = row.createCell(5);
+            cell.setCellValue(rowData.getTeamtotal());
+            cell.setCellValue(rowData.getType());
+        }
+        sheet.setAutoFilter(CellRangeAddress.valueOf("A1:F1"));
+
     }
 
     private static void autoSizeColumns(Workbook workbook) {
