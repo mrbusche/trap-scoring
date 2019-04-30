@@ -426,7 +426,8 @@ public class ReportController {
             }
             maxRow = Math.max(maxRow, updateRow);
 
-        sheet.setAutoFilter(CellRangeAddress.valueOf("A13:T13"));
+            sheet.setAutoFilter(CellRangeAddress.valueOf("A13:T13"));
+        }
     }
 
     private void setCurrentDateHeader(Sheet sheet) {
@@ -453,7 +454,6 @@ public class ReportController {
         cell.setCellValue(team);
         cell.setCellStyle(mainTextStyle);
     }
-
 
     private void populateTeamIndividualData(Sheet sheet) {
         List<AllTeamScores> allData = allTeamScoresRepository.findAll();
