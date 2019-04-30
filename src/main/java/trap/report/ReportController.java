@@ -144,8 +144,6 @@ public class ReportController {
         int claysCount = jdbc.update(con -> con.prepareStatement(claysSql));
         results.append("Added ").append(claysCount).append(" new records to database in clays table.<br>");
 
-        jdbc.execute("COMMIT;");
-
         fixNames();
 
         return results.toString();
@@ -171,7 +169,7 @@ public class ReportController {
         Workbook workbook = WorkbookFactory.create(file);
 
         result.append("Workbook has ").append(workbook.getNumberOfSheets()).append(" sheets");
-        workbook.forEach(sheet -> result.append("<br>").append(sheet.getSheetName()));
+        workbook.forEach(sheet -> result.append("<br> - ").append(sheet.getSheetName()));
 
         long start = System.currentTimeMillis();
         populateCleanData(workbook.getSheet("Clean Data"));
@@ -213,12 +211,12 @@ public class ReportController {
         result.append("<br>Individual Women data populated in ").append(System.currentTimeMillis() - start).append("ms");
 
         start = System.currentTimeMillis();
-        autoSizeColumns(workbook);
-        result.append("<br>Auto sized all columns in ").append(System.currentTimeMillis() - start).append("ms");
-
-        start = System.currentTimeMillis();
         populateTeamIndividualData(workbook.getSheet("Team-Individual-Scores"));
         result.append("<br>Team Individual Scores data populated in ").append(System.currentTimeMillis() - start).append("ms");
+
+        start = System.currentTimeMillis();
+        autoSizeColumns(workbook);
+        result.append("<br>Auto sized all columns in ").append(System.currentTimeMillis() - start).append("ms");
 
         Date date = new Date();
         SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmss");
@@ -427,7 +425,6 @@ public class ReportController {
                 addPlayerData(row, column, claysRowData.getAthlete(), claysRowData.getTotal(), claysRowData.getTeam(), mainTextStyle);
             }
             maxRow = Math.max(maxRow, updateRow);
-        }
 
         sheet.setAutoFilter(CellRangeAddress.valueOf("A13:T13"));
     }
@@ -496,7 +493,6 @@ public class ReportController {
                     Cell cell = cellIterator.next();
                     int columnIndex = cell.getColumnIndex();
                     sheet.autoSizeColumn(columnIndex);
-                    System.out.println(sheetNum + " column " + columnIndex);
                 }
             }
         }
