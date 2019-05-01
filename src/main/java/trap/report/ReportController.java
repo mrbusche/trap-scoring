@@ -39,6 +39,7 @@ import trap.repository.SkeetDataRepository;
 import trap.repository.SkeetDataTeamRepository;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -173,8 +174,8 @@ public class ReportController {
         result.append(saveDataToDatabase());
 
         ClassLoader classLoader = getClass().getClassLoader();
-        File file = new File(Objects.requireNonNull(classLoader.getResource("template.xls")).getFile());
-        Workbook workbook = WorkbookFactory.create(file);
+        File file = new File(Objects.requireNonNull(classLoader.getResource("template.xlsx")).getFile());
+        Workbook workbook = WorkbookFactory.create(new FileInputStream(file));
 
         result.append("Workbook has ").append(workbook.getNumberOfSheets()).append(" sheets");
         workbook.forEach(sheet -> result.append("<br> - ").append(sheet.getSheetName()));
@@ -230,7 +231,7 @@ public class ReportController {
         SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmss");
         String currentDate = formatter.format(date);
 
-        FileOutputStream fileOutputStream = new FileOutputStream(currentDate + ".xls");
+        FileOutputStream fileOutputStream = new FileOutputStream(currentDate + ".xlsx");
         workbook.write(fileOutputStream);
         fileOutputStream.close();
 
