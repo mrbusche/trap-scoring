@@ -144,18 +144,26 @@ public class ReportController {
         int claysCount = jdbc.update(con -> con.prepareStatement(claysSql));
         results.append("Added ").append(claysCount).append(" new records to database in clays table.<br>");
 
-        fixNames();
+        fixTeamNames();
+        fixAthleteNames();
 
         return results.toString();
     }
 
-    private void fixNames() {
+    private void fixTeamNames() {
         jdbc.execute("UPDATE singles SET team = 'North Scott Trap Club' WHERE team = 'North Scott Trap Team';");
         jdbc.execute("UPDATE doubles SET team = 'North Scott Trap Club' WHERE team = 'North Scott Trap Team';");
         jdbc.execute("UPDATE handicap SET team = 'North Scott Trap Club' WHERE team = 'North Scott Trap Team';");
         jdbc.execute("UPDATE skeet SET team = 'North Scott Trap Club' WHERE team = 'North Scott Trap Team';");
         jdbc.execute("UPDATE clays SET team = 'North Scott Trap Club' WHERE team = 'North Scott Trap Team';");
-        jdbc.execute("COMMIT;");
+    }
+
+    private void fixAthleteNames() {
+        jdbc.execute("UPDATE singles SET athlete = replace(athlete, '  ', '') WHERE athlete LIKE '%  %';");
+        jdbc.execute("UPDATE doubles SET athlete = replace(athlete, '  ', '') WHERE athlete LIKE '%  %';");
+        jdbc.execute("UPDATE handicap SET athlete = replace(athlete, '  ', '') WHERE athlete LIKE '%  %';");
+        jdbc.execute("UPDATE skeet SET athlete = replace(athlete, '  ', '') WHERE athlete LIKE '%  %';");
+        jdbc.execute("UPDATE clays SET athlete = replace(athlete, '  ', '') WHERE athlete LIKE '%  %';");
     }
 
     @RequestMapping("/export")
