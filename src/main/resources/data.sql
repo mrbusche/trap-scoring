@@ -515,6 +515,7 @@ FROM (
                   , s.round1, s.round2, 0 round3, 0 round4
                   , s.round1 + s.round2 total
                   , row_number() OVER (PARTITION BY athlete ORDER BY s.round1 + s.round2 DESC) AS seqnum
+                  , CASE WHEN fivestand = 'Y' THEN 1 ELSE 0 END AS fivestand
              FROM clays s
              UNION ALL
              SELECT s.eventid, s.event, s.locationid, s.location, s.squadname, replace(s.team, 'Club', 'Team') AS team, s.athlete, s.gender
@@ -522,6 +523,7 @@ FROM (
                   , s.round3, s.round4, 0, 0
                   , s.round3 + s.round4 total
                   , row_number() OVER (PARTITION BY athlete ORDER BY s.round3 + s.round4 DESC) AS seqnum
+                  , CASE WHEN fivestand = 'Y' THEN 1 ELSE 0 END AS fivestand
              FROM clays s
              UNION ALL
              SELECT s.eventid, s.event, s.locationid, s.location, s.squadname, replace(s.team, 'Club', 'Team') AS team, s.athlete, s.gender
@@ -529,6 +531,7 @@ FROM (
                   , s.round5, s.round6, 0, 0
                   , s.round5 + s.round6 total
                   , row_number() OVER (PARTITION BY athlete ORDER BY s.round5 + s.round6 DESC) AS seqnum
+                  , CASE WHEN fivestand = 'Y' THEN 1 ELSE 0 END AS fivestand
              FROM clays s
              UNION ALL
              SELECT s.eventid, s.event, s.locationid, s.location, s.squadname, replace(s.team, 'Club', 'Team') AS team, s.athlete, s.gender
@@ -536,6 +539,7 @@ FROM (
                   , s.round7, s.round8, 0, 0
                   , s.round7 + s.round8 total
                   , row_number() OVER (PARTITION BY athlete ORDER BY s.round7 + s.round8 DESC) AS seqnum
+                  , CASE WHEN fivestand = 'Y' THEN 1 ELSE 0 END AS fivestand
              FROM clays s
              WHERE s.locationid > 0
              ORDER BY athlete, total DESC
