@@ -1,9 +1,11 @@
 -- set global local_infile=1;
 
--- USE trap;
+
+
+USE trap;
 DROP TABLE IF EXISTS singles;
 CREATE TABLE IF NOT EXISTS singles (
-    CompId MEDIUMINT,
+    -- CompId MEDIUMINT,
     EventId VARCHAR(6),
     Event VARCHAR(50),
     LocationId MEDIUMINT,
@@ -38,21 +40,21 @@ FROM (
                            , s.round1 + s.round2 total
                       FROM singles s
                       WHERE s.locationid > 0
-                      UNION
+                      UNION ALL
                       SELECT s.eventid, s.event, s.locationid, s.location, s.squadname, replace(s.team, 'Club', 'Team') AS team, s.athlete, s.gender
                            , CASE WHEN s.classification = 'Senior/Varsity' THEN 'Varsity' WHEN s.classification = 'Senior/Jr. Varsity' THEN 'Junior Varsity' WHEN s.classification = 'Intermediate/Advanced' THEN 'Intermediate Advanced' WHEN s.classification = 'Intermediate/Entry Level' THEN 'Intermediate Entry' WHEN s.classification = 'Rookie' THEN 'Rookie' ELSE s.classification END classification
                            , s.round3, s.round4, 0 ,0
                            , s.round3 + s.round4 total
                       FROM singles s
                       WHERE s.locationid > 0
-                      UNION
+                      UNION ALL
                       SELECT s.eventid, s.event, s.locationid, s.location, s.squadname, replace(s.team, 'Club', 'Team') AS team, s.athlete, s.gender
                            , CASE WHEN s.classification = 'Senior/Varsity' THEN 'Varsity' WHEN s.classification = 'Senior/Jr. Varsity' THEN 'Junior Varsity' WHEN s.classification = 'Intermediate/Advanced' THEN 'Intermediate Advanced' WHEN s.classification = 'Intermediate/Entry Level' THEN 'Intermediate Entry' WHEN s.classification = 'Rookie' THEN 'Rookie' ELSE s.classification END classification
                            , s.round5, s.round6, 0 ,0
                            , s.round5 + s.round6 total
                       FROM singles s
                       WHERE s.locationid > 0
-                      UNION
+                      UNION ALL
                       SELECT s.eventid, s.event, s.locationid, s.location, s.squadname, replace(s.team, 'Club', 'Team') AS team, s.athlete, s.gender
                            , CASE WHEN s.classification = 'Senior/Varsity' THEN 'Varsity' WHEN s.classification = 'Senior/Jr. Varsity' THEN 'Junior Varsity' WHEN s.classification = 'Intermediate/Advanced' THEN 'Intermediate Advanced' WHEN s.classification = 'Intermediate/Entry Level' THEN 'Intermediate Entry' WHEN s.classification = 'Rookie' THEN 'Rookie' ELSE s.classification END classification
                            , s.round7, s.round8, 0 ,0
@@ -160,21 +162,21 @@ FROM (
                            , s.round1 total
                       FROM doubles s
                       WHERE s.locationid > 0
-                      UNION
+                      UNION ALL
                       SELECT s.eventid, s.event, s.locationid, s.location, s.squadname, replace(s.team, 'Club', 'Team') AS team, s.athlete, s.gender
                            , CASE WHEN s.classification = 'Senior/Varsity' THEN 'Varsity' WHEN s.classification = 'Senior/Jr. Varsity' THEN 'Junior Varsity' WHEN s.classification = 'Intermediate/Advanced' THEN 'Intermediate Advanced' WHEN s.classification = 'Intermediate/Entry Level' THEN 'Intermediate Entry' WHEN s.classification = 'Rookie' THEN 'Rookie' ELSE s.classification END classification
                            , s.round1, s.round2, s.round3, s.round4
                            , s.round2 total
                       FROM doubles s
                       WHERE s.locationid > 0
-                      UNION
+                      UNION ALL
                       SELECT s.eventid, s.event, s.locationid, s.location, s.squadname, replace(s.team, 'Club', 'Team') AS team, s.athlete, s.gender
                            , CASE WHEN s.classification = 'Senior/Varsity' THEN 'Varsity' WHEN s.classification = 'Senior/Jr. Varsity' THEN 'Junior Varsity' WHEN s.classification = 'Intermediate/Advanced' THEN 'Intermediate Advanced' WHEN s.classification = 'Intermediate/Entry Level' THEN 'Intermediate Entry' WHEN s.classification = 'Rookie' THEN 'Rookie' ELSE s.classification END classification
                            , s.round1, s.round2, s.round3, s.round4
                            , s.round3 total
                       FROM doubles s
                       WHERE s.locationid > 0
-                      UNION
+                      UNION ALL
                       SELECT s.eventid, s.event, s.locationid, s.location, s.squadname, replace(s.team, 'Club', 'Team') AS team, s.athlete, s.gender
                            , CASE WHEN s.classification = 'Senior/Varsity' THEN 'Varsity' WHEN s.classification = 'Senior/Jr. Varsity' THEN 'Junior Varsity' WHEN s.classification = 'Intermediate/Advanced' THEN 'Intermediate Advanced' WHEN s.classification = 'Intermediate/Entry Level' THEN 'Intermediate Entry' WHEN s.classification = 'Rookie' THEN 'Rookie' ELSE s.classification END classification
                            , s.round1, s.round2, s.round3, s.round4
@@ -231,7 +233,7 @@ ORDER BY total DESC;
 
 CREATE OR REPLACE VIEW doublesTeamScores AS
 SELECT sta.team, sdts.classification, athlete, sdts.total indtotal, sta.total teamtotal
-FROM singlesTeamAggregate sta
+FROM doublesTeamAggregate sta
          INNER JOIN (SELECT team, classification, athlete, SUM(total) total
                      FROM (
                               SELECT team, CASE WHEN classification IN ('Senior/Jr. Varsity', 'Senior/Varsity', 'Junior Varsity') THEN 'Varsity' WHEN classification IN ('Intermediate Entry', 'Intermediate Advanced') THEN 'Intermediate Entry' ELSE classification END classification, athlete, total, row_number() OVER (PARTITION BY team, CASE WHEN classification IN ('Senior/Jr. Varsity', 'Senior/Varsity', 'Junior Varsity') THEN 'Varsity' WHEN classification IN ('Intermediate Entry', 'Intermediate Advanced') THEN 'Intermediate Entry' ELSE classification END ORDER BY total DESC ) AS segnum
@@ -274,35 +276,35 @@ FROM (
          WITH s AS (
              SELECT eventid, event, locationid, location, squadname, team, athlete, gender, classification, round1, round2, round3, round4, total, row_number() OVER (PARTITION BY athlete ORDER BY total DESC) AS seqnum
              FROM (
-                 SELECT s.eventid, s.event, s.locationid, s.location, s.squadname, replace(s.team, 'Club', 'Team') AS team, s.athlete, s.gender
-                      , CASE WHEN s.classification = 'Senior/Varsity' THEN 'Varsity' WHEN s.classification = 'Senior/Jr. Varsity' THEN 'Junior Varsity' WHEN s.classification = 'Intermediate/Advanced' THEN 'Intermediate Advanced' WHEN s.classification = 'Intermediate/Entry Level' THEN 'Intermediate Entry' WHEN s.classification = 'Rookie' THEN 'Rookie' ELSE s.classification END classification
-                      , s.round1, s.round2, 0 round3, 0 round4
-                      , s.round1 + s.round2 total
-                      , row_number() OVER (PARTITION BY athlete ORDER BY s.round1 + s.round2 DESC) AS seqnum
-                 FROM handicap s
-                 UNION ALL
-                 SELECT s.eventid, s.event, s.locationid, s.location, s.squadname, replace(s.team, 'Club', 'Team') AS team, s.athlete, s.gender
-                      , CASE WHEN s.classification = 'Senior/Varsity' THEN 'Varsity' WHEN s.classification = 'Senior/Jr. Varsity' THEN 'Junior Varsity' WHEN s.classification = 'Intermediate/Advanced' THEN 'Intermediate Advanced' WHEN s.classification = 'Intermediate/Entry Level' THEN 'Intermediate Entry' WHEN s.classification = 'Rookie' THEN 'Rookie' ELSE s.classification END classification
-                      , s.round3, s.round4, 0, 0
-                      , s.round3 + s.round4 total
-                      , row_number() OVER (PARTITION BY athlete ORDER BY s.round3 + s.round4 DESC) AS seqnum
-                 FROM handicap s
-                 UNION ALL
-                 SELECT s.eventid, s.event, s.locationid, s.location, s.squadname, replace(s.team, 'Club', 'Team') AS team, s.athlete, s.gender
-                      , CASE WHEN s.classification = 'Senior/Varsity' THEN 'Varsity' WHEN s.classification = 'Senior/Jr. Varsity' THEN 'Junior Varsity' WHEN s.classification = 'Intermediate/Advanced' THEN 'Intermediate Advanced' WHEN s.classification = 'Intermediate/Entry Level' THEN 'Intermediate Entry' WHEN s.classification = 'Rookie' THEN 'Rookie' ELSE s.classification END classification
-                      , s.round5, s.round6, 0, 0
-                      , s.round5 + s.round6 total
-                      , row_number() OVER (PARTITION BY athlete ORDER BY s.round5 + s.round6 DESC) AS seqnum
-                 FROM handicap s
-                 UNION ALL
-                 SELECT s.eventid, s.event, s.locationid, s.location, s.squadname, replace(s.team, 'Club', 'Team') AS team, s.athlete, s.gender
-                      , CASE WHEN s.classification = 'Senior/Varsity' THEN 'Varsity' WHEN s.classification = 'Senior/Jr. Varsity' THEN 'Junior Varsity' WHEN s.classification = 'Intermediate/Advanced' THEN 'Intermediate Advanced' WHEN s.classification = 'Intermediate/Entry Level' THEN 'Intermediate Entry' WHEN s.classification = 'Rookie' THEN 'Rookie' ELSE s.classification END classification
-                      , s.round7, s.round8, 0, 0
-                      , s.round7 + s.round8 total
-                      , row_number() OVER (PARTITION BY athlete ORDER BY s.round7 + s.round8 DESC) AS seqnum
-                 FROM handicap s
-                 WHERE s.locationid > 0
-            ) a
+                      SELECT s.eventid, s.event, s.locationid, s.location, s.squadname, replace(s.team, 'Club', 'Team') AS team, s.athlete, s.gender
+                           , CASE WHEN s.classification = 'Senior/Varsity' THEN 'Varsity' WHEN s.classification = 'Senior/Jr. Varsity' THEN 'Junior Varsity' WHEN s.classification = 'Intermediate/Advanced' THEN 'Intermediate Advanced' WHEN s.classification = 'Intermediate/Entry Level' THEN 'Intermediate Entry' WHEN s.classification = 'Rookie' THEN 'Rookie' ELSE s.classification END classification
+                           , s.round1, s.round2, 0 round3, 0 round4
+                           , s.round1 + s.round2 total
+                           , row_number() OVER (PARTITION BY athlete ORDER BY s.round1 + s.round2 DESC) AS seqnum
+                      FROM handicap s
+                      UNION ALL
+                      SELECT s.eventid, s.event, s.locationid, s.location, s.squadname, replace(s.team, 'Club', 'Team') AS team, s.athlete, s.gender
+                           , CASE WHEN s.classification = 'Senior/Varsity' THEN 'Varsity' WHEN s.classification = 'Senior/Jr. Varsity' THEN 'Junior Varsity' WHEN s.classification = 'Intermediate/Advanced' THEN 'Intermediate Advanced' WHEN s.classification = 'Intermediate/Entry Level' THEN 'Intermediate Entry' WHEN s.classification = 'Rookie' THEN 'Rookie' ELSE s.classification END classification
+                           , s.round3, s.round4, 0, 0
+                           , s.round3 + s.round4 total
+                           , row_number() OVER (PARTITION BY athlete ORDER BY s.round3 + s.round4 DESC) AS seqnum
+                      FROM handicap s
+                      UNION ALL
+                      SELECT s.eventid, s.event, s.locationid, s.location, s.squadname, replace(s.team, 'Club', 'Team') AS team, s.athlete, s.gender
+                           , CASE WHEN s.classification = 'Senior/Varsity' THEN 'Varsity' WHEN s.classification = 'Senior/Jr. Varsity' THEN 'Junior Varsity' WHEN s.classification = 'Intermediate/Advanced' THEN 'Intermediate Advanced' WHEN s.classification = 'Intermediate/Entry Level' THEN 'Intermediate Entry' WHEN s.classification = 'Rookie' THEN 'Rookie' ELSE s.classification END classification
+                           , s.round5, s.round6, 0, 0
+                           , s.round5 + s.round6 total
+                           , row_number() OVER (PARTITION BY athlete ORDER BY s.round5 + s.round6 DESC) AS seqnum
+                      FROM handicap s
+                      UNION ALL
+                      SELECT s.eventid, s.event, s.locationid, s.location, s.squadname, replace(s.team, 'Club', 'Team') AS team, s.athlete, s.gender
+                           , CASE WHEN s.classification = 'Senior/Varsity' THEN 'Varsity' WHEN s.classification = 'Senior/Jr. Varsity' THEN 'Junior Varsity' WHEN s.classification = 'Intermediate/Advanced' THEN 'Intermediate Advanced' WHEN s.classification = 'Intermediate/Entry Level' THEN 'Intermediate Entry' WHEN s.classification = 'Rookie' THEN 'Rookie' ELSE s.classification END classification
+                           , s.round7, s.round8, 0, 0
+                           , s.round7 + s.round8 total
+                           , row_number() OVER (PARTITION BY athlete ORDER BY s.round7 + s.round8 DESC) AS seqnum
+                      FROM handicap s
+                      WHERE s.locationid > 0
+                  ) a
              ORDER BY athlete, total DESC
          ),
               s3 AS (
@@ -352,7 +354,7 @@ ORDER BY total DESC;
 
 CREATE OR REPLACE VIEW handicapTeamScores AS
 SELECT sta.team, sdts.classification, athlete, sdts.total indtotal, sta.total teamtotal
-FROM singlesTeamAggregate sta
+FROM handicapTeamAggregate sta
          INNER JOIN (SELECT team, classification, athlete, SUM(total) total
                      FROM (
                               SELECT team, CASE WHEN classification IN ('Senior/Jr. Varsity', 'Senior/Varsity', 'Junior Varsity') THEN 'Varsity' WHEN classification IN ('Intermediate Entry', 'Intermediate Advanced') THEN 'Intermediate Entry' ELSE classification END classification, athlete, total, row_number() OVER (PARTITION BY team, CASE WHEN classification IN ('Senior/Jr. Varsity', 'Senior/Varsity', 'Junior Varsity') THEN 'Varsity' WHEN classification IN ('Intermediate Entry', 'Intermediate Advanced') THEN 'Intermediate Entry' ELSE classification END ORDER BY total DESC ) AS segnum
@@ -396,35 +398,35 @@ FROM (
          WITH s AS (
              SELECT eventid, event, locationid, location, squadname, team, athlete, gender, classification, round1, round2, round3, round4, total, row_number() OVER (PARTITION BY athlete ORDER BY total DESC) AS seqnum
              FROM (
-                 SELECT s.eventid, s.event, s.locationid, s.location, s.squadname, replace(s.team, 'Club', 'Team') AS team, s.athlete, s.gender
-                      , CASE WHEN s.classification = 'Senior/Varsity' THEN 'Varsity' WHEN s.classification = 'Senior/Jr. Varsity' THEN 'Junior Varsity' WHEN s.classification = 'Intermediate/Advanced' THEN 'Intermediate Advanced' WHEN s.classification = 'Intermediate/Entry Level' THEN 'Intermediate Entry' WHEN s.classification = 'Rookie' THEN 'Rookie' ELSE s.classification END classification
-                      , s.round1, s.round2, 0 round3, 0 round4
-                      , s.round1 + s.round2 total
-                      , row_number() OVER (PARTITION BY athlete ORDER BY s.round1 + s.round2 DESC) AS seqnum
-                 FROM skeet s
-                 UNION ALL
-                 SELECT s.eventid, s.event, s.locationid, s.location, s.squadname, replace(s.team, 'Club', 'Team') AS team, s.athlete, s.gender
-                      , CASE WHEN s.classification = 'Senior/Varsity' THEN 'Varsity' WHEN s.classification = 'Senior/Jr. Varsity' THEN 'Junior Varsity' WHEN s.classification = 'Intermediate/Advanced' THEN 'Intermediate Advanced' WHEN s.classification = 'Intermediate/Entry Level' THEN 'Intermediate Entry' WHEN s.classification = 'Rookie' THEN 'Rookie' ELSE s.classification END classification
-                      , s.round3, s.round4, 0, 0
-                      , s.round3 + s.round4 total
-                      , row_number() OVER (PARTITION BY athlete ORDER BY s.round3 + s.round4 DESC) AS seqnum
-                 FROM skeet s
-                 UNION ALL
-                 SELECT s.eventid, s.event, s.locationid, s.location, s.squadname, replace(s.team, 'Club', 'Team') AS team, s.athlete, s.gender
-                      , CASE WHEN s.classification = 'Senior/Varsity' THEN 'Varsity' WHEN s.classification = 'Senior/Jr. Varsity' THEN 'Junior Varsity' WHEN s.classification = 'Intermediate/Advanced' THEN 'Intermediate Advanced' WHEN s.classification = 'Intermediate/Entry Level' THEN 'Intermediate Entry' WHEN s.classification = 'Rookie' THEN 'Rookie' ELSE s.classification END classification
-                      , s.round5, s.round6, 0, 0
-                      , s.round5 + s.round6 total
-                      , row_number() OVER (PARTITION BY athlete ORDER BY s.round5 + s.round6 DESC) AS seqnum
-                 FROM skeet s
-                 UNION ALL
-                 SELECT s.eventid, s.event, s.locationid, s.location, s.squadname, replace(s.team, 'Club', 'Team') AS team, s.athlete, s.gender
-                      , CASE WHEN s.classification = 'Senior/Varsity' THEN 'Varsity' WHEN s.classification = 'Senior/Jr. Varsity' THEN 'Junior Varsity' WHEN s.classification = 'Intermediate/Advanced' THEN 'Intermediate Advanced' WHEN s.classification = 'Intermediate/Entry Level' THEN 'Intermediate Entry' WHEN s.classification = 'Rookie' THEN 'Rookie' ELSE s.classification END classification
-                      , s.round7, s.round8, 0, 0
-                      , s.round7 + s.round8 total
-                      , row_number() OVER (PARTITION BY athlete ORDER BY s.round7 + s.round8 DESC) AS seqnum
-                 FROM skeet s
-                 WHERE s.locationid > 0
-                ) a
+                      SELECT s.eventid, s.event, s.locationid, s.location, s.squadname, replace(s.team, 'Club', 'Team') AS team, s.athlete, s.gender
+                           , CASE WHEN s.classification = 'Senior/Varsity' THEN 'Varsity' WHEN s.classification = 'Senior/Jr. Varsity' THEN 'Junior Varsity' WHEN s.classification = 'Intermediate/Advanced' THEN 'Intermediate Advanced' WHEN s.classification = 'Intermediate/Entry Level' THEN 'Intermediate Entry' WHEN s.classification = 'Rookie' THEN 'Rookie' ELSE s.classification END classification
+                           , s.round1, s.round2, 0 round3, 0 round4
+                           , s.round1 + s.round2 total
+                           , row_number() OVER (PARTITION BY athlete ORDER BY s.round1 + s.round2 DESC) AS seqnum
+                      FROM skeet s
+                      UNION ALL
+                      SELECT s.eventid, s.event, s.locationid, s.location, s.squadname, replace(s.team, 'Club', 'Team') AS team, s.athlete, s.gender
+                           , CASE WHEN s.classification = 'Senior/Varsity' THEN 'Varsity' WHEN s.classification = 'Senior/Jr. Varsity' THEN 'Junior Varsity' WHEN s.classification = 'Intermediate/Advanced' THEN 'Intermediate Advanced' WHEN s.classification = 'Intermediate/Entry Level' THEN 'Intermediate Entry' WHEN s.classification = 'Rookie' THEN 'Rookie' ELSE s.classification END classification
+                           , s.round3, s.round4, 0, 0
+                           , s.round3 + s.round4 total
+                           , row_number() OVER (PARTITION BY athlete ORDER BY s.round3 + s.round4 DESC) AS seqnum
+                      FROM skeet s
+                      UNION ALL
+                      SELECT s.eventid, s.event, s.locationid, s.location, s.squadname, replace(s.team, 'Club', 'Team') AS team, s.athlete, s.gender
+                           , CASE WHEN s.classification = 'Senior/Varsity' THEN 'Varsity' WHEN s.classification = 'Senior/Jr. Varsity' THEN 'Junior Varsity' WHEN s.classification = 'Intermediate/Advanced' THEN 'Intermediate Advanced' WHEN s.classification = 'Intermediate/Entry Level' THEN 'Intermediate Entry' WHEN s.classification = 'Rookie' THEN 'Rookie' ELSE s.classification END classification
+                           , s.round5, s.round6, 0, 0
+                           , s.round5 + s.round6 total
+                           , row_number() OVER (PARTITION BY athlete ORDER BY s.round5 + s.round6 DESC) AS seqnum
+                      FROM skeet s
+                      UNION ALL
+                      SELECT s.eventid, s.event, s.locationid, s.location, s.squadname, replace(s.team, 'Club', 'Team') AS team, s.athlete, s.gender
+                           , CASE WHEN s.classification = 'Senior/Varsity' THEN 'Varsity' WHEN s.classification = 'Senior/Jr. Varsity' THEN 'Junior Varsity' WHEN s.classification = 'Intermediate/Advanced' THEN 'Intermediate Advanced' WHEN s.classification = 'Intermediate/Entry Level' THEN 'Intermediate Entry' WHEN s.classification = 'Rookie' THEN 'Rookie' ELSE s.classification END classification
+                           , s.round7, s.round8, 0, 0
+                           , s.round7 + s.round8 total
+                           , row_number() OVER (PARTITION BY athlete ORDER BY s.round7 + s.round8 DESC) AS seqnum
+                      FROM skeet s
+                      WHERE s.locationid > 0
+                  ) a
              ORDER BY athlete, total DESC
          ),
               s3 AS (
@@ -474,7 +476,7 @@ ORDER BY total DESC;
 
 CREATE OR REPLACE VIEW skeetTeamScores AS
 SELECT sta.team, sdts.classification, athlete, sdts.total indtotal, sta.total teamtotal
-FROM singlesTeamAggregate sta
+FROM skeetTeamAggregate sta
          INNER JOIN (SELECT team, classification, athlete, SUM(total) total
                      FROM (
                               SELECT team, CASE WHEN classification IN ('Senior/Jr. Varsity', 'Senior/Varsity', 'Junior Varsity') THEN 'Varsity' WHEN classification IN ('Intermediate Entry', 'Intermediate Advanced') THEN 'Intermediate Entry' ELSE classification END classification, athlete, total, row_number() OVER (PARTITION BY team, CASE WHEN classification IN ('Senior/Jr. Varsity', 'Senior/Varsity', 'Junior Varsity') THEN 'Varsity' WHEN classification IN ('Intermediate Entry', 'Intermediate Advanced') THEN 'Intermediate Entry' ELSE classification END ORDER BY total DESC ) AS segnum
@@ -518,39 +520,35 @@ FROM (
          WITH s AS (
              SELECT eventid, event, locationid, location, squadname, team, athlete, gender, classification, round1, round2, round3, round4, total, fivestand, row_number() OVER (PARTITION BY athlete ORDER BY total DESC) AS seqnum
              FROM (
-                 SELECT s.eventid, s.event, s.locationid, s.location, s.squadname, replace(s.team, 'Club', 'Team') AS team, s.athlete, s.gender
-                      , CASE WHEN s.classification = 'Senior/Varsity' THEN 'Varsity' WHEN s.classification = 'Senior/Jr. Varsity' THEN 'Junior Varsity' WHEN s.classification = 'Intermediate/Advanced' THEN 'Intermediate Advanced' WHEN s.classification = 'Intermediate/Entry Level' THEN 'Intermediate Entry' WHEN s.classification = 'Rookie' THEN 'Rookie' ELSE s.classification END classification
-                      , s.round1, s.round2, 0 round3, 0 round4
-                      , s.round1 + s.round2 total
-                      , row_number() OVER (PARTITION BY athlete ORDER BY s.round1 + s.round2 DESC) AS seqnum
-                      , CASE WHEN fivestand = 'Y' THEN 1 ELSE 0 END AS fivestand
-                 FROM clays s
-                 UNION ALL
-                 SELECT s.eventid, s.event, s.locationid, s.location, s.squadname, replace(s.team, 'Club', 'Team') AS team, s.athlete, s.gender
-                      , CASE WHEN s.classification = 'Senior/Varsity' THEN 'Varsity' WHEN s.classification = 'Senior/Jr. Varsity' THEN 'Junior Varsity' WHEN s.classification = 'Intermediate/Advanced' THEN 'Intermediate Advanced' WHEN s.classification = 'Intermediate/Entry Level' THEN 'Intermediate Entry' WHEN s.classification = 'Rookie' THEN 'Rookie' ELSE s.classification END classification
-                      , s.round3, s.round4, 0, 0
-                      , s.round3 + s.round4 total
-                      , row_number() OVER (PARTITION BY athlete ORDER BY s.round3 + s.round4 DESC) AS seqnum
-                      , CASE WHEN fivestand = 'Y' THEN 1 ELSE 0 END AS fivestand
-                 FROM clays s
-                 UNION ALL
-                 SELECT s.eventid, s.event, s.locationid, s.location, s.squadname, replace(s.team, 'Club', 'Team') AS team, s.athlete, s.gender
-                      , CASE WHEN s.classification = 'Senior/Varsity' THEN 'Varsity' WHEN s.classification = 'Senior/Jr. Varsity' THEN 'Junior Varsity' WHEN s.classification = 'Intermediate/Advanced' THEN 'Intermediate Advanced' WHEN s.classification = 'Intermediate/Entry Level' THEN 'Intermediate Entry' WHEN s.classification = 'Rookie' THEN 'Rookie' ELSE s.classification END classification
-                      , s.round5, s.round6, 0, 0
-                      , s.round5 + s.round6 total
-                      , row_number() OVER (PARTITION BY athlete ORDER BY s.round5 + s.round6 DESC) AS seqnum
-                      , CASE WHEN fivestand = 'Y' THEN 1 ELSE 0 END AS fivestand
-                 FROM clays s
-                 UNION ALL
-                 SELECT s.eventid, s.event, s.locationid, s.location, s.squadname, replace(s.team, 'Club', 'Team') AS team, s.athlete, s.gender
-                      , CASE WHEN s.classification = 'Senior/Varsity' THEN 'Varsity' WHEN s.classification = 'Senior/Jr. Varsity' THEN 'Junior Varsity' WHEN s.classification = 'Intermediate/Advanced' THEN 'Intermediate Advanced' WHEN s.classification = 'Intermediate/Entry Level' THEN 'Intermediate Entry' WHEN s.classification = 'Rookie' THEN 'Rookie' ELSE s.classification END classification
-                      , s.round7, s.round8, 0, 0
-                      , s.round7 + s.round8 total
-                      , row_number() OVER (PARTITION BY athlete ORDER BY s.round7 + s.round8 DESC) AS seqnum
-                      , CASE WHEN fivestand = 'Y' THEN 1 ELSE 0 END AS fivestand
-                 FROM clays s
-                 WHERE s.locationid > 0
-                ) a
+                      SELECT s.eventid, s.event, s.locationid, s.location, s.squadname, replace(s.team, 'Club', 'Team') AS team, s.athlete, s.gender
+                           , CASE WHEN s.classification = 'Senior/Varsity' THEN 'Varsity' WHEN s.classification = 'Senior/Jr. Varsity' THEN 'Junior Varsity' WHEN s.classification = 'Intermediate/Advanced' THEN 'Intermediate Advanced' WHEN s.classification = 'Intermediate/Entry Level' THEN 'Intermediate Entry' WHEN s.classification = 'Rookie' THEN 'Rookie' ELSE s.classification END classification
+                           , s.round1, s.round2, s.round3, s.round4
+                           , s.round1 total
+                           , CASE WHEN fivestand = 'Y' THEN 1 ELSE 0 END AS fivestand
+                      FROM clays s
+                      UNION ALL
+                      SELECT s.eventid, s.event, s.locationid, s.location, s.squadname, replace(s.team, 'Club', 'Team') AS team, s.athlete, s.gender
+                           , CASE WHEN s.classification = 'Senior/Varsity' THEN 'Varsity' WHEN s.classification = 'Senior/Jr. Varsity' THEN 'Junior Varsity' WHEN s.classification = 'Intermediate/Advanced' THEN 'Intermediate Advanced' WHEN s.classification = 'Intermediate/Entry Level' THEN 'Intermediate Entry' WHEN s.classification = 'Rookie' THEN 'Rookie' ELSE s.classification END classification
+                           , s.round1, s.round2, s.round3, s.round4
+                           , s.round2 total
+                           , CASE WHEN fivestand = 'Y' THEN 1 ELSE 0 END AS fivestand
+                      FROM clays s
+                      UNION ALL
+                      SELECT s.eventid, s.event, s.locationid, s.location, s.squadname, replace(s.team, 'Club', 'Team') AS team, s.athlete, s.gender
+                           , CASE WHEN s.classification = 'Senior/Varsity' THEN 'Varsity' WHEN s.classification = 'Senior/Jr. Varsity' THEN 'Junior Varsity' WHEN s.classification = 'Intermediate/Advanced' THEN 'Intermediate Advanced' WHEN s.classification = 'Intermediate/Entry Level' THEN 'Intermediate Entry' WHEN s.classification = 'Rookie' THEN 'Rookie' ELSE s.classification END classification
+                           , s.round1, s.round2, s.round3, s.round4
+                           , s.round3 total
+                           , CASE WHEN fivestand = 'Y' THEN 1 ELSE 0 END AS fivestand
+                      FROM clays s
+                      UNION ALL
+                      SELECT s.eventid, s.event, s.locationid, s.location, s.squadname, replace(s.team, 'Club', 'Team') AS team, s.athlete, s.gender
+                           , CASE WHEN s.classification = 'Senior/Varsity' THEN 'Varsity' WHEN s.classification = 'Senior/Jr. Varsity' THEN 'Junior Varsity' WHEN s.classification = 'Intermediate/Advanced' THEN 'Intermediate Advanced' WHEN s.classification = 'Intermediate/Entry Level' THEN 'Intermediate Entry' WHEN s.classification = 'Rookie' THEN 'Rookie' ELSE s.classification END classification
+                           , s.round1, s.round2, s.round3, s.round4
+                           , s.round4 total
+                           , CASE WHEN fivestand = 'Y' THEN 1 ELSE 0 END AS fivestand
+                      FROM clays s
+                      WHERE s.locationid > 0
+                  ) a
              ORDER BY athlete, total DESC
          ),
               s3 AS (
@@ -562,7 +560,7 @@ FROM (
          FROM s3
          UNION ALL
          (
-             SELECT eventid, event, locationid, location, squadname, team, athlete, gender, classification, round1, round2, round3, round4, total, fourth, CASE WHEN fivestand = 'Y' THEN 1 ELSE 0 END AS fivestand
+             SELECT eventid, event, locationid, location, squadname, team, athlete, gender, classification, round1, round2, round3, round4, total, fourth, fivestand
              FROM (
                       SELECT eventid, event, locationid, location, squadname, team, unreal.athlete, gender, classification, round1, round2, round3, round4, total, seqnum, row_number() OVER (PARTITION BY unreal.athlete ORDER BY total DESC) AS fourth
                            , CASE WHEN fivestand = 'Y' THEN 1 ELSE 0 END AS fivestand
@@ -603,7 +601,7 @@ ORDER BY total DESC;
 
 CREATE OR REPLACE VIEW claysTeamScores AS
 SELECT sta.team, sdts.classification, athlete, sdts.total indtotal, sta.total teamtotal
-FROM singlesTeamAggregate sta
+FROM claysTeamAggregate sta
          INNER JOIN (SELECT team, classification, athlete, SUM(total) total
                      FROM (
                               SELECT team, CASE WHEN classification IN ('Senior/Jr. Varsity', 'Senior/Varsity', 'Junior Varsity') THEN 'Varsity' WHEN classification IN ('Intermediate Entry', 'Intermediate Advanced') THEN 'Intermediate Entry' ELSE classification END classification, athlete, total, row_number() OVER (PARTITION BY team, CASE WHEN classification IN ('Senior/Jr. Varsity', 'Senior/Varsity', 'Junior Varsity') THEN 'Varsity' WHEN classification IN ('Intermediate Entry', 'Intermediate Advanced') THEN 'Intermediate Entry' ELSE classification END ORDER BY total DESC ) AS segnum
