@@ -31,6 +31,7 @@ public class AllData {
     String athlete;
     String classification;
     String gender;
+    @Column(name="round1", insertable = false, updatable = false)
     Integer round1 = 0;
     Integer round2 = 0;
     Integer round3 = 0;
