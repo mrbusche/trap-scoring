@@ -1,7 +1,5 @@
 -- set global local_infile=1;
 
-
-
 USE trap;
 DROP TABLE IF EXISTS singles;
 CREATE TABLE IF NOT EXISTS singles (
