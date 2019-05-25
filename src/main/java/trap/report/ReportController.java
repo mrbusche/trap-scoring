@@ -128,22 +128,27 @@ public class ReportController {
         String singlesSql = "load data local infile '" + singles + "' into table singles fields terminated by ',' OPTIONALLY ENCLOSED BY '\"' lines terminated by '\n' IGNORE 1 LINES;";
         int singlesCount = jdbc.update(con -> con.prepareStatement(singlesSql));
         results.append("Added ").append(singlesCount).append(" new records to database in singles table.<br>");
+        System.out.println("Added " + singlesCount + " new records to database in singles table.");
 
         String doublesSql = "load data local infile '" + doubles + "' into table doubles fields terminated by ',' OPTIONALLY ENCLOSED BY '\"' lines terminated by '\n' IGNORE 1 LINES;";
         int doublesCount = jdbc.update(con -> con.prepareStatement(doublesSql));
         results.append("Added ").append(doublesCount).append(" new records to database in doubles table.<br>");
+        System.out.println("Added " + doublesCount + " new records to database in doubles table.");
 
         String handicapSql = "load data local infile '" + handicap + "' into table handicap fields terminated by ',' OPTIONALLY ENCLOSED BY '\"' lines terminated by '\n' IGNORE 1 LINES;";
         int handicapCount = jdbc.update(con -> con.prepareStatement(handicapSql));
         results.append("Added ").append(handicapCount).append(" new records to database in handicap table.<br>");
+        System.out.println("Added " + handicapCount + " new records to database in handicap table.");
 
         String skeetSql = "load data local infile '" + skeet + "' into table skeet fields terminated by ',' OPTIONALLY ENCLOSED BY '\"' lines terminated by '\n' IGNORE 1 LINES;";
         int skeetCount = jdbc.update(con -> con.prepareStatement(skeetSql));
         results.append("Added ").append(skeetCount).append(" new records to database in skeet table.<br>");
+        System.out.println("Added " + skeetCount + " new records to database in skeet table.");
 
         String claysSql = "load data local infile '" + clays + "' into table clays fields terminated by ',' OPTIONALLY ENCLOSED BY '\"' lines terminated by '\n' IGNORE 1 LINES;";
         int claysCount = jdbc.update(con -> con.prepareStatement(claysSql));
         results.append("Added ").append(claysCount).append(" new records to database in clays table.<br>");
+        System.out.println("Added " + claysCount + " new records to database in clays table.");
 
         fixTeamNames();
         fixAthleteNames();
@@ -178,11 +183,15 @@ public class ReportController {
         Workbook workbook = WorkbookFactory.create(new FileInputStream(file));
 
         result.append("Workbook has ").append(workbook.getNumberOfSheets()).append(" sheets");
+        System.out.println("Workbook has " + workbook.getNumberOfSheets() + " sheets");
         workbook.forEach(sheet -> result.append("<br> - ").append(sheet.getSheetName()));
+        workbook.forEach(sheet -> System.out.println("- " + sheet.getSheetName()));
 
         long start = System.currentTimeMillis();
+        long trueStart = System.currentTimeMillis();
         populateCleanData(workbook.getSheet("Clean Data"));
         result.append("<br>Clean data populated in ").append(System.currentTimeMillis() - start).append("ms");
+        System.out.println("Clean data populated in " + (System.currentTimeMillis() - start) + "ms");
 
         Map<String, String> types = new HashMap<>();
         types.put("Team-Senior", "Varsity");
@@ -200,6 +209,7 @@ public class ReportController {
             start = System.currentTimeMillis();
             populateTeamData(workbook.getSheet(entry.getKey()), entry.getValue(), mainTextStyle);
             result.append("<br>").append(entry.getKey()).append(" data populated in ").append(System.currentTimeMillis() - start).append("ms");
+            System.out.println("" + entry.getKey() + " data populated in " + (System.currentTimeMillis() - start) + "ms");
         }
 
         //Set font for headers
@@ -214,27 +224,35 @@ public class ReportController {
         start = System.currentTimeMillis();
         populateIndividualData(workbook.getSheet("Individual-Men"), "M", style, mainTextStyle);
         result.append("<br>Individual Men data populated in ").append(System.currentTimeMillis() - start).append("ms");
+        System.out.println("Individual Men data populated in " + (System.currentTimeMillis() - start) + "ms");
 
         start = System.currentTimeMillis();
         populateIndividualData(workbook.getSheet("Individual-Ladies"), "F", style, mainTextStyle);
         result.append("<br>Individual Women data populated in ").append(System.currentTimeMillis() - start).append("ms");
+        System.out.println("Individual Women data populated in " + (System.currentTimeMillis() - start) + "ms");
 
         start = System.currentTimeMillis();
         populateTeamIndividualData(workbook.getSheet("Team-Individual-Scores"));
         result.append("<br>Team Individual Scores data populated in ").append(System.currentTimeMillis() - start).append("ms");
+        System.out.println("Team Individual Scores data populated in " + (System.currentTimeMillis() - start) + "ms");
 
         start = System.currentTimeMillis();
         autoSizeColumns(workbook);
         result.append("<br>Auto sized all columns in ").append(System.currentTimeMillis() - start).append("ms");
+        System.out.println("Auto sized all columns in " + (System.currentTimeMillis() - start) + "ms");
 
+        start = System.currentTimeMillis();
         Date date = new Date();
         SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmss");
         String currentDate = formatter.format(date);
+        System.out.println("Added today's date in " + (System.currentTimeMillis() - start) + "ms");
 
+        start = System.currentTimeMillis();
         FileOutputStream fileOutputStream = new FileOutputStream(currentDate + ".xlsx");
         workbook.write(fileOutputStream);
         fileOutputStream.close();
-
+        System.out.println("Wrote the contents to a file in " + (System.currentTimeMillis() - start) + "ms");
+        System.out.println("Finished in " + (System.currentTimeMillis() - trueStart) + "ms");
         workbook.close();
 
         return result.toString();
