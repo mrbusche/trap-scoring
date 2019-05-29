@@ -124,6 +124,7 @@ public class ReportController {
         jdbc.execute("TRUNCATE TABLE skeet;");
         jdbc.execute("TRUNCATE TABLE clays;");
 
+        long start = System.currentTimeMillis();
         StringBuilder results = new StringBuilder();
         String singlesSql = "load data local infile '" + singles + "' into table singles fields terminated by ',' OPTIONALLY ENCLOSED BY '\"' lines terminated by '\n' IGNORE 1 LINES;";
         int singlesCount = jdbc.update(con -> con.prepareStatement(singlesSql));
@@ -149,6 +150,7 @@ public class ReportController {
         int claysCount = jdbc.update(con -> con.prepareStatement(claysSql));
         results.append("Added ").append(claysCount).append(" new records to database in clays table.<br>");
         System.out.println("Added " + claysCount + " new records to database in clays table.");
+        System.out.println("Database loaded in " + (System.currentTimeMillis() - start) + "ms");
 
         fixTeamNames();
         fixAthleteNames();
