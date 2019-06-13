@@ -31,8 +31,8 @@ allprojects {
     apply plugin: 'org.springframework.boot'
     apply plugin: 'io.spring.dependency-management'
 
-    sourceCompatibility = 1.8
-    targetCompatibility = 1.8
+    sourceCompatibility = 12
+    targetCompatibility = 12
 
     dependencies {
         compile 'org.springframework.boot:spring-boot-starter-web'
@@ -45,6 +45,7 @@ allprojects {
         compileOnly 'org.projectlombok:lombok:1.18.8'
         annotationProcessor 'org.projectlombok:lombok:1.18.8'
 
+        //compile 'org.apache.poi:poi:4.1.0' //xls files
         compile 'org.apache.poi:poi-ooxml:4.1.0' //xlsx files
 
         compile 'ch.vorburger.mariaDB4j:mariaDB4j:2.4.0'
