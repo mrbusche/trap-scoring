@@ -45,7 +45,6 @@ allprojects {
         compileOnly 'org.projectlombok:lombok:1.18.8'
         annotationProcessor 'org.projectlombok:lombok:1.18.8'
 
-        //compile 'org.apache.poi:poi:4.1.0' //xls files
         compile 'org.apache.poi:poi-ooxml:4.1.0' //xlsx files
 
         compile 'ch.vorburger.mariaDB4j:mariaDB4j:2.4.0'
