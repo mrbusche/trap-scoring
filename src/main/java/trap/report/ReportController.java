@@ -1,5 +1,6 @@
 package trap.report;
 
+import lombok.RequiredArgsConstructor;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.Font;
@@ -8,7 +9,6 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.apache.poi.ss.util.CellRangeAddress;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -55,6 +55,7 @@ import java.util.logging.Logger;
 
 @RestController
 @RequestMapping("/reports")
+@RequiredArgsConstructor
 public class ReportController {
 
     private final SinglesDataRepository singlesRepository;
@@ -70,8 +71,7 @@ public class ReportController {
     private final AllDataRepository allDataRepository;
     private final AllTeamScoresRepository allTeamScoresRepository;
 
-    private final List<String> classificationList = Arrays.asList("Varsity", "Junior Varsity", "Intermediate Advanced", "Intermediate Entry", "Rookie");
-    private final String currentDate = new SimpleDateFormat("MM/dd/yyyy").format(Calendar.getInstance().getTime());
+    private String currentDate = new SimpleDateFormat("MM/dd/yyyy").format(Calendar.getInstance().getTime());
 
     private static final Logger LOG = Logger.getLogger(ReportController.class.getName());
 
@@ -87,28 +87,6 @@ public class ReportController {
     private String skeet;
     @Value("${trap.clays}")
     private String clays;
-
-    @Autowired
-    public ReportController(SinglesDataRepository singlesRepository, SinglesDataTeamRepository singlesDataTeamRepository, DoublesDataRepository doublesDataRepository, DoublesDataTeamRepository doublesDataTeamRepository, HandicapDataRepository handicapDataRepository, HandicapDataTeamRepository handicapDataTeamRepository, SkeetDataRepository skeetDataRepository, SkeetDataTeamRepository skeetDataTeamRepository, ClaysDataRepository claysDataRepository, ClaysDataTeamRepository claysDataTeamRepository, AllDataRepository allDataRepository, AllTeamScoresRepository allTeamScoresRepository, JdbcTemplate jdbcTemplate) {
-        jdbc = jdbcTemplate;
-        String result = checkFileImport();
-        if (result.contains("OFF")) {
-            ReportController.LOG.warning("local_infile is OFF.  File import is prohibited!");
-        }
-
-        this.singlesRepository = singlesRepository;
-        this.singlesDataTeamRepository = singlesDataTeamRepository;
-        this.doublesDataRepository = doublesDataRepository;
-        this.doublesDataTeamRepository = doublesDataTeamRepository;
-        this.handicapDataRepository = handicapDataRepository;
-        this.handicapDataTeamRepository = handicapDataTeamRepository;
-        this.skeetDataRepository = skeetDataRepository;
-        this.skeetDataTeamRepository = skeetDataTeamRepository;
-        this.claysDataRepository = claysDataRepository;
-        this.claysDataTeamRepository = claysDataTeamRepository;
-        this.allDataRepository = allDataRepository;
-        this.allTeamScoresRepository = allTeamScoresRepository;
-    }
 
     @RequestMapping("/checkFileImport")
     public String checkFileImport() {
@@ -381,6 +359,7 @@ public class ReportController {
         int maxRow = rows;
         int classificationStartRow;
         boolean addBlankRowForHeader = false;
+        final List<String> classificationList = Arrays.asList("Varsity", "Junior Varsity", "Intermediate Advanced", "Intermediate Entry", "Rookie");
         for (String classification : classificationList) {
             int column = 1;
             updateRow = maxRow;
