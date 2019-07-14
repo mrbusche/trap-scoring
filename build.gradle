@@ -3,7 +3,7 @@ version '0.1.0'
 
 buildscript {
     ext {
-        springBootVersion = '2.1.5.RELEASE'
+        springBootVersion = '2.1.6.RELEASE'
     }
 
     repositories {
@@ -17,7 +17,7 @@ buildscript {
 
 allprojects {
     ext {
-        springBootVersion = '2.1.5.RELEASE'
+        springBootVersion = '2.1.6.RELEASE'
     }
 
     repositories {
