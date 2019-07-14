@@ -11,27 +11,24 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "alldata")
 public class AllData {
-    @EmbeddedId
-    private AllDataIdentity allDataIdentity;
-
-    @Column(name="eventid", insertable = false, updatable = false)
+    @Column(name = "eventid", insertable = false, updatable = false)
     String eventid;
     String event;
-    @Column(name="locationid", insertable = false, updatable = false)
+    @Column(name = "locationid", insertable = false, updatable = false)
     Integer locationid;
     String location;
-    @Column(name="eventdate", insertable = false, updatable = false)
+    @Column(name = "eventdate", insertable = false, updatable = false)
     String eventdate;
-    @Column(name="squadname", insertable = false, updatable = false)
+    @Column(name = "squadname", insertable = false, updatable = false)
     String squadname;
     Integer station;
-    @Column(name="team", insertable = false, updatable = false)
+    @Column(name = "team", insertable = false, updatable = false)
     String team;
-    @Column(name="athlete", insertable = false, updatable = false)
+    @Column(name = "athlete", insertable = false, updatable = false)
     String athlete;
     String classification;
     String gender;
-    @Column(name="round1", insertable = false, updatable = false)
+    @Column(name = "round1", insertable = false, updatable = false)
     Integer round1 = 0;
     Integer round2 = 0;
     Integer round3 = 0;
@@ -44,4 +41,6 @@ public class AllData {
     Integer backrun = 0;
     String fivestand;
     String type;
+    @EmbeddedId
+    private AllDataIdentity allDataIdentity;
 }

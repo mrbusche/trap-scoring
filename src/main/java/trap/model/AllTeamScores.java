@@ -11,17 +11,16 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "allteamscores")
 public class AllTeamScores {
-    @EmbeddedId
-    private AllTeamScoresIdentity allTeamScoresIdentity;
-
-    @Column(name="team", insertable = false, updatable = false)
+    @Column(name = "team", insertable = false, updatable = false)
     String team;
-    @Column(name="classification", insertable = false, updatable = false)
+    @Column(name = "classification", insertable = false, updatable = false)
     String classification;
-    @Column(name="athlete", insertable = false, updatable = false)
+    @Column(name = "athlete", insertable = false, updatable = false)
     String athlete;
     Integer indtotal;
     Integer teamtotal;
-    @Column(name="type", insertable = false, updatable = false)
+    @Column(name = "type", insertable = false, updatable = false)
     String type;
+    @EmbeddedId
+    private AllTeamScoresIdentity allTeamScoresIdentity;
 }

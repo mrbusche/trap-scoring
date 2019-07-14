@@ -13,9 +13,9 @@ import javax.persistence.Table;
 public class SinglesAggregate {
     @EmbeddedId
     private SinglesAggregateIdentity singlesAggregateIdentity;
-    @Column(name="team", insertable = false, updatable = false)
+    @Column(name = "team", insertable = false, updatable = false)
     String team;
-    @Column(name="athlete", insertable = false, updatable = false)
+    @Column(name = "athlete", insertable = false, updatable = false)
     String athlete;
     String classification;
     String gender;
