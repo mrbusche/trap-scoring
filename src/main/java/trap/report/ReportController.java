@@ -47,7 +47,6 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -217,11 +216,6 @@ public class ReportController {
         System.out.println("Team Individual Scores data populated in " + (System.currentTimeMillis() - start) + "ms");
 
         start = System.currentTimeMillis();
-        autoSizeColumns(workbook);
-        result.append("<br>Auto sized all columns in ").append(System.currentTimeMillis() - start).append("ms");
-        System.out.println("Auto sized all columns in " + (System.currentTimeMillis() - start) + "ms");
-
-        start = System.currentTimeMillis();
         Date date = new Date();
         SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmss");
         String currentDate = formatter.format(date);
@@ -359,7 +353,7 @@ public class ReportController {
         int maxRow = rows;
         int classificationStartRow;
         boolean addBlankRowForHeader = false;
-        final List<String> classificationList = Arrays.asList("Varsity", "Junior Varsity", "Intermediate Advanced", "Intermediate Entry", "Rookie");
+        List<String> classificationList = Arrays.asList("Varsity", "Junior Varsity", "Intermediate Advanced", "Intermediate Entry", "Rookie");
         for (String classification : classificationList) {
             int column = 1;
             updateRow = maxRow;
@@ -488,22 +482,6 @@ public class ReportController {
         }
         sheet.setAutoFilter(CellRangeAddress.valueOf("A1:F1"));
 
-    }
-
-    private static void autoSizeColumns(Workbook workbook) {
-        int numberOfSheets = workbook.getNumberOfSheets();
-        for (int sheetNum = 1; sheetNum < numberOfSheets; sheetNum++) {
-            Sheet sheet = workbook.getSheetAt(sheetNum);
-            if (sheet.getPhysicalNumberOfRows() > 0) {
-                Row row = sheet.getRow(sheet.getFirstRowNum());
-                Iterator<Cell> cellIterator = row.cellIterator();
-                while (cellIterator.hasNext()) {
-                    Cell cell = cellIterator.next();
-                    int columnIndex = cell.getColumnIndex();
-                    sheet.autoSizeColumn(columnIndex);
-                }
-            }
-        }
     }
 
 }
