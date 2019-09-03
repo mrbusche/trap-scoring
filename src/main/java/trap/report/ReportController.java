@@ -71,7 +71,7 @@ public class ReportController {
     private final AllDataRepository allDataRepository;
     private final AllTeamScoresRepository allTeamScoresRepository;
     private final JdbcTemplate jdbc;
-    private String currentDate = new SimpleDateFormat("MM/dd/yyyy").format(Calendar.getInstance().getTime());
+    private final String currentDate = new SimpleDateFormat("MM/dd/yyyy").format(Calendar.getInstance().getTime());
     @Value("${trap.singles}")
     private String singles;
     @Value("${trap.doubles}")
@@ -243,7 +243,7 @@ public class ReportController {
         FileOutputStream fileOutputStream = new FileOutputStream(currentDate + ".xlsx");
         workbook.write(fileOutputStream);
         fileOutputStream.close();
-        result.append("<br>Wrote the contents to a file in").append(System.currentTimeMillis() - start).append("ms");
+        result.append("<br>Wrote the contents to a file in ").append(System.currentTimeMillis() - start).append("ms");
         System.out.println("Wrote the contents to a file in " + (System.currentTimeMillis() - start) + "ms");
         result.append("<br>Finished in ").append(System.currentTimeMillis() - trueStart).append("ms");
         System.out.println("Finished in " + (System.currentTimeMillis() - trueStart) + "ms");

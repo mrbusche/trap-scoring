@@ -7,7 +7,7 @@ import java.io.Serializable;
 
 @Embeddable
 @Data
-public class SinglesAggregateIdentity implements Serializable {
+class SinglesAggregateIdentity implements Serializable {
     private String team;
     private String athlete;
 

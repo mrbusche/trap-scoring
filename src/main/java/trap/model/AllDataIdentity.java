@@ -7,7 +7,7 @@ import java.io.Serializable;
 
 @Embeddable
 @Data
-public class AllDataIdentity implements Serializable {
+class AllDataIdentity implements Serializable {
     String team;
     private String eventid;
     private Integer locationid;
