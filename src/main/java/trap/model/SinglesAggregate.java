@@ -11,8 +11,6 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "singlesaggregate")
 public class SinglesAggregate {
-    @EmbeddedId
-    private SinglesAggregateIdentity singlesAggregateIdentity;
     @Column(name = "team", insertable = false, updatable = false)
     String team;
     @Column(name = "athlete", insertable = false, updatable = false)
@@ -20,6 +18,8 @@ public class SinglesAggregate {
     String classification;
     String gender;
     Integer total;
+    @EmbeddedId
+    private SinglesAggregateIdentity singlesAggregateIdentity;
 
     @Override
     public String toString() {

@@ -8,11 +8,11 @@ import java.io.Serializable;
 @Embeddable
 @Data
 public class AllDataIdentity implements Serializable {
+    String team;
     private String eventid;
     private Integer locationid;
     private String eventdate;
     private String squadname;
-    String team;
     private String athlete;
     private String round1;
 

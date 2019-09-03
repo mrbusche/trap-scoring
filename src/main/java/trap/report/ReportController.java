@@ -57,6 +57,7 @@ import java.util.logging.Logger;
 @RequiredArgsConstructor
 public class ReportController {
 
+    private static final Logger LOG = Logger.getLogger(ReportController.class.getName());
     private final SinglesDataRepository singlesRepository;
     private final SinglesDataTeamRepository singlesDataTeamRepository;
     private final DoublesDataRepository doublesDataRepository;
@@ -69,13 +70,8 @@ public class ReportController {
     private final ClaysDataTeamRepository claysDataTeamRepository;
     private final AllDataRepository allDataRepository;
     private final AllTeamScoresRepository allTeamScoresRepository;
-
-    private String currentDate = new SimpleDateFormat("MM/dd/yyyy").format(Calendar.getInstance().getTime());
-
-    private static final Logger LOG = Logger.getLogger(ReportController.class.getName());
-
     private final JdbcTemplate jdbc;
-
+    private String currentDate = new SimpleDateFormat("MM/dd/yyyy").format(Calendar.getInstance().getTime());
     @Value("${trap.singles}")
     private String singles;
     @Value("${trap.doubles}")
@@ -86,6 +82,27 @@ public class ReportController {
     private String skeet;
     @Value("${trap.clays}")
     private String clays;
+
+    private static void addTeamData(Row row, int startColumn, String team, Integer total, CellStyle mainTextStyle) {
+        Cell cell = row.createCell(startColumn);
+        cell.setCellValue(team);
+        cell.setCellStyle(mainTextStyle);
+        cell = row.createCell(startColumn + 1);
+        cell.setCellValue(total);
+        cell.setCellStyle(mainTextStyle);
+    }
+
+    private static void addPlayerData(Row row, int column, String athlete, Integer total, String team, CellStyle mainTextStyle) {
+        Cell cell = row.createCell(column);
+        cell.setCellValue(athlete);
+        cell.setCellStyle(mainTextStyle);
+        cell = row.createCell(column + 1);
+        cell.setCellValue(total);
+        cell.setCellStyle(mainTextStyle);
+        cell = row.createCell(column + 2);
+        cell.setCellValue(team);
+        cell.setCellStyle(mainTextStyle);
+    }
 
     @RequestMapping("/checkFileImport")
     public String checkFileImport() {
@@ -219,13 +236,16 @@ public class ReportController {
         Date date = new Date();
         SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmss");
         String currentDate = formatter.format(date);
+        result.append("<br>Added today's date in ").append(System.currentTimeMillis() - start).append("ms");
         System.out.println("Added today's date in " + (System.currentTimeMillis() - start) + "ms");
 
         start = System.currentTimeMillis();
         FileOutputStream fileOutputStream = new FileOutputStream(currentDate + ".xlsx");
         workbook.write(fileOutputStream);
         fileOutputStream.close();
+        result.append("<br>Wrote the contents to a file in").append(System.currentTimeMillis() - start).append("ms");
         System.out.println("Wrote the contents to a file in " + (System.currentTimeMillis() - start) + "ms");
+        result.append("<br>Finished in ").append(System.currentTimeMillis() - trueStart).append("ms");
         System.out.println("Finished in " + (System.currentTimeMillis() - trueStart) + "ms");
         workbook.close();
 
@@ -434,27 +454,6 @@ public class ReportController {
 
     private void setCurrentDateHeader(Sheet sheet) {
         sheet.getRow(9).getCell(1).setCellValue(sheet.getRow(9).getCell(1).getStringCellValue() + currentDate);
-    }
-
-    private static void addTeamData(Row row, int startColumn, String team, Integer total, CellStyle mainTextStyle) {
-        Cell cell = row.createCell(startColumn);
-        cell.setCellValue(team);
-        cell.setCellStyle(mainTextStyle);
-        cell = row.createCell(startColumn + 1);
-        cell.setCellValue(total);
-        cell.setCellStyle(mainTextStyle);
-    }
-
-    private static void addPlayerData(Row row, int column, String athlete, Integer total, String team, CellStyle mainTextStyle) {
-        Cell cell = row.createCell(column);
-        cell.setCellValue(athlete);
-        cell.setCellStyle(mainTextStyle);
-        cell = row.createCell(column + 1);
-        cell.setCellValue(total);
-        cell.setCellStyle(mainTextStyle);
-        cell = row.createCell(column + 2);
-        cell.setCellValue(team);
-        cell.setCellStyle(mainTextStyle);
     }
 
     private void populateTeamIndividualData(Sheet sheet) {

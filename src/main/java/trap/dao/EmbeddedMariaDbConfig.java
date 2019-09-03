@@ -15,11 +15,6 @@ import javax.sql.DataSource;
 @Configuration
 class EmbeddedMariaDbConfig {
 
-    @Bean
-    static MariaDB4jSpringService mariaDB4jSpringService() {
-        return new MariaDB4jSpringService();
-    }
-
     @Value("${app.mariaDB4j.databaseName}")
     String databaseName;
     @Value("${spring.datasource.username}")
@@ -28,6 +23,11 @@ class EmbeddedMariaDbConfig {
     String datasourcePassword;
     @Value("${spring.datasource.driver-class-name}")
     String datasourceDriver;
+
+    @Bean
+    static MariaDB4jSpringService mariaDB4jSpringService() {
+        return new MariaDB4jSpringService();
+    }
 
     @Bean
     DataSource dataSource(MariaDB4jSpringService mariaDB4jSpringService) throws ManagedProcessException {
