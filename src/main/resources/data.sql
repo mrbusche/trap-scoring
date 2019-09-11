@@ -3,7 +3,7 @@ set global local_infile=1;
 USE trap;
 DROP TABLE IF EXISTS singles;
 CREATE TABLE IF NOT EXISTS singles (
-    -- CompId MEDIUMINT,
+    CompId MEDIUMINT,
     EventId VARCHAR(6),
     Event VARCHAR(50),
     LocationId MEDIUMINT,
@@ -76,13 +76,13 @@ FROM (
              FROM (
                       SELECT eventid, event, locationid, location, squadname, team, unreal.athlete, gender, classification, round1, round2, round3, round4, total, seqnum, row_number() OVER (PARTITION BY unreal.athlete ORDER BY total DESC) AS fourth
                       FROM s,
-                           (SELECT s3.athlete, CASE WHEN COUNT(DISTINCT s3.locationid) = 1 THEN 'Next' ELSE 'Four' END numberfour, (SELECT DISTINCT s3.locationid) dontuselocid
+                           (SELECT s3.athlete, IF(COUNT(DISTINCT s3.locationid) = 1, 'Next', 'Four') numberfour, (SELECT DISTINCT s3.locationid) dontuselocid
                             FROM s
                                      INNER JOIN s3 ON s.athlete = s3.athlete
                             GROUP BY s.athlete) unreal
                       WHERE s.athlete = unreal.athlete
                         AND seqnum > 3
-                        AND CASE WHEN numberfour = 'four' THEN seqnum = 4 ELSE locationid != dontuselocid END
+                        AND IF(numberfour = 'four', seqnum = 4, locationid != dontuselocid)
                   ) bananas
              WHERE fourth = 1
          )
@@ -206,13 +206,13 @@ FROM (
              FROM (
                       SELECT eventid, event, locationid, location, squadname, team, unreal.athlete, gender, classification, round1, round2, round3, round4, total, seqnum, row_number() OVER (PARTITION BY unreal.athlete ORDER BY total DESC) AS fourth
                       FROM s,
-                           (SELECT s3.athlete, CASE WHEN COUNT(DISTINCT s3.locationid) = 1 THEN 'Next' ELSE 'Four' END numberfour, (SELECT DISTINCT s3.locationid) dontuselocid
+                           (SELECT s3.athlete, IF(COUNT(DISTINCT s3.locationid) = 1, 'Next', 'Four') numberfour, (SELECT DISTINCT s3.locationid) dontuselocid
                             FROM s
                                      INNER JOIN s3 ON s.athlete = s3.athlete
                             GROUP BY s.athlete) unreal
                       WHERE s.athlete = unreal.athlete
                         AND seqnum > 3
-                        AND CASE WHEN numberfour = 'four' THEN seqnum = 4 ELSE locationid != dontuselocid END
+                        AND IF(numberfour = 'four', seqnum = 4, locationid != dontuselocid)
                   ) bananas
              WHERE fourth = 1
          )) AS a
@@ -335,13 +335,13 @@ FROM (
              FROM (
                       SELECT eventid, event, locationid, location, squadname, team, unreal.athlete, gender, classification, round1, round2, round3, round4, total, seqnum, row_number() OVER (PARTITION BY unreal.athlete ORDER BY total DESC) AS fourth
                       FROM s,
-                           (SELECT s3.athlete, CASE WHEN COUNT(DISTINCT s3.locationid) = 1 THEN 'Next' ELSE 'Four' END numberfour, (SELECT DISTINCT s3.locationid) dontuselocid
+                           (SELECT s3.athlete, IF(COUNT(DISTINCT s3.locationid) = 1, 'Next', 'Four') numberfour, (SELECT DISTINCT s3.locationid) dontuselocid
                             FROM s
                                      INNER JOIN s3 ON s.athlete = s3.athlete
                             GROUP BY s.athlete) unreal
                       WHERE s.athlete = unreal.athlete
                         AND seqnum > 3
-                        AND CASE WHEN numberfour = 'four' THEN seqnum = 4 ELSE locationid != dontuselocid END
+                        AND IF(numberfour = 'four', seqnum = 4, locationid != dontuselocid)
                   ) bananas
              WHERE fourth = 1
          )) AS a
@@ -465,13 +465,13 @@ FROM (
              FROM (
                       SELECT eventid, event, locationid, location, squadname, team, unreal.athlete, gender, classification, round1, round2, round3, round4, total, seqnum, row_number() OVER (PARTITION BY unreal.athlete ORDER BY total DESC) AS fourth
                       FROM s,
-                           (SELECT s3.athlete, CASE WHEN COUNT(DISTINCT s3.locationid) = 1 THEN 'Next' ELSE 'Four' END numberfour, (SELECT DISTINCT s3.locationid) dontuselocid
+                           (SELECT s3.athlete, IF(COUNT(DISTINCT s3.locationid) = 1, 'Next', 'Four') numberfour, (SELECT DISTINCT s3.locationid) dontuselocid
                             FROM s
                                      INNER JOIN s3 ON s.athlete = s3.athlete
                             GROUP BY s.athlete) unreal
                       WHERE s.athlete = unreal.athlete
                         AND seqnum > 2
-                        AND CASE WHEN numberfour = 'four' THEN seqnum = 3 ELSE locationid != dontuselocid END
+                        AND IF(numberfour = 'four', seqnum = 3, locationid != dontuselocid)
                   ) bananas
              WHERE fourth = 1
          )) AS a
@@ -555,28 +555,28 @@ FROM (
                            , CASE WHEN s.classification = 'Senior/Varsity' THEN 'Varsity' WHEN s.classification = 'Senior/Jr. Varsity' THEN 'Junior Varsity' WHEN s.classification = 'Intermediate/Advanced' THEN 'Intermediate Advanced' WHEN s.classification = 'Intermediate/Entry Level' THEN 'Intermediate Entry' WHEN s.classification = 'Rookie' THEN 'Rookie' ELSE s.classification END classification
                            , s.round1, s.round2, s.round3, s.round4
                            , s.round1 total
-                           , CASE WHEN fivestand = 'Y' THEN 1 ELSE 0 END AS fivestand
+                           , IF(fivestand = 'Y', 1, 0) AS fivestand
                       FROM clays s
                       UNION ALL
                       SELECT s.eventid, s.event, s.locationid, s.location, s.squadname, replace(s.team, 'Club', 'Team') AS team, s.athlete, s.gender
                            , CASE WHEN s.classification = 'Senior/Varsity' THEN 'Varsity' WHEN s.classification = 'Senior/Jr. Varsity' THEN 'Junior Varsity' WHEN s.classification = 'Intermediate/Advanced' THEN 'Intermediate Advanced' WHEN s.classification = 'Intermediate/Entry Level' THEN 'Intermediate Entry' WHEN s.classification = 'Rookie' THEN 'Rookie' ELSE s.classification END classification
                            , s.round1, s.round2, s.round3, s.round4
                            , s.round2 total
-                           , CASE WHEN fivestand = 'Y' THEN 1 ELSE 0 END AS fivestand
+                           , IF(fivestand = 'Y', 1, 0) AS fivestand
                       FROM clays s
                       UNION ALL
                       SELECT s.eventid, s.event, s.locationid, s.location, s.squadname, replace(s.team, 'Club', 'Team') AS team, s.athlete, s.gender
                            , CASE WHEN s.classification = 'Senior/Varsity' THEN 'Varsity' WHEN s.classification = 'Senior/Jr. Varsity' THEN 'Junior Varsity' WHEN s.classification = 'Intermediate/Advanced' THEN 'Intermediate Advanced' WHEN s.classification = 'Intermediate/Entry Level' THEN 'Intermediate Entry' WHEN s.classification = 'Rookie' THEN 'Rookie' ELSE s.classification END classification
                            , s.round1, s.round2, s.round3, s.round4
                            , s.round3 total
-                           , CASE WHEN fivestand = 'Y' THEN 1 ELSE 0 END AS fivestand
+                           , IF(fivestand = 'Y', 1, 0) AS fivestand
                       FROM clays s
                       UNION ALL
                       SELECT s.eventid, s.event, s.locationid, s.location, s.squadname, replace(s.team, 'Club', 'Team') AS team, s.athlete, s.gender
                            , CASE WHEN s.classification = 'Senior/Varsity' THEN 'Varsity' WHEN s.classification = 'Senior/Jr. Varsity' THEN 'Junior Varsity' WHEN s.classification = 'Intermediate/Advanced' THEN 'Intermediate Advanced' WHEN s.classification = 'Intermediate/Entry Level' THEN 'Intermediate Entry' WHEN s.classification = 'Rookie' THEN 'Rookie' ELSE s.classification END classification
                            , s.round1, s.round2, s.round3, s.round4
                            , s.round4 total
-                           , CASE WHEN fivestand = 'Y' THEN 1 ELSE 0 END AS fivestand
+                           , IF(fivestand = 'Y', 1, 0) AS fivestand
                       FROM clays s
                       WHERE s.locationid > 0
                   ) a
@@ -594,7 +594,7 @@ FROM (
              SELECT eventid, event, locationid, location, squadname, team, athlete, gender, classification, round1, round2, round3, round4, total, fourth, fivestand
              FROM (
                       SELECT eventid, event, locationid, location, squadname, team, unreal.athlete, gender, classification, round1, round2, round3, round4, total, seqnum, row_number() OVER (PARTITION BY unreal.athlete ORDER BY total DESC) AS fourth
-                           , CASE WHEN fivestand = 'Y' THEN 1 ELSE 0 END AS fivestand
+                           , IF(fivestand = 'Y', 1, 0) AS fivestand
                       FROM s,
                            (SELECT s3.athlete, CASE WHEN COUNT(DISTINCT s3.locationid) = 1 THEN 'Next' WHEN SUM(s3.fivestand) > 0 THEN 'fivestandused' ELSE 'Four' END numberfour, (SELECT DISTINCT s3.locationid) dontuselocid
                             FROM s
