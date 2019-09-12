@@ -253,7 +253,9 @@ public class ReportController {
     }
 
     private void populateCleanData(Sheet sheet) {
+        var start = System.currentTimeMillis();
         List<AllData> allData = allDataRepository.findAll();
+        System.out.println("Ran get all data for clean data population " + (System.currentTimeMillis() - start) + "ms");
 
         int rows = sheet.getLastRowNum();
 
@@ -320,7 +322,9 @@ public class ReportController {
 
         int updateRow = rows;
         int startColumn = 1;
+        var start = System.currentTimeMillis();
         List<SinglesTeamAggregate> singlesTeamData = singlesDataTeamRepository.getAllByClassificationOrderByTotalDesc(teamType);
+        System.out.println("Ran query for singles by " + teamType + " " + (System.currentTimeMillis() - start) + "ms");
         for (SinglesTeamAggregate singlesTeamRowData : singlesTeamData) {
             row = sheet.createRow(++updateRow);
             addTeamData(row, startColumn, singlesTeamRowData.getTeam(), singlesTeamRowData.getTotal(), mainTextStyle);
@@ -330,7 +334,9 @@ public class ReportController {
             startColumn += 3;
 
             updateRow = rows;
+            start = System.currentTimeMillis();
             List<HandicapTeamAggregate> handicapTeamData = handicapDataTeamRepository.getAllByClassificationOrderByTotalDesc(teamType);
+            System.out.println("Ran query for handicap by " + teamType + " " + (System.currentTimeMillis() - start) + "ms");
             for (HandicapTeamAggregate handicapTeamRowData : handicapTeamData) {
                 row = sheet.getRow(++updateRow);
                 addTeamData(row, startColumn, handicapTeamRowData.getTeam(), handicapTeamRowData.getTotal(), mainTextStyle);
@@ -338,7 +344,9 @@ public class ReportController {
             startColumn += 3;
 
             updateRow = rows;
+            start = System.currentTimeMillis();
             List<DoublesTeamAggregate> doublesTeamData = doublesDataTeamRepository.getAllByClassificationOrderByTotalDesc(teamType);
+            System.out.println("Ran query for doubles by " + teamType + " " + (System.currentTimeMillis() - start) + "ms");
             for (DoublesTeamAggregate doublesTeamRowData : doublesTeamData) {
                 row = sheet.getRow(++updateRow);
                 addTeamData(row, startColumn, doublesTeamRowData.getTeam(), doublesTeamRowData.getTotal(), mainTextStyle);
@@ -346,7 +354,9 @@ public class ReportController {
             startColumn += 3;
 
             updateRow = rows;
+            start = System.currentTimeMillis();
             List<SkeetTeamAggregate> skeetTeamData = skeetDataTeamRepository.getAllByClassificationOrderByTotalDesc(teamType);
+            System.out.println("Ran query for skeet by " + teamType + " " + (System.currentTimeMillis() - start) + "ms");
             for (SkeetTeamAggregate skeetTeamRowData : skeetTeamData) {
                 row = sheet.getRow(++updateRow);
                 addTeamData(row, startColumn, skeetTeamRowData.getTeam(), skeetTeamRowData.getTotal(), mainTextStyle);
@@ -354,7 +364,9 @@ public class ReportController {
             startColumn += 3;
 
             updateRow = rows;
+            start = System.currentTimeMillis();
             List<ClaysTeamAggregate> claysTeamData = claysDataTeamRepository.getAllByClassificationOrderByTotalDesc(teamType);
+            System.out.println("Ran query for clays by " + teamType + " " + (System.currentTimeMillis() - start) + "ms");
             for (ClaysTeamAggregate claysTeamRowData : claysTeamData) {
                 row = sheet.getRow(++updateRow);
                 addTeamData(row, startColumn, claysTeamRowData.getTeam(), claysTeamRowData.getTotal(), mainTextStyle);
@@ -374,6 +386,7 @@ public class ReportController {
         int classificationStartRow;
         boolean addBlankRowForHeader = false;
         List<String> classificationList = Arrays.asList("Varsity", "Junior Varsity", "Intermediate Advanced", "Intermediate Entry", "Rookie");
+        var start = System.currentTimeMillis();
         for (String classification : classificationList) {
             int column = 1;
             updateRow = maxRow;
@@ -403,7 +416,9 @@ public class ReportController {
             cell.setCellValue(classification);
             cell.setCellStyle(style);
 
+            start = System.currentTimeMillis();
             List<SinglesAggregate> individualSinglesData = singlesRepository.getAllByGenderAndClassification(gender, classification);
+            System.out.println("Ran query for singles by " + gender + " and " + classification + " " + (System.currentTimeMillis() - start) + "ms");
 
             for (SinglesAggregate singlesRowData : individualSinglesData) {
                 row = sheet.createRow(++updateRow);
@@ -414,7 +429,9 @@ public class ReportController {
 
             updateRow = classificationStartRow;
             updateRow++;
+            start = System.currentTimeMillis();
             List<HandicapAggregate> individualHandicapData = handicapDataRepository.getAllByGenderAndClassification(gender, classification);
+            System.out.println("Ran query for handicap by " + gender + " and " + classification + " " + (System.currentTimeMillis() - start) + "ms");
             for (HandicapAggregate handicapRowData : individualHandicapData) {
                 row = sheet.getRow(++updateRow);
                 addPlayerData(row, column, handicapRowData.getAthlete(), handicapRowData.getTotal(), handicapRowData.getTeam(), mainTextStyle);
@@ -423,7 +440,9 @@ public class ReportController {
 
             updateRow = classificationStartRow;
             updateRow++;
+            start = System.currentTimeMillis();
             List<DoublesAggregate> doublesIndividualData = doublesDataRepository.getAllByGenderAndClassification(gender, classification);
+            System.out.println("Ran query for doubles by " + gender + " and " + classification + " " + (System.currentTimeMillis() - start) + "ms");
             for (DoublesAggregate doublesRowData : doublesIndividualData) {
                 row = sheet.getRow(++updateRow);
                 addPlayerData(row, column, doublesRowData.getAthlete(), doublesRowData.getTotal(), doublesRowData.getTeam(), mainTextStyle);
@@ -432,7 +451,9 @@ public class ReportController {
 
             updateRow = classificationStartRow;
             updateRow++;
+            start = System.currentTimeMillis();
             List<SkeetAggregate> skeetIndividualData = skeetDataRepository.getAllByGenderAndClassification(gender, classification);
+            System.out.println("Ran query for skeet by " + gender + " and " + classification + " " + (System.currentTimeMillis() - start) + "ms");
             for (SkeetAggregate skeetRowData : skeetIndividualData) {
                 row = sheet.getRow(++updateRow);
                 addPlayerData(row, column, skeetRowData.getAthlete(), skeetRowData.getTotal(), skeetRowData.getTeam(), mainTextStyle);
@@ -441,7 +462,9 @@ public class ReportController {
 
             updateRow = classificationStartRow;
             updateRow++;
+            start = System.currentTimeMillis();
             List<ClaysAggregate> claysIndividualData = claysDataRepository.getAllByGenderAndClassification(gender, classification);
+            System.out.println("Ran query for clays by " + gender + " and " + classification + " " + (System.currentTimeMillis() - start) + "ms");
             for (ClaysAggregate claysRowData : claysIndividualData) {
                 row = sheet.getRow(++updateRow);
                 addPlayerData(row, column, claysRowData.getAthlete(), claysRowData.getTotal(), claysRowData.getTeam(), mainTextStyle);
@@ -457,7 +480,9 @@ public class ReportController {
     }
 
     private void populateTeamIndividualData(Sheet sheet) {
+        var start = System.currentTimeMillis();
         List<AllTeamScores> allData = allTeamScoresRepository.findAll();
+        System.out.println("Ran query for team scores " + (System.currentTimeMillis() - start) + "ms");
 
         int rows = sheet.getLastRowNum();
 
