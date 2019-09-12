@@ -684,3 +684,9 @@ CREATE VIEW allTeamScores AS
     UNION
     SELECT *, 'clays'
     FROM claysTeamScores;
+
+CREATE INDEX singlesClassGen ON singles(classification, gender);
+CREATE INDEX doublesClassGen ON doubles(classification, gender);
+CREATE INDEX handicapClassGen ON handicap(classification, gender);
+CREATE INDEX skeetClassGen ON skeet(classification, gender);
+CREATE INDEX claysClassGen ON clays(classification, gender);
