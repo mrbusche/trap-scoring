@@ -146,18 +146,33 @@ public class ReportController {
         System.out.println("Added " + claysCount + " new records to database in clays table.");
         System.out.println("Database loaded in " + (System.currentTimeMillis() - start) + "ms");
 
+        start = System.currentTimeMillis();
         fixTeamNames();
+        System.out.println("Team names fixed in " + (System.currentTimeMillis() - start) + "ms");
+        start = System.currentTimeMillis();
+        //fixClassifications();
+        System.out.println("Classifications fixed in " + (System.currentTimeMillis() - start) + "ms");
+        start = System.currentTimeMillis();
         fixAthleteNames();
+        System.out.println("Athlete names fixed in " + (System.currentTimeMillis() - start) + "ms");
 
         return results.toString();
     }
 
     private void fixTeamNames() {
-        jdbc.execute("UPDATE singles SET team = 'North Scott Trap Club' WHERE team = 'North Scott Trap Team';");
-        jdbc.execute("UPDATE doubles SET team = 'North Scott Trap Club' WHERE team = 'North Scott Trap Team';");
-        jdbc.execute("UPDATE handicap SET team = 'North Scott Trap Club' WHERE team = 'North Scott Trap Team';");
-        jdbc.execute("UPDATE skeet SET team = 'North Scott Trap Club' WHERE team = 'North Scott Trap Team';");
-        jdbc.execute("UPDATE clays SET team = 'North Scott Trap Club' WHERE team = 'North Scott Trap Team';");
+        jdbc.execute("UPDATE singles SET team = replace(team, 'Club', 'Team') WHERE team LIKE '%Club%';");
+        jdbc.execute("UPDATE doubles SET team = replace(team, 'Club', 'Team') WHERE team LIKE '%Club%';");
+        jdbc.execute("UPDATE handicap SET team = replace(team, 'Club', 'Team') WHERE team LIKE '%Club%';");
+        jdbc.execute("UPDATE skeet SET team = replace(team, 'Club', 'Team') WHERE team LIKE '%Club%';");
+        jdbc.execute("UPDATE clays SET team = replace(team, 'Club', 'Team') WHERE team LIKE '%Club%';");
+    }
+
+    private void fixClassifications() {
+        jdbc.execute("UPDATE singles SET classification = CASE WHEN classification = 'Senior/Varsity' THEN 'Varsity' WHEN classification = 'Senior/Jr. Varsity' THEN 'Junior Varsity' WHEN classification = 'Intermediate/Advanced' THEN 'Intermediate Advanced' WHEN classification = 'Intermediate/Entry Level' THEN 'Intermediate Entry' WHEN classification = 'Rookie' THEN 'Rookie' ELSE classification END;");
+        jdbc.execute("UPDATE doubles SET classification = CASE WHEN classification = 'Senior/Varsity' THEN 'Varsity' WHEN classification = 'Senior/Jr. Varsity' THEN 'Junior Varsity' WHEN classification = 'Intermediate/Advanced' THEN 'Intermediate Advanced' WHEN classification = 'Intermediate/Entry Level' THEN 'Intermediate Entry' WHEN classification = 'Rookie' THEN 'Rookie' ELSE classification END;");
+        jdbc.execute("UPDATE handicap SET classification = CASE WHEN classification = 'Senior/Varsity' THEN 'Varsity' WHEN classification = 'Senior/Jr. Varsity' THEN 'Junior Varsity' WHEN classification = 'Intermediate/Advanced' THEN 'Intermediate Advanced' WHEN classification = 'Intermediate/Entry Level' THEN 'Intermediate Entry' WHEN classification = 'Rookie' THEN 'Rookie' ELSE classification END;");
+        jdbc.execute("UPDATE skeet SET classification = CASE WHEN classification = 'Senior/Varsity' THEN 'Varsity' WHEN classification = 'Senior/Jr. Varsity' THEN 'Junior Varsity' WHEN classification = 'Intermediate/Advanced' THEN 'Intermediate Advanced' WHEN classification = 'Intermediate/Entry Level' THEN 'Intermediate Entry' WHEN classification = 'Rookie' THEN 'Rookie' ELSE classification END;");
+        jdbc.execute("UPDATE clays SET classification = CASE WHEN classification = 'Senior/Varsity' THEN 'Varsity' WHEN classification = 'Senior/Jr. Varsity' THEN 'Junior Varsity' WHEN classification = 'Intermediate/Advanced' THEN 'Intermediate Advanced' WHEN classification = 'Intermediate/Entry Level' THEN 'Intermediate Entry' WHEN classification = 'Rookie' THEN 'Rookie' ELSE classification END;");
     }
 
     private void fixAthleteNames() {
@@ -178,15 +193,12 @@ public class ReportController {
         File file = new File(Objects.requireNonNull(classLoader.getResource("template.xlsx")).getFile());
         Workbook workbook = WorkbookFactory.create(new FileInputStream(file));
 
-        result.append("Workbook has ").append(workbook.getNumberOfSheets()).append(" sheets");
         System.out.println("Workbook has " + workbook.getNumberOfSheets() + " sheets");
-        workbook.forEach(sheet -> result.append("<br> - ").append(sheet.getSheetName()));
         workbook.forEach(sheet -> System.out.println("- " + sheet.getSheetName()));
 
         long start = System.currentTimeMillis();
         long trueStart = System.currentTimeMillis();
         populateCleanData(workbook.getSheet("Clean Data"));
-        result.append("<br>Clean data populated in ").append(System.currentTimeMillis() - start).append("ms");
         System.out.println("Clean data populated in " + (System.currentTimeMillis() - start) + "ms");
 
         Map<String, String> types = new HashMap<>();
@@ -204,7 +216,6 @@ public class ReportController {
         for (Map.Entry<String, String> entry : types.entrySet()) {
             start = System.currentTimeMillis();
             populateTeamData(workbook.getSheet(entry.getKey()), entry.getValue(), mainTextStyle);
-            result.append("<br>").append(entry.getKey()).append(" data populated in ").append(System.currentTimeMillis() - start).append("ms");
             System.out.println("" + entry.getKey() + " data populated in " + (System.currentTimeMillis() - start) + "ms");
         }
 
@@ -219,37 +230,31 @@ public class ReportController {
 
         start = System.currentTimeMillis();
         populateIndividualData(workbook.getSheet("Individual-Men"), "M", style, mainTextStyle);
-        result.append("<br>Individual Men data populated in ").append(System.currentTimeMillis() - start).append("ms");
         System.out.println("Individual Men data populated in " + (System.currentTimeMillis() - start) + "ms");
 
         start = System.currentTimeMillis();
         populateIndividualData(workbook.getSheet("Individual-Ladies"), "F", style, mainTextStyle);
-        result.append("<br>Individual Women data populated in ").append(System.currentTimeMillis() - start).append("ms");
         System.out.println("Individual Women data populated in " + (System.currentTimeMillis() - start) + "ms");
 
         start = System.currentTimeMillis();
         populateTeamIndividualData(workbook.getSheet("Team-Individual-Scores"));
-        result.append("<br>Team Individual Scores data populated in ").append(System.currentTimeMillis() - start).append("ms");
         System.out.println("Team Individual Scores data populated in " + (System.currentTimeMillis() - start) + "ms");
 
         start = System.currentTimeMillis();
         Date date = new Date();
         SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmss");
         String currentDate = formatter.format(date);
-        result.append("<br>Added today's date in ").append(System.currentTimeMillis() - start).append("ms");
         System.out.println("Added today's date in " + (System.currentTimeMillis() - start) + "ms");
 
         start = System.currentTimeMillis();
         FileOutputStream fileOutputStream = new FileOutputStream(currentDate + ".xlsx");
         workbook.write(fileOutputStream);
         fileOutputStream.close();
-        result.append("<br>Wrote the contents to a file in ").append(System.currentTimeMillis() - start).append("ms");
         System.out.println("Wrote the contents to a file in " + (System.currentTimeMillis() - start) + "ms");
-        result.append("<br>Finished in ").append(System.currentTimeMillis() - trueStart).append("ms");
         System.out.println("Finished in " + (System.currentTimeMillis() - trueStart) + "ms");
         workbook.close();
 
-        return result.toString();
+        return "Finished in " + (System.currentTimeMillis() - trueStart) + "ms";
     }
 
     private void populateCleanData(Sheet sheet) {
