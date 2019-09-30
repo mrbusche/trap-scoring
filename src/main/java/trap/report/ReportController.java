@@ -14,6 +14,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import trap.model.AllData;
+import trap.model.AllIndividualScores;
 import trap.model.AllTeamScores;
 import trap.model.ClaysAggregate;
 import trap.model.ClaysTeamAggregate;
@@ -26,6 +27,7 @@ import trap.model.SinglesTeamAggregate;
 import trap.model.SkeetAggregate;
 import trap.model.SkeetTeamAggregate;
 import trap.repository.AllDataRepository;
+import trap.repository.AllIndividualScoresRepository;
 import trap.repository.AllTeamScoresRepository;
 import trap.repository.ClaysDataRepository;
 import trap.repository.ClaysDataTeamRepository;
@@ -70,6 +72,7 @@ public class ReportController {
     private final ClaysDataTeamRepository claysDataTeamRepository;
     private final AllDataRepository allDataRepository;
     private final AllTeamScoresRepository allTeamScoresRepository;
+    private final AllIndividualScoresRepository allIndividualScoresRepository;
     private final JdbcTemplate jdbc;
     private final String currentDate = new SimpleDateFormat("MM/dd/yyyy").format(Calendar.getInstance().getTime());
     @Value("${trap.singles}")
@@ -239,6 +242,10 @@ public class ReportController {
         start = System.currentTimeMillis();
         populateTeamIndividualData(workbook.getSheet("Team-Individual-Scores"));
         System.out.println("Team Individual Scores data populated in " + (System.currentTimeMillis() - start) + "ms");
+
+        start = System.currentTimeMillis();
+        populateAllIndividualData(workbook.getSheet("Individual-All-Scores"));
+        System.out.println("Individual All Scores data populated in " + (System.currentTimeMillis() - start) + "ms");
 
         start = System.currentTimeMillis();
         Date date = new Date();
@@ -505,12 +512,35 @@ public class ReportController {
             cell.setCellValue(rowData.getAthlete());
             cell = row.createCell(4);
             cell.setCellValue(rowData.getIndtotal());
-            cell = row.createCell(5);
-            cell.setCellValue(rowData.getTeamtotal());
+        }
+        sheet.setAutoFilter(CellRangeAddress.valueOf("A1:E1"));
+    }
+
+    private void populateAllIndividualData(Sheet sheet) {
+        var start = System.currentTimeMillis();
+        List<AllIndividualScores> allIndividualScores = allIndividualScoresRepository.findAll();
+        System.out.println("Ran query for all scores " + (System.currentTimeMillis() - start) + "ms");
+
+        int rows = sheet.getLastRowNum();
+
+        Cell cell;
+        Row row;
+        for (AllIndividualScores rowData : allIndividualScores) {
+            row = sheet.createRow(++rows);
+            cell = row.createCell(0);
             cell.setCellValue(rowData.getType());
+            cell = row.createCell(1);
+            cell.setCellValue(rowData.getTeam());
+            cell = row.createCell(2);
+            cell.setCellValue(rowData.getClassification());
+            cell = row.createCell(3);
+            cell.setCellValue(rowData.getAthlete());
+            cell = row.createCell(4);
+            cell.setCellValue(rowData.getTotal());
+            cell = row.createCell(5);
+            cell.setCellValue(rowData.getGender());
         }
         sheet.setAutoFilter(CellRangeAddress.valueOf("A1:F1"));
-
     }
 
 }
