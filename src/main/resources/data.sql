@@ -685,6 +685,24 @@ CREATE VIEW allTeamScores AS
     SELECT *, 'clays'
     FROM claysTeamScores;
 
+DROP VIEW IF EXISTS allIndividualScores;
+DROP TABLE IF EXISTS allIndividualScores;
+CREATE VIEW allIndividualScores AS
+    SELECT *, 'singles' type
+    FROM singlesaggregate
+    UNION
+    SELECT *, 'doubles'
+    FROM doublesaggregate
+    UNION
+    SELECT *, 'handicap'
+    FROM handicapaggregate
+    UNION
+    SELECT *, 'skeet'
+    FROM skeetaggregate
+    UNION
+    SELECT *, 'clays'
+    FROM claysaggregate;
+
 CREATE INDEX singlesClassGen ON singles(classification, gender);
 CREATE INDEX doublesClassGen ON doubles(classification, gender);
 CREATE INDEX handicapClassGen ON handicap(classification, gender);
