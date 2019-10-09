@@ -3,7 +3,7 @@ version '0.1.0'
 
 buildscript {
     ext {
-        springBootVersion = '2.1.7.RELEASE'
+        springBootVersion = '2.1.9.RELEASE'
     }
 
     repositories {
@@ -17,7 +17,7 @@ buildscript {
 
 allprojects {
     ext {
-        springBootVersion = '2.1.7.RELEASE'
+        springBootVersion = '2.1.9.RELEASE'
     }
 
     repositories {
@@ -42,14 +42,14 @@ allprojects {
         }
         compile "org.springframework.boot:spring-boot-starter-data-jpa:${springBootVersion}"
 
-        compileOnly 'org.projectlombok:lombok:1.18.8'
-        annotationProcessor 'org.projectlombok:lombok:1.18.8'
+        compileOnly 'org.projectlombok:lombok:1.18.10'
+        annotationProcessor 'org.projectlombok:lombok:1.18.10'
 
         compile 'org.apache.poi:poi-ooxml:4.1.0' //xlsx files
 
         compile 'ch.vorburger.mariaDB4j:mariaDB4j:2.4.0'
 
-        runtime 'org.springframework.boot:spring-boot-devtools'
+        //runtime 'org.springframework.boot:spring-boot-devtools'
     }
 
 }
