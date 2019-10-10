@@ -6,5 +6,5 @@ import trap.model.AllIndividualScores;
 import java.util.List;
 
 public interface AllIndividualScoresRepository extends Repository<AllIndividualScores, String> {
-    List<AllIndividualScores> findAll();
+    List<AllIndividualScores> findAllByOrderByTeamAscTypeAscClassificationAscGenderAscTotalDesc();
 }

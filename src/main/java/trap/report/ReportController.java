@@ -518,7 +518,7 @@ public class ReportController {
 
     private void populateAllIndividualData(Sheet sheet) {
         var start = System.currentTimeMillis();
-        List<AllIndividualScores> allIndividualScores = allIndividualScoresRepository.findAll();
+        List<AllIndividualScores> allIndividualScores = allIndividualScoresRepository.findAllByOrderByTeamAscTypeAscClassificationAscGenderAscTotalDesc();
         System.out.println("Ran query for all scores " + (System.currentTimeMillis() - start) + "ms");
 
         int rows = sheet.getLastRowNum();
