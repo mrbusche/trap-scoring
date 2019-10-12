@@ -1,6 +1,6 @@
-set global local_infile=1;
+-- set global local_infile=1;
 
-USE trap;
+-- USE trap;
 DROP TABLE IF EXISTS singles;
 CREATE TABLE IF NOT EXISTS singles (
     CompId MEDIUMINT,

@@ -11,7 +11,6 @@ import org.springframework.context.annotation.Profile;
 
 import javax.sql.DataSource;
 
-@Profile("maria")
 @Configuration
 class EmbeddedMariaDbConfig {
 
