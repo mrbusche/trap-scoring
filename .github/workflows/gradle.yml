@@ -13,5 +13,7 @@ jobs:
       uses: actions/setup-java@v1
       with:
         java-version: 1.12
+    - name: Grant rights
+      run: chmod 0755 gradlew && git add gradlew
     - name: Build with Gradle
       run: ./gradlew build
