@@ -480,8 +480,6 @@ public class ReportHelper {
 
         int rows = sheet.getLastRowNum();
 
-        Cell cell;
-        Row row;
         for (AllTeamScores rowData : allData) {
             rows = getRows(sheet, rows, rowData);
         }
