@@ -24,8 +24,7 @@ public class Application {
 
     @Bean
     public CommandLineRunner commandLineRunner(ApplicationContext ctx) throws IOException {
-        StringBuilder result = new StringBuilder();
-        result.append(reportHelper.doItAll());
+        reportHelper.doItAll();
         return args -> LOG.info("Welcome to Trap App");
     }
 
