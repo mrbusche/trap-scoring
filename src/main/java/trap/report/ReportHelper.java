@@ -226,7 +226,7 @@ public class ReportHelper {
     }
 
     private void populateCleanData(Sheet sheet) {
-        var start = System.currentTimeMillis();
+        long start = System.currentTimeMillis();
         List<AllData> allData = allDataRepository.findAll();
         System.out.println("Ran get all data for clean data population " + (System.currentTimeMillis() - start) + "ms");
 
@@ -316,7 +316,7 @@ public class ReportHelper {
 
         int updateRow = rows;
         int startColumn = 1;
-        var start = System.currentTimeMillis();
+        long start = System.currentTimeMillis();
         List<SinglesTeamAggregate> singlesTeamData = singlesDataTeamRepository.getAllByClassificationOrderByTotalDesc(teamType);
         System.out.println("Ran query for singles by " + teamType + " " + (System.currentTimeMillis() - start) + "ms");
         for (SinglesTeamAggregate singlesTeamRowData : singlesTeamData) {
@@ -380,7 +380,7 @@ public class ReportHelper {
         int classificationStartRow;
         boolean addBlankRowForHeader = false;
         List<String> classificationList = Arrays.asList("Varsity", "Junior Varsity", "Intermediate Advanced", "Intermediate Entry", "Rookie");
-        var start = System.currentTimeMillis();
+        long start = System.currentTimeMillis();
         for (String classification : classificationList) {
             int column = 1;
             updateRow = maxRow;
@@ -474,7 +474,7 @@ public class ReportHelper {
     }
 
     private void populateTeamIndividualData(Sheet sheet) {
-        var start = System.currentTimeMillis();
+        long start = System.currentTimeMillis();
         List<AllTeamScores> allData = allTeamScoresRepository.findAll();
         System.out.println("Ran query for team scores " + (System.currentTimeMillis() - start) + "ms");
 
@@ -506,7 +506,7 @@ public class ReportHelper {
     }
 
     private void populateAllIndividualData(Sheet sheet) {
-        var start = System.currentTimeMillis();
+        long start = System.currentTimeMillis();
         List<AllIndividualScores> allIndividualScores = allIndividualScoresRepository.findAllByOrderByTeamAscTypeAscClassificationAscGenderAscTotalDesc();
         System.out.println("Ran query for all scores " + (System.currentTimeMillis() - start) + "ms");
 
