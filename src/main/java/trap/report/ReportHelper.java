@@ -83,9 +83,7 @@ public class ReportHelper {
     private String clays;
 
     public String doItAll() throws IOException {
-        StringBuilder result = new StringBuilder();
-
-        result.append(saveDataToDatabase());
+        saveDataToDatabase();
         Workbook workbook = getWorkbook();
 
         System.out.println("Workbook has " + workbook.getNumberOfSheets() + " sheets");
@@ -380,7 +378,7 @@ public class ReportHelper {
         int classificationStartRow;
         boolean addBlankRowForHeader = false;
         List<String> classificationList = Arrays.asList("Varsity", "Junior Varsity", "Intermediate Advanced", "Intermediate Entry", "Rookie");
-        long start = System.currentTimeMillis();
+        long start;
         for (String classification : classificationList) {
             int column = 1;
             updateRow = maxRow;
@@ -487,10 +485,8 @@ public class ReportHelper {
     }
 
     private static int getRows(Sheet sheet, int rows, AllTeamScores rowData) {
-        Row row;
-        Cell cell;
-        row = sheet.createRow(++rows);
-        cell = row.createCell(0);
+        Row row = sheet.createRow(++rows);
+        Cell cell = row.createCell(0);
         cell.setCellValue(rowData.getType());
         cell = row.createCell(1);
         cell.setCellValue(rowData.getTeam());
