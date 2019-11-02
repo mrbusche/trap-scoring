@@ -1,20 +1,22 @@
 package trap.model;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.RequiredArgsConstructor;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.Embeddable;
 import java.io.Serializable;
 
 @Embeddable
 @Data
-@RequiredArgsConstructor
+@AllArgsConstructor
+@NoArgsConstructor
 class AllDataIdentity implements Serializable {
-    private final String team;
-    private final String eventid;
-    private final Integer locationid;
-    private final String eventdate;
-    private final String squadname;
-    private final String athlete;
-    private final String round1;
+    private String team;
+    private String eventid;
+    private Integer locationid;
+    private String eventdate;
+    private String squadname;
+    private String athlete;
+    private String round1;
 }

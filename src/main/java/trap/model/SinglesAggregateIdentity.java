@@ -1,15 +1,17 @@
 package trap.model;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.RequiredArgsConstructor;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.Embeddable;
 import java.io.Serializable;
 
 @Embeddable
 @Data
-@RequiredArgsConstructor
+@AllArgsConstructor
+@NoArgsConstructor
 class SinglesAggregateIdentity implements Serializable {
-    private final String team;
-    private final String athlete;
+    private String team;
+    private String athlete;
 }
