@@ -1,26 +1,17 @@
 package trap.model;
 
 import lombok.Data;
+import lombok.RequiredArgsConstructor;
 
 import javax.persistence.Embeddable;
 import java.io.Serializable;
 
 @Embeddable
 @Data
+@RequiredArgsConstructor
 class AllIndividualScoresIdentity implements Serializable {
-    private String team;
-    private String classification;
-    private String athlete;
-    private String type;
-
-    public AllIndividualScoresIdentity() {
-
-    }
-
-    public AllIndividualScoresIdentity(String team, String classification, String athlete, String type) {
-        this.team = team;
-        this.classification = classification;
-        this.athlete = athlete;
-        this.type = type;
-    }
+    private final String team;
+    private final String classification;
+    private final String athlete;
+    private final String type;
 }
