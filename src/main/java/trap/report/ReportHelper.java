@@ -152,7 +152,7 @@ public class ReportHelper {
         return "Finished in " + (System.currentTimeMillis() - trueStart) + "ms";
     }
 
-    private String saveDataToDatabase() {
+    private void saveDataToDatabase() {
         LOG.fine("Saving trap data to database");
 
         jdbc.execute("TRUNCATE TABLE singles;");
@@ -199,7 +199,6 @@ public class ReportHelper {
         fixAthleteNames();
         System.out.println("Athlete names fixed in " + (System.currentTimeMillis() - start) + "ms");
 
-        return results.toString();
     }
 
     private void fixTeamNames() {
