@@ -38,7 +38,3 @@ dependencies {
 
     implementation 'ch.vorburger.mariaDB4j:mariaDB4j:2.4.0'
 }
-
-test {
-    useJUnitPlatform()
-}
