@@ -131,15 +131,16 @@ ORDER BY sta.total DESC, sdts.total DESC;
 
 DROP TABLE IF EXISTS doubles;
 CREATE TABLE IF NOT EXISTS doubles (
+    CompId MEDIUMINT,
     EventId VARCHAR(6),
     Event VARCHAR(50),
     LocationId MEDIUMINT,
     Location VARCHAR(50),
     EventDate VARCHAR(16),
     SquadName VARCHAR(50),
-    Station SMALLINT,
     Team VARCHAR(50),
     Athlete VARCHAR(50),
+    Athlete_Id MEDIUMINT,
     Classification VARCHAR(50),
     Gender VARCHAR(6),
     Round1 TINYINT,
@@ -149,9 +150,7 @@ CREATE TABLE IF NOT EXISTS doubles (
     Round5 TINYINT DEFAULT 0,
     Round6 TINYINT DEFAULT 0,
     Round7 TINYINT DEFAULT 0,
-    Round8 TINYINT DEFAULT 0,
-    FrontRun TINYINT DEFAULT 0,
-    BackRun TINYINT DEFAULT 0
+    Round8 TINYINT DEFAULT 0
 );
 
 -- top 4 scores for individual rounds
@@ -259,15 +258,16 @@ ORDER BY sta.total DESC, sdts.total DESC;
 
 DROP TABLE IF EXISTS handicap;
 CREATE TABLE IF NOT EXISTS handicap (
+    CompId MEDIUMINT,
     EventId VARCHAR(6),
     Event VARCHAR(50),
     LocationId MEDIUMINT,
     Location VARCHAR(50),
     EventDate VARCHAR(16),
     SquadName VARCHAR(50),
-    Station SMALLINT,
     Team VARCHAR(50),
     Athlete VARCHAR(50),
+    Athlete_Id MEDIUMINT,
     Classification VARCHAR(50),
     Gender VARCHAR(6),
     Round1 TINYINT,
@@ -277,9 +277,7 @@ CREATE TABLE IF NOT EXISTS handicap (
     Round5 TINYINT DEFAULT 0,
     Round6 TINYINT DEFAULT 0,
     Round7 TINYINT DEFAULT 0,
-    Round8 TINYINT DEFAULT 0,
-    FrontRun TINYINT DEFAULT 0,
-    BackRun TINYINT DEFAULT 0
+    Round8 TINYINT DEFAULT 0
 );
 
 -- top 4 scores
@@ -389,15 +387,16 @@ ORDER BY sta.total DESC, sdts.total DESC;
 
 DROP TABLE IF EXISTS skeet;
 CREATE TABLE IF NOT EXISTS skeet (
+    CompId MEDIUMINT,
     EventId VARCHAR(6),
     Event VARCHAR(50),
     LocationId MEDIUMINT,
     Location VARCHAR(50),
     EventDate VARCHAR(16),
     SquadName VARCHAR(50),
-    Station SMALLINT,
     Team VARCHAR(50),
     Athlete VARCHAR(50),
+    Athlete_Id MEDIUMINT,
     Classification VARCHAR(50),
     Gender VARCHAR(6),
     Round1 TINYINT,
@@ -407,9 +406,7 @@ CREATE TABLE IF NOT EXISTS skeet (
     Round5 TINYINT DEFAULT 0,
     Round6 TINYINT DEFAULT 0,
     Round7 TINYINT DEFAULT 0,
-    Round8 TINYINT DEFAULT 0,
-    FrontRun TINYINT DEFAULT 0,
-    BackRun TINYINT DEFAULT 0
+    Round8 TINYINT DEFAULT 0
 );
 
 -- top 3 scores only
@@ -518,15 +515,16 @@ ORDER BY sta.total DESC, sdts.total DESC;
 
 DROP TABLE IF EXISTS clays;
 CREATE TABLE IF NOT EXISTS clays (
+    CompId MEDIUMINT,
     EventId VARCHAR(6),
     Event VARCHAR(50),
     LocationId MEDIUMINT,
     Location VARCHAR(50),
     EventDate VARCHAR(16),
     SquadName VARCHAR(50),
-    Station SMALLINT,
     Team VARCHAR(50),
     Athlete VARCHAR(50),
+    Athlete_Id MEDIUMINT,
     Classification VARCHAR(50),
     Gender VARCHAR(6),
     Round1 TINYINT,
@@ -537,9 +535,7 @@ CREATE TABLE IF NOT EXISTS clays (
     Round6 TINYINT DEFAULT 0,
     Round7 TINYINT DEFAULT 0,
     Round8 TINYINT DEFAULT 0,
-    FrontRun TINYINT DEFAULT 0,
-    BackRun TINYINT DEFAULT 0,
-    FiveStand VARCHAR(1)
+    FiveStand VARCHAR(1) DEFAULT 'N'
 );
 
 -- top 3 scores only
