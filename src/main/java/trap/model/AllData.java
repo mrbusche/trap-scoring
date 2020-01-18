@@ -21,7 +21,6 @@ public class AllData {
     String eventdate;
     @Column(name = "squadname", insertable = false, updatable = false)
     String squadname;
-    Integer station;
     @Column(name = "team", insertable = false, updatable = false)
     String team;
     @Column(name = "athlete", insertable = false, updatable = false)
@@ -37,8 +36,6 @@ public class AllData {
     Integer round6 = 0;
     Integer round7 = 0;
     Integer round8 = 0;
-    Integer frontrun = 0;
-    Integer backrun = 0;
     String fivestand;
     String type;
     @EmbeddedId
