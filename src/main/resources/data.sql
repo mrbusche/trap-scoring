@@ -12,7 +12,7 @@ CREATE TABLE IF NOT EXISTS singles (
     SquadName VARCHAR(50),
     Team VARCHAR(50),
     Athlete VARCHAR(50),
-    Athlete_Id MEDIUMINT,
+    AthleteId MEDIUMINT,
     Classification VARCHAR(50),
     Gender VARCHAR(6),
     Round1 TINYINT DEFAULT 0,
@@ -140,7 +140,7 @@ CREATE TABLE IF NOT EXISTS doubles (
     SquadName VARCHAR(50),
     Team VARCHAR(50),
     Athlete VARCHAR(50),
-    Athlete_Id MEDIUMINT,
+    AthleteId MEDIUMINT,
     Classification VARCHAR(50),
     Gender VARCHAR(6),
     Round1 TINYINT,
@@ -267,7 +267,7 @@ CREATE TABLE IF NOT EXISTS handicap (
     SquadName VARCHAR(50),
     Team VARCHAR(50),
     Athlete VARCHAR(50),
-    Athlete_Id MEDIUMINT,
+    AthleteId MEDIUMINT,
     Classification VARCHAR(50),
     Gender VARCHAR(6),
     Round1 TINYINT,
@@ -396,7 +396,7 @@ CREATE TABLE IF NOT EXISTS skeet (
     SquadName VARCHAR(50),
     Team VARCHAR(50),
     Athlete VARCHAR(50),
-    Athlete_Id MEDIUMINT,
+    AthleteId MEDIUMINT,
     Classification VARCHAR(50),
     Gender VARCHAR(6),
     Round1 TINYINT,
@@ -524,7 +524,7 @@ CREATE TABLE IF NOT EXISTS clays (
     SquadName VARCHAR(50),
     Team VARCHAR(50),
     Athlete VARCHAR(50),
-    Athlete_Id MEDIUMINT,
+    AthleteId MEDIUMINT,
     Classification VARCHAR(50),
     Gender VARCHAR(6),
     Round1 TINYINT,
@@ -648,7 +648,7 @@ ORDER BY sta.total DESC, sdts.total DESC;
 DROP VIEW IF EXISTS allData;
 DROP TABLE IF EXISTS allData;
 CREATE VIEW allData AS
-    SELECT eventid, event, locationid, location, eventdate, squadname, '' station, team, athlete, classification, gender, round1, round2, round3, round4, round5, round6, round7, round8, 0 as frontrun, 0 as backrun, 'N' as fivestand, 'singles' as type
+    SELECT compid, eventid, event, locationid, location, eventdate, squadname, team, athlete, athleteid, classification, gender, round1, round2, round3, round4, round5, round6, round7, round8, 'N' as fivestand, 'singles' as type
     FROM singles
     UNION
     SELECT *, 'N', 'doubles' as type
