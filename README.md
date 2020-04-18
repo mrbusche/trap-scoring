@@ -10,7 +10,6 @@ trap app
 - When finished there will be output of `Finished in 352211ms`
 - There will be a file generated in `c:\trap` directory
 
-
 [Singles](https://metabase.sssfonline.com:8443/public/question/8648faf9-42e8-4a9c-b55d-2f251349de7f)
 
 [Doubles](https://metabase.sssfonline.com:8443/public/question/5d5a78a5-2356-477f-b1b8-fe6ee11d25b1)
