@@ -1,6 +1,7 @@
 package trap.report;
 
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.io.FileUtils;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.Font;
@@ -9,7 +10,6 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.apache.poi.ss.util.CellRangeAddress;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import trap.model.AllData;
@@ -39,17 +39,17 @@ import trap.repository.SinglesDataTeamRepository;
 import trap.repository.SkeetDataRepository;
 import trap.repository.SkeetDataTeamRepository;
 
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @RequiredArgsConstructor
 @Service
@@ -70,17 +70,14 @@ public class ReportHelper {
     private final AllTeamScoresRepository allTeamScoresRepository;
     private final AllIndividualScoresRepository allIndividualScoresRepository;
     private final String currentDate = new SimpleDateFormat("MM/dd/yyyy").format(Calendar.getInstance().getTime());
-
-    @Value("${trap.singles}")
-    private String singles;
-    @Value("${trap.doubles}")
-    private String doubles;
-    @Value("${trap.handicap}")
-    private String handicap;
-    @Value("${trap.skeet}")
-    private String skeet;
-    @Value("${trap.clays}")
-    private String clays;
+    private final String types[] = new String[]{"singles", "doubles", "handicap", "skeet", "clays"};
+    private final Map<String, String> fileUrls = Stream.of(new String[][]{
+                {"singles", "https://metabase.sssfonline.com/public/question/8648faf9-42e8-4a9c-b55d-2f251349de7f.csv"},
+                {"doubles", "https://metabase.sssfonline.com/public/question/5d5a78a5-2356-477f-b1b8-fe6ee11d25b1.csv"},
+                {"handicap", "https://metabase.sssfonline.com/public/question/69ca55d9-3e18-45bc-b57f-73aeb205ece8.csv"},
+                {"skeet", "https://metabase.sssfonline.com/public/question/c697d744-0e06-4c3f-a640-fea02f9c9ecd.csv"},
+                {"clays", "https://metabase.sssfonline.com/public/question/2c6edb1a-a7ee-43c2-8180-ad199a57be55.csv"},
+        }).collect(Collectors.toMap(data -> data[0], data -> data[1]));
 
     public String doItAll() throws IOException {
         saveDataToDatabase();
@@ -152,40 +149,41 @@ public class ReportHelper {
         return "Finished in " + (System.currentTimeMillis() - trueStart) + "ms";
     }
 
-    private void saveDataToDatabase() {
+    private void saveDataToDatabase() throws MalformedURLException, IOException {
         LOG.fine("Saving trap data to database");
-
-        jdbc.execute("TRUNCATE TABLE singles;");
-        jdbc.execute("TRUNCATE TABLE doubles;");
-        jdbc.execute("TRUNCATE TABLE handicap;");
-        jdbc.execute("TRUNCATE TABLE skeet;");
-        jdbc.execute("TRUNCATE TABLE clays;");
 
         long start = System.currentTimeMillis();
         StringBuilder results = new StringBuilder();
-        String singlesSql = "load data local infile '" + singles + "' into table singles fields terminated by ',' OPTIONALLY ENCLOSED BY '\"' lines terminated by '\n' IGNORE 1 LINES;";
+
+        String fileUrl;
+        String filename;
+        // retrieve files for each type
+        for (String type: types) {
+            fileUrl = fileUrls.get(type);
+            filename = type + ".csv";
+            FileUtils.copyURLToFile(new URL(fileUrl), new File(filename), 10000, 10000);
+        }
+        System.out.println("Files downloaded in " + (System.currentTimeMillis() - start) + " ms");
+
+        start = System.currentTimeMillis();
+        String singlesSql = "load data local infile 'singles.csv' into table singles fields terminated by ',' OPTIONALLY ENCLOSED BY '\"' lines terminated by '\n' IGNORE 1 LINES;";
         int singlesCount = jdbc.update(con -> con.prepareStatement(singlesSql));
-        results.append("Added ").append(singlesCount).append(" new records to database in singles table.<br>");
         System.out.println("Added " + singlesCount + " new records to database in singles table.");
 
-        String doublesSql = "load data local infile '" + doubles + "' into table doubles fields terminated by ',' OPTIONALLY ENCLOSED BY '\"' lines terminated by '\n' IGNORE 1 LINES;";
+        String doublesSql = "load data local infile 'doubles.csv' into table doubles fields terminated by ',' OPTIONALLY ENCLOSED BY '\"' lines terminated by '\n' IGNORE 1 LINES;";
         int doublesCount = jdbc.update(con -> con.prepareStatement(doublesSql));
-        results.append("Added ").append(doublesCount).append(" new records to database in doubles table.<br>");
         System.out.println("Added " + doublesCount + " new records to database in doubles table.");
 
-        String handicapSql = "load data local infile '" + handicap + "' into table handicap fields terminated by ',' OPTIONALLY ENCLOSED BY '\"' lines terminated by '\n' IGNORE 1 LINES;";
+        String handicapSql = "load data local infile 'handicap.csv' into table handicap fields terminated by ',' OPTIONALLY ENCLOSED BY '\"' lines terminated by '\n' IGNORE 1 LINES;";
         int handicapCount = jdbc.update(con -> con.prepareStatement(handicapSql));
-        results.append("Added ").append(handicapCount).append(" new records to database in handicap table.<br>");
         System.out.println("Added " + handicapCount + " new records to database in handicap table.");
 
-        String skeetSql = "load data local infile '" + skeet + "' into table skeet fields terminated by ',' OPTIONALLY ENCLOSED BY '\"' lines terminated by '\n' IGNORE 1 LINES;";
+        String skeetSql = "load data local infile 'skeet.csv' into table skeet fields terminated by ',' OPTIONALLY ENCLOSED BY '\"' lines terminated by '\n' IGNORE 1 LINES;";
         int skeetCount = jdbc.update(con -> con.prepareStatement(skeetSql));
-        results.append("Added ").append(skeetCount).append(" new records to database in skeet table.<br>");
         System.out.println("Added " + skeetCount + " new records to database in skeet table.");
 
-        String claysSql = "load data local infile '" + clays + "' into table clays fields terminated by ',' OPTIONALLY ENCLOSED BY '\"' lines terminated by '\n' IGNORE 1 LINES;";
+        String claysSql = "load data local infile 'clays.csv' into table clays fields terminated by ',' OPTIONALLY ENCLOSED BY '\"' lines terminated by '\n' IGNORE 1 LINES;";
         int claysCount = jdbc.update(con -> con.prepareStatement(claysSql));
-        results.append("Added ").append(claysCount).append(" new records to database in clays table.<br>");
         System.out.println("Added " + claysCount + " new records to database in clays table.");
         System.out.println("Database loaded in " + (System.currentTimeMillis() - start) + "ms");
 
@@ -198,7 +196,6 @@ public class ReportHelper {
         start = System.currentTimeMillis();
         fixAthleteNames();
         System.out.println("Athlete names fixed in " + (System.currentTimeMillis() - start) + "ms");
-
     }
 
     private void fixTeamNames() {
