@@ -19,13 +19,13 @@ public class Application {
     private final ReportHelper reportHelper;
 
     public static void main(String[] args) {
-        SpringApplication.run(Application.class, args);
+        SpringApplication.run(Application.class, args).close();
     }
 
     @Bean
     public CommandLineRunner commandLineRunner(ApplicationContext ctx) throws IOException {
         reportHelper.doItAll();
-        return args -> LOG.info("Welcome to Trap App");
+        return args -> LOG.info("File created");
     }
 
 }
