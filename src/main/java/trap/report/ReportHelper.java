@@ -43,10 +43,14 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -70,7 +74,7 @@ public class ReportHelper {
     private final AllTeamScoresRepository allTeamScoresRepository;
     private final AllIndividualScoresRepository allIndividualScoresRepository;
     private final String currentDate = new SimpleDateFormat("MM/dd/yyyy").format(Calendar.getInstance().getTime());
-    private final String types[] = new String[]{"singles", "doubles", "handicap", "skeet", "clays"};
+    private final String[] types = new String[]{"singles", "doubles", "handicap", "skeet", "clays"};
     private final Map<String, String> fileUrls = Stream.of(new String[][]{
                 {"singles", "https://metabase.sssfonline.com/public/question/8648faf9-42e8-4a9c-b55d-2f251349de7f.csv"},
                 {"doubles", "https://metabase.sssfonline.com/public/question/5d5a78a5-2356-477f-b1b8-fe6ee11d25b1.csv"},
@@ -149,19 +153,15 @@ public class ReportHelper {
         return "Finished in " + (System.currentTimeMillis() - trueStart) + "ms";
     }
 
-    private void saveDataToDatabase() throws MalformedURLException, IOException {
+    private void saveDataToDatabase() throws IOException {
         LOG.fine("Saving trap data to database");
 
         long start = System.currentTimeMillis();
         StringBuilder results = new StringBuilder();
 
-        String fileUrl;
-        String filename;
-        // retrieve files for each type
+        // download files for each type
         for (String type: types) {
-            fileUrl = fileUrls.get(type);
-            filename = type + ".csv";
-            FileUtils.copyURLToFile(new URL(fileUrl), new File(filename), 10000, 10000);
+            FileUtils.copyURLToFile(new URL(fileUrls.get(type)), new File(type + ".csv"), 10000, 10000);
         }
         System.out.println("Files downloaded in " + (System.currentTimeMillis() - start) + " ms");
 
