@@ -166,6 +166,7 @@ public class ReportHelper {
         System.out.println("Files downloaded in " + (System.currentTimeMillis() - start) + " ms");
 
         start = System.currentTimeMillis();
+        jdbc.execute("set global local_infile=1;");
         String singlesSql = "load data local infile 'singles.csv' into table singles fields terminated by ',' OPTIONALLY ENCLOSED BY '\"' lines terminated by '\n' IGNORE 1 LINES;";
         int singlesCount = jdbc.update(con -> con.prepareStatement(singlesSql));
         System.out.println("Added " + singlesCount + " new records to database in singles table.");
