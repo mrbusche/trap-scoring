@@ -2,6 +2,7 @@ package trap.model;
 
 import lombok.Data;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -13,9 +14,7 @@ import static javax.persistence.GenerationType.IDENTITY;
 @Entity
 @Table(name = "singles")
 public class Singles {
-    @Id
-    @GeneratedValue(strategy = IDENTITY)
-    private Integer id;
+    @Column(name="comp_id")
     Integer CompId;
     String EventId;
     String Event;
@@ -25,6 +24,7 @@ public class Singles {
     String SquadName;
     String Team;
     String Athlete;
+    @Column(name = "ath_id")
     Integer AthleteId;
     String Classification;
     String Gender;
@@ -36,4 +36,7 @@ public class Singles {
     Integer Round6;
     Integer Round7;
     Integer Round8;
+    @Id
+    @GeneratedValue(strategy = IDENTITY)
+    private Integer id;
 }
