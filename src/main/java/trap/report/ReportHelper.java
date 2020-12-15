@@ -159,6 +159,7 @@ public class ReportHelper {
         long start = System.currentTimeMillis();
 
         // download files for each type
+        System.out.println("Started downloading files");
         for (String type: trapTypes) {
             FileUtils.copyURLToFile(new URL(fileUrls.get(type)), new File(type + ".csv"), 10000, 10000);
         }
