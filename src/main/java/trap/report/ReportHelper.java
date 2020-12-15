@@ -74,7 +74,7 @@ public class ReportHelper {
     private final AllTeamScoresRepository allTeamScoresRepository;
     private final AllIndividualScoresRepository allIndividualScoresRepository;
     private final String currentDate = new SimpleDateFormat("MM/dd/yyyy").format(Calendar.getInstance().getTime());
-    private final String[] types = new String[]{"singles", "doubles", "handicap", "skeet", "clays"};
+    private final String[] trapTypes = new String[]{"singles", "doubles", "handicap", "skeet", "clays"};
     private final Map<String, String> fileUrls = Stream.of(new String[][]{
                 {"singles", "https://metabase.sssfonline.com/public/question/8648faf9-42e8-4a9c-b55d-2f251349de7f.csv"},
                 {"doubles", "https://metabase.sssfonline.com/public/question/5d5a78a5-2356-477f-b1b8-fe6ee11d25b1.csv"},
@@ -157,10 +157,9 @@ public class ReportHelper {
         LOG.fine("Saving trap data to database");
 
         long start = System.currentTimeMillis();
-        StringBuilder results = new StringBuilder();
 
         // download files for each type
-        for (String type: types) {
+        for (String type: trapTypes) {
             FileUtils.copyURLToFile(new URL(fileUrls.get(type)), new File(type + ".csv"), 10000, 10000);
         }
         System.out.println("Files downloaded in " + (System.currentTimeMillis() - start) + " ms");
