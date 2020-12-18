@@ -14,6 +14,7 @@ public class ReportController {
 
     @RequestMapping("/export")
     public String export() throws IOException {
-        return reportHelper.doItAll();
+        reportHelper.doItAll();
+        return "Report complete";
     }
 }

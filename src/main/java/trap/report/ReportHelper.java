@@ -73,17 +73,13 @@ public class ReportHelper {
     private final AllIndividualScoresRepository allIndividualScoresRepository;
     private final String currentDate = new SimpleDateFormat("MM/dd/yyyy").format(Calendar.getInstance().getTime());
     private final String[] trapTypes = new String[]{"singles", "doubles", "handicap", "skeet", "clays"};
-    Map<String, String> fileUrls = new HashMap<String, String>(){
-        {
-            put("singles", "https://metabase.sssfonline.com/public/question/8648faf9-42e8-4a9c-b55d-2f251349de7f.csv");
-            put("doubles", "https://metabase.sssfonline.com/public/question/5d5a78a5-2356-477f-b1b8-fe6ee11d25b1.csv");
-            put("handicap", "https://metabase.sssfonline.com/public/question/69ca55d9-3e18-45bc-b57f-73aeb205ece8.csv");
-            put("skeet", "https://metabase.sssfonline.com/public/question/c697d744-0e06-4c3f-a640-fea02f9c9ecd.csv");
-            put("clays", "https://metabase.sssfonline.com/public/question/2c6edb1a-a7ee-43c2-8180-ad199a57be55.csv");
-        }};
 
-    public String doItAll() throws IOException {
-        saveDataToDatabase();
+    public void doItAll() throws IOException {
+        downloadFiles();
+        addFilesToDatabase();
+        fixTeamNames();
+        fixAthleteNames();
+
         Workbook workbook = getWorkbook();
 
         System.out.println("Workbook has " + workbook.getNumberOfSheets() + " sheets");
@@ -92,79 +88,59 @@ public class ReportHelper {
         long start = System.currentTimeMillis();
         long trueStart = System.currentTimeMillis();
         populateCleanData(workbook.getSheet("Clean Data"));
-        System.out.println("Clean data populated in " + (System.currentTimeMillis() - start) + "ms");
 
         Map<String, String> types = new HashMap<>();
         types.put("Team-Senior", "Varsity");
         types.put("Team-Intermediate", "Intermediate Entry");
-        types.put("Team-Rookie", "Rookie");//Set font for mainText
-        Font mainText = workbook.createFont();
-        mainText.setFontName("Calibri");
-        mainText.setFontHeightInPoints((short) 12);
-        CellStyle mainTextStyle = workbook.createCellStyle();
-        mainTextStyle.setFont(mainText);
+        types.put("Team-Rookie", "Rookie");
 
+        CellStyle mainTextStyle = getCellStyle(workbook);
         for (Map.Entry<String, String> entry : types.entrySet()) {
             start = System.currentTimeMillis();
             populateTeamData(workbook.getSheet(entry.getKey()), entry.getValue(), mainTextStyle);
             System.out.println("" + entry.getKey() + " data populated in " + (System.currentTimeMillis() - start) + "ms");
         }
 
-        //Set font for headers
-        Font font = workbook.createFont();
-        font.setFontName("Calibri");
-        font.setItalic(true);
-        font.setBold(true);
-        font.setFontHeightInPoints((short) 14);
-        CellStyle style = workbook.createCellStyle();
-        style.setFont(font);
+        CellStyle style = setFontForHeaders(workbook);
+        populateIndividualData(workbook, "Individual-Men", "M", style, mainTextStyle);
+        populateIndividualData(workbook, "Individual-Ladies", "F", style, mainTextStyle);
 
-        start = System.currentTimeMillis();
-        populateIndividualData(workbook.getSheet("Individual-Men"), "M", style, mainTextStyle);
-        System.out.println("Individual Men data populated in " + (System.currentTimeMillis() - start) + "ms");
+        populateTeamIndividualData(workbook, "Team-Individual-Scores");
+        populateAllIndividualData(workbook, "Individual-All-Scores");
 
-        start = System.currentTimeMillis();
-        populateIndividualData(workbook.getSheet("Individual-Ladies"), "F", style, mainTextStyle);
-        System.out.println("Individual Women data populated in " + (System.currentTimeMillis() - start) + "ms");
+        createFile(workbook);
 
-        start = System.currentTimeMillis();
-        populateTeamIndividualData(workbook.getSheet("Team-Individual-Scores"));
-        System.out.println("Team Individual Scores data populated in " + (System.currentTimeMillis() - start) + "ms");
-
-        start = System.currentTimeMillis();
-        populateAllIndividualData(workbook.getSheet("Individual-All-Scores"));
-        System.out.println("Individual All Scores data populated in " + (System.currentTimeMillis() - start) + "ms");
-
-        start = System.currentTimeMillis();
-        Date date = new Date();
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmss");
-        String currentDate = formatter.format(date);
-        System.out.println("Added today's date in " + (System.currentTimeMillis() - start) + "ms");
-
-        start = System.currentTimeMillis();
-        FileOutputStream fileOutputStream = new FileOutputStream(currentDate + ".xlsx");
-        workbook.write(fileOutputStream);
-        fileOutputStream.close();
-        System.out.println("Wrote the contents to a file in " + (System.currentTimeMillis() - start) + "ms");
         System.out.println("Finished in " + (System.currentTimeMillis() - trueStart) + "ms");
         workbook.close();
-
-        return "Finished in " + (System.currentTimeMillis() - trueStart) + "ms";
     }
 
-    private void saveDataToDatabase() throws IOException {
-        LOG.fine("Saving trap data to database");
+//    private Connection getConnectionSuitableForLocalLoad(Connection connection) throws SQLException {
+//        JdbcConnection unwrapped = connection.unwrap(com.mysql.cj.jdbc.JdbcConnection.class);
+//        unwrapped.getPropertySet().getProperty(PropertyKey.allowLoadLocalInfile).setValue(true);
+//        return unwrapped;
+//    }
 
+    private void downloadFiles() throws IOException {
         long start = System.currentTimeMillis();
-
-        // download files for each type
         System.out.println("Started downloading files");
-        for (String type: trapTypes) {
+
+        Map<String, String> fileUrls = new HashMap<String, String>() {
+            {
+                put("singles", "https://metabase.sssfonline.com/public/question/8648faf9-42e8-4a9c-b55d-2f251349de7f.csv");
+                put("doubles", "https://metabase.sssfonline.com/public/question/5d5a78a5-2356-477f-b1b8-fe6ee11d25b1.csv");
+                put("handicap", "https://metabase.sssfonline.com/public/question/69ca55d9-3e18-45bc-b57f-73aeb205ece8.csv");
+                put("skeet", "https://metabase.sssfonline.com/public/question/c697d744-0e06-4c3f-a640-fea02f9c9ecd.csv");
+                put("clays", "https://metabase.sssfonline.com/public/question/2c6edb1a-a7ee-43c2-8180-ad199a57be55.csv");
+            }
+        };
+        for (String type : trapTypes) {
             FileUtils.copyURLToFile(new URL(fileUrls.get(type)), new File(type + ".csv"), 10000, 10000);
         }
         System.out.println("Files downloaded in " + (System.currentTimeMillis() - start) + " ms");
+    }
 
-        start = System.currentTimeMillis();
+    private void addFilesToDatabase() {
+        long start = System.currentTimeMillis();
         jdbc.execute("set global local_infile=1;");
         String singlesSql = "load data local infile 'singles.csv' into table singles fields terminated by ',' OPTIONALLY ENCLOSED BY '\"' lines terminated by '\n' IGNORE 1 LINES;";
         int singlesCount = jdbc.update(con -> con.prepareStatement(singlesSql));
@@ -186,32 +162,26 @@ public class ReportHelper {
         int claysCount = jdbc.update(con -> con.prepareStatement(claysSql));
         System.out.println("Added " + claysCount + " new records to database in clays table.");
         System.out.println("Database loaded in " + (System.currentTimeMillis() - start) + "ms");
-
-        start = System.currentTimeMillis();
-        fixTeamNames();
-        System.out.println("Team names fixed in " + (System.currentTimeMillis() - start) + "ms");
-        start = System.currentTimeMillis();
-        //fixClassifications();
-        System.out.println("Classifications fixed in " + (System.currentTimeMillis() - start) + "ms");
-        start = System.currentTimeMillis();
-        fixAthleteNames();
-        System.out.println("Athlete names fixed in " + (System.currentTimeMillis() - start) + "ms");
     }
 
     private void fixTeamNames() {
+        long start = System.currentTimeMillis();
         jdbc.execute("UPDATE singles SET team = replace(team, 'Club', 'Team') WHERE team LIKE '%Club%';");
         jdbc.execute("UPDATE doubles SET team = replace(team, 'Club', 'Team') WHERE team LIKE '%Club%';");
         jdbc.execute("UPDATE handicap SET team = replace(team, 'Club', 'Team') WHERE team LIKE '%Club%';");
         jdbc.execute("UPDATE skeet SET team = replace(team, 'Club', 'Team') WHERE team LIKE '%Club%';");
         jdbc.execute("UPDATE clays SET team = replace(team, 'Club', 'Team') WHERE team LIKE '%Club%';");
+        System.out.println("Team names fixed in " + (System.currentTimeMillis() - start) + "ms");
     }
 
     private void fixAthleteNames() {
+        long start = System.currentTimeMillis();
         jdbc.execute("UPDATE singles SET athlete = replace(athlete, '  ', '') WHERE athlete LIKE '%  %';");
         jdbc.execute("UPDATE doubles SET athlete = replace(athlete, '  ', '') WHERE athlete LIKE '%  %';");
         jdbc.execute("UPDATE handicap SET athlete = replace(athlete, '  ', '') WHERE athlete LIKE '%  %';");
         jdbc.execute("UPDATE skeet SET athlete = replace(athlete, '  ', '') WHERE athlete LIKE '%  %';");
         jdbc.execute("UPDATE clays SET athlete = replace(athlete, '  ', '') WHERE athlete LIKE '%  %';");
+        System.out.println("Athlete names fixed in " + (System.currentTimeMillis() - start) + "ms");
     }
 
     private Workbook getWorkbook() throws IOException {
@@ -272,7 +242,27 @@ public class ReportHelper {
             cell.setCellValue(rowData.getType());
         }
         sheet.setAutoFilter(CellRangeAddress.valueOf("A1:W1"));
+        System.out.println("Clean data populated in " + (System.currentTimeMillis() - start) + "ms");
+    }
 
+    private CellStyle setFontForHeaders(Workbook workbook) {
+        Font font = workbook.createFont();
+        font.setFontName("Calibri");
+        font.setItalic(true);
+        font.setBold(true);
+        font.setFontHeightInPoints((short) 14);
+        CellStyle style = workbook.createCellStyle();
+        style.setFont(font);
+        return style;
+    }
+
+    private CellStyle getCellStyle(Workbook workbook) {
+        Font mainText = workbook.createFont();
+        mainText.setFontName("Calibri");
+        mainText.setFontHeightInPoints((short) 12);
+        CellStyle mainTextStyle = workbook.createCellStyle();
+        mainTextStyle.setFont(mainText);
+        return mainTextStyle;
     }
 
     private static void addTeamData(Row row, int startColumn, String team, Integer total, CellStyle mainTextStyle) {
@@ -356,7 +346,9 @@ public class ReportHelper {
         }
     }
 
-    private void populateIndividualData(Sheet sheet, String gender, CellStyle style, CellStyle mainTextStyle) {
+    private void populateIndividualData(Workbook workbook, String sheetName, String gender, CellStyle style, CellStyle mainTextStyle) {
+        long initialStart = System.currentTimeMillis();
+        Sheet sheet = workbook.getSheet(sheetName);
         setCurrentDateHeader(sheet);
 
         int rows = sheet.getLastRowNum();
@@ -455,13 +447,16 @@ public class ReportHelper {
 
             sheet.setAutoFilter(CellRangeAddress.valueOf("A13:T13"));
         }
+        System.out.println(sheetName + " data populated in " + (System.currentTimeMillis() - initialStart) + "ms");
     }
 
     private void setCurrentDateHeader(Sheet sheet) {
         sheet.getRow(9).getCell(1).setCellValue(sheet.getRow(9).getCell(1).getStringCellValue() + currentDate);
     }
 
-    private void populateTeamIndividualData(Sheet sheet) {
+    private void populateTeamIndividualData(Workbook workbook, String sheetName) {
+        Sheet sheet = workbook.getSheet(sheetName);
+        long startTime = System.currentTimeMillis();
         long start = System.currentTimeMillis();
         List<AllTeamScores> allData = allTeamScoresRepository.findAll();
         System.out.println("Ran query for team scores " + (System.currentTimeMillis() - start) + "ms");
@@ -472,6 +467,7 @@ public class ReportHelper {
             rows = getRows(sheet, rows, rowData);
         }
         sheet.setAutoFilter(CellRangeAddress.valueOf("A1:E1"));
+        System.out.println("Team Individual Scores data populated in " + (System.currentTimeMillis() - startTime) + "ms");
     }
 
     private static int getRows(Sheet sheet, int rows, AllTeamScores rowData) {
@@ -489,7 +485,9 @@ public class ReportHelper {
         return rows;
     }
 
-    private void populateAllIndividualData(Sheet sheet) {
+    private void populateAllIndividualData(Workbook workbook, String sheetName) {
+        Sheet sheet = workbook.getSheet(sheetName);
+        long trueStart = System.currentTimeMillis();
         long start = System.currentTimeMillis();
         List<AllIndividualScores> allIndividualScores = allIndividualScoresRepository.findAllByOrderByTeamAscTypeAscClassificationAscGenderAscTotalDesc();
         System.out.println("Ran query for all scores " + (System.currentTimeMillis() - start) + "ms");
@@ -514,6 +512,18 @@ public class ReportHelper {
             cell.setCellValue(rowData.getGender());
         }
         sheet.setAutoFilter(CellRangeAddress.valueOf("A1:F1"));
+        System.out.println("Individual All Scores data populated in " + (System.currentTimeMillis() - trueStart) + "ms");
     }
 
+    private void createFile(Workbook workbook) throws IOException {
+        long start;
+        start = System.currentTimeMillis();
+        Date date = new Date();
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmss");
+        String currentDate = formatter.format(date);
+        FileOutputStream fileOutputStream = new FileOutputStream(currentDate + ".xlsx");
+        workbook.write(fileOutputStream);
+        fileOutputStream.close();
+        System.out.println("Wrote the contents to a file in " + (System.currentTimeMillis() - start) + "ms");
+    }
 }
