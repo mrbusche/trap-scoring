@@ -8,8 +8,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest
 class ReportHelperTest {
 
-    ReportHelper reportHelper;
-
     @Test
     public void testUpdateDatabase() {
         assertThat(true).isTrue();
