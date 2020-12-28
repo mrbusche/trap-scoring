@@ -6,8 +6,8 @@ plugins {
 }
 
 group = 'org.springframework'
-version = '2.0.0'
-sourceCompatibility = '1.8'
+version = '2.1.0'
+sourceCompatibility = '15'
 
 configurations {
     developmentOnly
@@ -20,23 +20,21 @@ configurations {
 }
 
 repositories {
-    mavenCentral()
+    maven { url "http://art.nwie.net:80/artifactory/libs-release/" }
+    //mavenLocal()
+    //mavenCentral()
 }
 
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
-    developmentOnly 'org.springframework.boot:spring-boot-devtools'
 
-    implementation('mysql:mysql-connector-java:8.0.14') {
-        exclude(module: 'protobuf-java')
-    }
+    runtime 'mysql:mysql-connector-java'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
 
-    implementation 'org.apache.poi:poi-ooxml:4.1.2' //xlsx files
-
+    implementation 'org.apache.poi:poi-ooxml:4.1.2'
     implementation 'ch.vorburger.mariaDB4j:mariaDB4j:2.4.0'
 }
 
