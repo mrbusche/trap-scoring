@@ -516,6 +516,7 @@ public class ReportHelper {
         FileOutputStream fileOutputStream = new FileOutputStream(currentDate + ".xlsx");
         workbook.write(fileOutputStream);
         fileOutputStream.close();
+        System.out.println("Created file " + currentDate + ".xlsx");
         System.out.println("Wrote the contents to a file in " + (System.currentTimeMillis() - start) + "ms");
     }
 }
