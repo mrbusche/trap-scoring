@@ -222,7 +222,7 @@ CREATE VIEW doublesAggregate AS
 SELECT athlete, classification, gender, team, SUM(total) total
 FROM (
          SELECT athlete, classification, gender, total, team
-         FROM doublesdata
+         FROM doublesData
      ) a
 GROUP BY athlete, classification, gender, team
 ORDER BY total DESC;
@@ -350,7 +350,7 @@ CREATE VIEW handicapAggregate AS
 SELECT athlete, classification, gender, team, SUM(total) total
 FROM (
          SELECT athlete, classification, gender, total, team
-         FROM handicapdata
+         FROM handicapData
      ) a
 GROUP BY athlete, classification, gender, team
 ORDER BY total DESC;
@@ -479,7 +479,7 @@ CREATE VIEW skeetAggregate AS
 SELECT athlete, classification, gender, team, SUM(total) total
 FROM (
          SELECT athlete, classification, gender, total, team
-         FROM skeetdata
+         FROM skeetData
      ) a
 GROUP BY athlete, classification, gender, team
 ORDER BY total DESC;
@@ -610,7 +610,7 @@ CREATE VIEW claysAggregate AS
 SELECT athlete, classification, gender, team, SUM(total) total
 FROM (
          SELECT athlete, classification, gender, total, team
-         FROM claysdata
+         FROM claysData
      ) a
 GROUP BY athlete, classification, gender, team
 ORDER BY total DESC;
