@@ -21,8 +21,6 @@ class EmbeddedMariaDbConfig {
     String datasourcePassword;
     @Value("${spring.datasource.driver-class-name}")
     String datasourceDriver;
-    @Value("${spring.datasource.url}")
-    String url;
 
     @Bean
     static MariaDB4jSpringService mariaDB4jSpringService() {
