@@ -37,6 +37,10 @@ dependencies {
     implementation 'ch.vorburger.mariaDB4j:mariaDB4j:2.4.0'
 }
 
+test {
+    useJUnitPlatform()
+}
+
 sonarqube {
   properties {
     property "sonar.projectKey", "mrbusche_trap-scoring"
