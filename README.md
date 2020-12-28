@@ -2,7 +2,7 @@ trap app
 
 - Download jar file from release pages
 - open command prompt
-- type `java -Xms1024m -Xmx4096m -jar trap-2.0.0.jar`
+- type `java -Xms1024m -Xmx4096m -jar trap-2.1.0.jar`
 - There will be output as the process runs. Depending on how fast your computer is it will take between 5 and 15 minutes.
 - When finished there will be output of `Finished in 352211ms`
 - There will be a file generated in the directory you ran the commands from
