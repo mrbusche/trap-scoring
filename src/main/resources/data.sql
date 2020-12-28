@@ -222,7 +222,7 @@ CREATE VIEW doublesAggregate AS
 SELECT athlete, classification, gender, team, SUM(total) total
 FROM (
          SELECT athlete, classification, gender, total, team
-         FROM doublesdata
+         FROM doublesData
      ) a
 GROUP BY athlete, classification, gender, team
 ORDER BY total DESC;
