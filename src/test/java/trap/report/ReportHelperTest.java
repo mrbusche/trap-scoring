@@ -14,7 +14,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class ReportHelperTest {
 
     @Test
-    public void testFileCreated() {
+    void testFileCreated() {
         boolean fileExists = false;
         Set<String> files = Stream.of(new File(".").listFiles())
                 .filter(file -> !file.isDirectory())
