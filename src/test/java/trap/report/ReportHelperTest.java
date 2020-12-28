@@ -1,7 +1,14 @@
 package trap.report;
 
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -9,7 +16,18 @@ import static org.assertj.core.api.Assertions.assertThat;
 class ReportHelperTest {
 
     @Test
-    public void testUpdateDatabase() {
-        assertThat(true).isTrue();
+    public void testFileCreated() {
+        boolean fileExists = false;
+        Set<String> files = Stream.of(new File(".").listFiles())
+                .filter(file -> !file.isDirectory())
+                .map(File::getName)
+                .collect(Collectors.toSet());
+        for (String file : files) {
+            if (file.endsWith(".xlsx")) {
+                fileExists = true;
+                break;
+            }
+        }
+        assertThat(fileExists).isTrue();
     }
 }
