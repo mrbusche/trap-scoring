@@ -114,17 +114,11 @@ public class ReportHelper {
         workbook.close();
     }
 
-//    private Connection getConnectionSuitableForLocalLoad(Connection connection) throws SQLException {
-//        JdbcConnection unwrapped = connection.unwrap(com.mysql.cj.jdbc.JdbcConnection.class);
-//        unwrapped.getPropertySet().getProperty(PropertyKey.allowLoadLocalInfile).setValue(true);
-//        return unwrapped;
-//    }
-
     private void downloadFiles() throws IOException {
         long start = System.currentTimeMillis();
         System.out.println("Started downloading files");
 
-        Map<String, String> fileUrls = new HashMap<String, String>() {
+        Map<String, String> fileUrls = new HashMap<>() {
             {
                 put("singles", "https://metabase.sssfonline.com/public/question/8648faf9-42e8-4a9c-b55d-2f251349de7f.csv");
                 put("doubles", "https://metabase.sssfonline.com/public/question/5d5a78a5-2356-477f-b1b8-fe6ee11d25b1.csv");
