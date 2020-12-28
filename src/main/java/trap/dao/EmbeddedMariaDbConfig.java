@@ -21,6 +21,8 @@ class EmbeddedMariaDbConfig {
     String datasourcePassword;
     @Value("${spring.datasource.driver-class-name}")
     String datasourceDriver;
+    @Value("${spring.datasource.url}")
+    String url;
 
     @Bean
     static MariaDB4jSpringService mariaDB4jSpringService() {
@@ -33,7 +35,14 @@ class EmbeddedMariaDbConfig {
         mariaDB4jSpringService.getDB().createDB(databaseName);
 
         DBConfigurationBuilder config = mariaDB4jSpringService.getConfiguration();
+        String url = config.getURL(databaseName) + "?allowLoadLocalInfile=true";
 
-        return DataSourceBuilder.create().username(datasourceUsername).password(datasourcePassword).url(config.getURL(databaseName)).driverClassName(datasourceDriver).build();
+        DataSourceBuilder dataSourceBuilder = DataSourceBuilder.create();
+        dataSourceBuilder.username(datasourceUsername);
+        dataSourceBuilder.password(datasourcePassword);
+        dataSourceBuilder.url(url);
+        dataSourceBuilder.driverClassName(datasourceDriver);
+        return dataSourceBuilder.build();
     }
+
 }
