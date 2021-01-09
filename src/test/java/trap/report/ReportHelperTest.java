@@ -1,9 +1,13 @@
 package trap.report;
 
+import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -14,18 +18,25 @@ import static org.assertj.core.api.Assertions.assertThat;
 class ReportHelperTest {
 
     @Test
-    void testFileCreated() {
+    void testFileCreated() throws IOException {
         boolean fileExists = false;
-        Set<String> files = Stream.of(new File(".").listFiles())
+        ClassLoader classloader = Thread.currentThread().getContextClassLoader();
+        InputStream is = classloader.getResourceAsStream("template.xlsx");
+        long templateSize = IOUtils.toByteArray(Objects.requireNonNull(is)).length;
+        long fileSize = 0;
+
+        Set<String> files = Stream.of(Objects.requireNonNull(new File(".").listFiles()))
                 .filter(file -> !file.isDirectory())
                 .map(File::getName)
                 .collect(Collectors.toSet());
         for (String file : files) {
             if (file.endsWith(".xlsx")) {
                 fileExists = true;
+                fileSize = new File(file).length();
                 break;
             }
         }
         assertThat(fileExists).isTrue();
+        assertThat(fileSize).isGreaterThan(templateSize + 1000);
     }
 }
