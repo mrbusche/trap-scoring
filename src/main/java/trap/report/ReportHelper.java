@@ -124,11 +124,35 @@ public class ReportHelper {
         fileUrls.put("handicap", "https://metabase.sssfonline.com/public/question/69ca55d9-3e18-45bc-b57f-73aeb205ece8.csv");
         fileUrls.put("skeet", "https://metabase.sssfonline.com/public/question/c697d744-0e06-4c3f-a640-fea02f9c9ecd.csv");
         fileUrls.put("clays", "https://metabase.sssfonline.com/public/question/2c6edb1a-a7ee-43c2-8180-ad199a57be55.csv");
+
+        for (String type : trapTypes) {
+            FileUtils.copyURLToFile(new URL(fileUrls.get(type)), new File(type + ".csv"), 10000, 10000);
+        }
         System.out.println("Files downloaded in " + (System.currentTimeMillis() - start) + " ms");
     }
 
     private void addFilesToDatabase() {
-        long start = System.currentTimeMillis();      
+        long start = System.currentTimeMillis();
+        jdbc.execute("set global local_infile=1;");
+        String singlesSql = "load data local infile 'singles.csv' into table singles fields terminated by ',' OPTIONALLY ENCLOSED BY '\"' lines terminated by '\n' IGNORE 1 LINES;";
+        int singlesCount = jdbc.update(con -> con.prepareStatement(singlesSql));
+        System.out.println("Added " + singlesCount + " new records to database in singles table.");
+
+        String doublesSql = "load data local infile 'doubles.csv' into table doubles fields terminated by ',' OPTIONALLY ENCLOSED BY '\"' lines terminated by '\n' IGNORE 1 LINES;";
+        int doublesCount = jdbc.update(con -> con.prepareStatement(doublesSql));
+        System.out.println("Added " + doublesCount + " new records to database in doubles table.");
+
+        String handicapSql = "load data local infile 'handicap.csv' into table handicap fields terminated by ',' OPTIONALLY ENCLOSED BY '\"' lines terminated by '\n' IGNORE 1 LINES;";
+        int handicapCount = jdbc.update(con -> con.prepareStatement(handicapSql));
+        System.out.println("Added " + handicapCount + " new records to database in handicap table.");
+
+        String skeetSql = "load data local infile 'skeet.csv' into table skeet fields terminated by ',' OPTIONALLY ENCLOSED BY '\"' lines terminated by '\n' IGNORE 1 LINES;";
+        int skeetCount = jdbc.update(con -> con.prepareStatement(skeetSql));
+        System.out.println("Added " + skeetCount + " new records to database in skeet table.");
+
+        String claysSql = "load data local infile 'clays.csv' into table clays fields terminated by ',' OPTIONALLY ENCLOSED BY '\"' lines terminated by '\n' IGNORE 1 LINES;";
+        int claysCount = jdbc.update(con -> con.prepareStatement(claysSql));
+        System.out.println("Added " + claysCount + " new records to database in clays table.");
         System.out.println("Database loaded in " + (System.currentTimeMillis() - start) + "ms");
     }
 
