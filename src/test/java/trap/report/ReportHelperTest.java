@@ -22,10 +22,10 @@ class ReportHelperTest {
         boolean fileExists = false;
         ClassLoader classloader = Thread.currentThread().getContextClassLoader();
         InputStream is = classloader.getResourceAsStream("template.xlsx");
-        long templateSize = IOUtils.toByteArray(Objects.requireNonNull(is)).length;
+        long templateSize = IOUtils.toByteArray(is).length;
         long fileSize = 0;
 
-        Set<String> files = Stream.of(Objects.requireNonNull(new File(".").listFiles()))
+        Set<String> files = Stream.of(new File(".").listFiles())
                 .filter(file -> !file.isDirectory())
                 .map(File::getName)
                 .collect(Collectors.toSet());
@@ -37,6 +37,6 @@ class ReportHelperTest {
             }
         }
         assertThat(fileExists).isTrue();
-        assertThat(fileSize).isGreaterThan(templateSize + 1000);
+        assertThat(fileSize).isGreaterThan(templateSize);
     }
 }
