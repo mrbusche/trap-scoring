@@ -7,7 +7,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -31,6 +30,8 @@ class ReportHelperTest {
                 .collect(Collectors.toSet());
         for (String file : files) {
             if (file.endsWith(".xlsx")) {
+                System.out.println("xlsx file");
+                System.out.println(file);
                 fileExists = true;
                 fileSize = new File(file).length();
                 break;
