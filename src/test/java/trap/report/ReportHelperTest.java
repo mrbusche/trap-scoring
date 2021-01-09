@@ -34,6 +34,8 @@ class ReportHelperTest {
                 System.out.println(file);
                 fileExists = true;
                 fileSize = new File(file).length();
+                System.out.println("file size");
+                System.out.println(fileSize);
                 break;
             }
         }
