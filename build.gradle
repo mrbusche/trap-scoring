@@ -7,7 +7,7 @@ plugins {
 
 group = 'org.springframework'
 version = '2.1.0'
-sourceCompatibility = '15'
+sourceCompatibility = '1.8'
 
 configurations {
     developmentOnly
@@ -39,6 +39,10 @@ dependencies {
 
 test {
     useJUnitPlatform()
+    testLogging {
+        exceptionFormat = 'full'
+        showStandardStreams = true
+    }
 }
 
 sonarqube {

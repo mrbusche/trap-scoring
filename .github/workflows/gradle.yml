@@ -1,4 +1,4 @@
-name: Master Branch
+name: Main Branch
 
 on:
   push:
