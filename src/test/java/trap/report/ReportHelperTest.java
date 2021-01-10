@@ -7,6 +7,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Objects;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -19,9 +20,9 @@ class ReportHelperTest {
         boolean fileExists = false;
         ClassLoader classloader = Thread.currentThread().getContextClassLoader();
         InputStream is = classloader.getResourceAsStream("template.xlsx");
-        long templateSize = IOUtils.toByteArray(is).length;
+        long templateSize = IOUtils.toByteArray(Objects.requireNonNull(is)).length;
 
-        String excelFileName = Stream.of(new File(".").listFiles())
+        String excelFileName = Stream.of(Objects.requireNonNull(new File(".").listFiles()))
                 .filter(file -> !file.isDirectory())
                 .map(File::getName)
                 .filter(fileName -> fileName.endsWith(".xlsx"))
