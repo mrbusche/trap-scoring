@@ -7,8 +7,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Set;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -22,24 +20,16 @@ class ReportHelperTest {
         ClassLoader classloader = Thread.currentThread().getContextClassLoader();
         InputStream is = classloader.getResourceAsStream("template.xlsx");
         long templateSize = IOUtils.toByteArray(is).length;
-        long fileSize = 0;
 
-        Set<String> files = Stream.of(new File(".").listFiles())
+        String excelFileName = Stream.of(new File(".").listFiles())
                 .filter(file -> !file.isDirectory())
                 .map(File::getName)
-                .collect(Collectors.toSet());
-        for (String file : files) {
-            if (file.endsWith(".xlsx")) {
-                System.out.println("xlsx file");
-                System.out.println(file);
-                fileExists = true;
-                fileSize = new File(file).length();
-                System.out.println("file size");
-                System.out.println(fileSize);
-                break;
-            }
-        }
-        assertThat(fileExists).isTrue();
+                .filter(fileName -> fileName.endsWith(".xlsx"))
+                .findFirst()
+                .orElseThrow();
+        long fileSize = new File(excelFileName).length();
+        assertThat(fileSize).isGreaterThan(templateSize);
+
         assertThat(fileSize).isGreaterThan(templateSize);
     }
 }
