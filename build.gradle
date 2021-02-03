@@ -51,5 +51,6 @@ sonarqube {
     property "sonar.projectKey", "mrbusche_trap-scoring"
     property "sonar.organization", "mrbusche"
     property "sonar.host.url", "https://sonarcloud.io"
+    property "sonar.scanner.force-deprecated-java-version-grace-period", true
   }
 }
