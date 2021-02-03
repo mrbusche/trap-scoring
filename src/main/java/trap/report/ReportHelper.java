@@ -51,6 +51,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.logging.Logger;
 
 @RequiredArgsConstructor
@@ -178,7 +179,7 @@ public class ReportHelper {
 
     private Workbook getWorkbook() throws IOException {
         InputStream in = getClass().getResourceAsStream("/template.xlsx");
-        return WorkbookFactory.create(in);
+        return WorkbookFactory.create(Objects.requireNonNull(in));
     }
 
     private void populateCleanData(Sheet sheet) {
