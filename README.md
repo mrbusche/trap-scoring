@@ -1,4 +1,4 @@
-trap app
+# Trap Scoring App
 
 - Download jar file from [latest release](https://github.com/mrbusche/trap-scoring/releases)
 - open command prompt to directory with downloaded jar file
