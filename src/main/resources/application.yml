@@ -12,6 +12,7 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
     initialization-mode: always
     data: classpath:data.sql
+    initialization-order: after-jpa
   jpa:
     database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
     generate-ddl: true
