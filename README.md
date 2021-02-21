@@ -2,10 +2,9 @@
 
 - Download jar file from [latest release](https://github.com/mrbusche/trap-scoring/releases)
 - open command prompt to directory with downloaded jar file
-- run `java -Xms1024m -Xmx4096m -jar trap-2.1.0.jar`
-- There will be output as the process runs. Depending on how fast your computer is it will take between 5 and 15 minutes.
-- When finished there will be output of `Finished in 352211ms`
-- There will be a file generated in the directory you ran the commands from
+- run `java -Xms1024m -Xmx4096m -jar trap-2.2.0.jar`
+- There will be output as the process generates the file
+- When finished there will be a file generated in the directory you ran the commands from
 
 ## Online metabase links (no longer need to download separately)
 
