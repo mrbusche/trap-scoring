@@ -3,6 +3,7 @@ plugins {
     id 'io.spring.dependency-management' version '1.0.11.RELEASE'
     id 'java'
     id "org.sonarqube" version "3.1.1"
+	id 'net.ltgt.apt' version '0.10'
 }
 
 group = 'org.springframework'
@@ -33,6 +34,7 @@ dependencies {
 
     compileOnly 'org.projectlombok:lombok:edge-SNAPSHOT'
     annotationProcessor 'org.projectlombok:lombok:edge-SNAPSHOT'
+	apt 'org.projectlombok:lombok:edge-SNAPSHOT'
 
     implementation 'org.apache.poi:poi-ooxml:5.0.0'
     implementation 'ch.vorburger.mariaDB4j:mariaDB4j:2.4.0'
