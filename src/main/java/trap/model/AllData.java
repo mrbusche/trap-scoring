@@ -9,7 +9,7 @@ import javax.persistence.Table;
 
 @Data
 @Entity
-@Table(name = "alldata")
+@Table(name = "allData")
 public class AllData {
     @Column(name = "eventid", insertable = false, updatable = false)
     String eventid;
