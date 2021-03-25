@@ -9,7 +9,7 @@ import javax.persistence.Table;
 
 @Data
 @Entity
-@Table(name = "allteamscores")
+@Table(name = "allTeamScores")
 public class AllTeamScores {
     @Column(name = "team", insertable = false, updatable = false)
     String team;

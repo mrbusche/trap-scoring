@@ -8,7 +8,7 @@ import javax.persistence.Table;
 
 @Data
 @Entity
-@Table(name = "skeetaggregate")
+@Table(name = "skeetAggregate")
 public class SkeetAggregate {
     String team;
     @Id
