@@ -127,7 +127,7 @@ public class ReportHelper {
         fileUrls.put("clays", "https://metabase.sssfonline.com/public/question/2c6edb1a-a7ee-43c2-8180-ad199a57be55.csv");
 
         for (String type : trapTypes) {
-            FileUtils.copyURLToFile(new URL(fileUrls.get(type)), new File(type + ".csv"), 10000, 10000);
+            FileUtils.copyURLToFile(new URL(fileUrls.get(type)), new File(type + ".csv"), 20000, 20000);
         }
         System.out.println("Files downloaded in " + (System.currentTimeMillis() - start) + " ms");
     }
