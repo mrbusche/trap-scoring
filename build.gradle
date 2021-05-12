@@ -6,7 +6,7 @@ plugins {
 }
 
 group = 'org.springframework'
-version = '2.1.0'
+version = '2.3.0'
 sourceCompatibility = '15'
 
 configurations {
@@ -33,12 +33,16 @@ dependencies {
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
 
-    implementation 'org.apache.poi:poi-ooxml:4.1.2'
+    implementation 'org.apache.poi:poi-ooxml:5.0.0'
     implementation 'ch.vorburger.mariaDB4j:mariaDB4j:2.4.0'
 }
 
 test {
     useJUnitPlatform()
+    testLogging {
+        exceptionFormat = 'full'
+        showStandardStreams = true
+    }
 }
 
 sonarqube {

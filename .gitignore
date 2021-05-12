@@ -7,3 +7,6 @@ data/
 *.csv
 *.xlsx
 .settings/
+bin
+.classpath
+*.jar
