@@ -6,7 +6,7 @@ plugins {
 }
 
 group = 'org.springframework'
-version = '2.3.0'
+version = '2.4.0'
 sourceCompatibility = '15'
 
 configurations {
