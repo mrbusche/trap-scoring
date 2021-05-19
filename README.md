@@ -2,7 +2,7 @@
 
 - Download jar file from [latest release](https://github.com/mrbusche/trap-scoring/releases)
 - open command prompt to directory with downloaded jar file
-- run `java -Xms1024m -Xmx4096m -jar trap-2.3.0.jar`
+- run `java -Xms1024m -Xmx4096m -jar trap-2.4.0.jar`
 - There will be output as the process generates the file
 - When finished there will be a file generated in the directory you ran the commands from
 
