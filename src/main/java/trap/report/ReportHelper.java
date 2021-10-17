@@ -125,6 +125,7 @@ public class ReportHelper {
         fileUrls.put("handicap", "https://metabase.sssfonline.com/public/question/69ca55d9-3e18-45bc-b57f-73aeb205ece8.csv");
         fileUrls.put("skeet", "https://metabase.sssfonline.com/public/question/c697d744-0e06-4c3f-a640-fea02f9c9ecd.csv");
         fileUrls.put("clays", "https://metabase.sssfonline.com/public/question/2c6edb1a-a7ee-43c2-8180-ad199a57be55.csv");
+        fileUrls.put("fivestand", "https://metabase.sssfonline.com/public/question/3c5aecf2-a9f2-49b2-a11f-36965cb1a964.csv");
 
         for (String type : trapTypes) {
             FileUtils.copyURLToFile(new URL(fileUrls.get(type)), new File(type + ".csv"), 60000, 60000);
@@ -164,6 +165,7 @@ public class ReportHelper {
         jdbc.execute("UPDATE handicap SET team = replace(team, 'Club', 'Team') WHERE team LIKE '%Club%';");
         jdbc.execute("UPDATE skeet SET team = replace(team, 'Club', 'Team') WHERE team LIKE '%Club%';");
         jdbc.execute("UPDATE clays SET team = replace(team, 'Club', 'Team') WHERE team LIKE '%Club%';");
+        jdbc.execute("UPDATE fivestand SET team = replace(team, 'Club', 'Team') WHERE team LIKE '%Club%';");
         System.out.println("Team names fixed in " + (System.currentTimeMillis() - start) + "ms");
     }
 
@@ -174,11 +176,12 @@ public class ReportHelper {
         jdbc.execute("UPDATE handicap SET athlete = replace(athlete, '  ', '') WHERE athlete LIKE '%  %';");
         jdbc.execute("UPDATE skeet SET athlete = replace(athlete, '  ', '') WHERE athlete LIKE '%  %';");
         jdbc.execute("UPDATE clays SET athlete = replace(athlete, '  ', '') WHERE athlete LIKE '%  %';");
+        jdbc.execute("UPDATE fivestand SET athlete = replace(athlete, '  ', '') WHERE athlete LIKE '%  %';");
         System.out.println("Athlete names fixed in " + (System.currentTimeMillis() - start) + "ms");
     }
 
     private Workbook getWorkbook() throws IOException {
-        InputStream in = getClass().getResourceAsStream("/template.xlsx");
+        InputStream in = getClass().getResourceAsStream("/main-template.xlsx");
         return WorkbookFactory.create(Objects.requireNonNull(in));
     }
 
@@ -230,8 +233,6 @@ public class ReportHelper {
             cell = row.createCell(17);
             cell.setCellValue(rowData.getRound8());
             cell = row.createCell(18);
-            cell.setCellValue(rowData.getFivestand());
-            cell = row.createCell(19);
             cell.setCellValue(rowData.getType());
         }
         sheet.setAutoFilter(CellRangeAddress.valueOf("A1:W1"));
@@ -281,6 +282,7 @@ public class ReportHelper {
 
     private void populateTeamData(Sheet sheet, String teamType, CellStyle mainTextStyle) {
         setCurrentDateHeader(sheet);
+        setCurrentSeasonHeader(sheet);
 
         int rows = sheet.getLastRowNum();
         Row row;
@@ -343,6 +345,7 @@ public class ReportHelper {
         long initialStart = System.currentTimeMillis();
         Sheet sheet = workbook.getSheet(sheetName);
         setCurrentDateHeader(sheet);
+        setCurrentSeasonHeader(sheet);
 
         int rows = sheet.getLastRowNum();
         Cell cell;
@@ -445,6 +448,16 @@ public class ReportHelper {
 
     private void setCurrentDateHeader(Sheet sheet) {
         sheet.getRow(9).getCell(1).setCellValue(sheet.getRow(9).getCell(1).getStringCellValue() + currentDate);
+    }
+
+    private void setCurrentSeasonHeader(Sheet sheet) {
+        java.util.Date date = new Date();
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(date);
+        int month = cal.get(Calendar.MONTH);
+        int year = cal.get(Calendar.YEAR);
+        int currentSeason = month > 8 ? year + 1 : year;
+        sheet.getRow(8).getCell(1).setCellValue(currentSeason + " " + sheet.getRow(8).getCell(1).getStringCellValue());
     }
 
     private void populateTeamIndividualData(Workbook workbook, String sheetName) {
