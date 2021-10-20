@@ -9,8 +9,8 @@ import javax.persistence.Table;
 
 @Data
 @Entity
-@Table(name = "alldata")
-public class AllData {
+@Table(name = "fivestand")
+public class FiveStandData {
     @Column(name = "eventid", insertable = false, updatable = false)
     String eventid;
     String event;
@@ -36,7 +36,7 @@ public class AllData {
     Integer round6 = 0;
     Integer round7 = 0;
     Integer round8 = 0;
-    String type;
+//    String type = "fivestand";
     @EmbeddedId
     private AllDataIdentity allDataIdentity;
 }
