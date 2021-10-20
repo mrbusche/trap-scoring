@@ -1,13 +1,21 @@
 package trap.model;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
+import org.hibernate.Hibernate;
 
 import javax.persistence.Column;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 import javax.persistence.Table;
+import java.util.Objects;
 
-@Data
+@Getter
+@Setter
+@ToString
+@RequiredArgsConstructor
 @Entity
 @Table(name = "fivestand")
 public class FiveStandData {
@@ -36,7 +44,20 @@ public class FiveStandData {
     Integer round6 = 0;
     Integer round7 = 0;
     Integer round8 = 0;
-//    String type = "fivestand";
+    //    String type = "fivestand";
     @EmbeddedId
     private AllDataIdentity allDataIdentity;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
+        FiveStandData that = (FiveStandData) o;
+        return allDataIdentity != null && Objects.equals(allDataIdentity, that.allDataIdentity);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(allDataIdentity);
+    }
 }

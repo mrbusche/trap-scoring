@@ -96,7 +96,7 @@ public class ReportHelper {
             System.out.println("Workbook has " + workbook.getNumberOfSheets() + " sheets");
             workbook.forEach(sheet -> System.out.println("- " + sheet.getSheetName()));
 
-            long start = System.currentTimeMillis();
+            long start;
             long trueStart = System.currentTimeMillis();
 
             Map<String, String> types = new HashMap<>();
