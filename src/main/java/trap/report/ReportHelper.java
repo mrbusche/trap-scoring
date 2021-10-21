@@ -20,6 +20,7 @@ import trap.model.ClaysTeamAggregate;
 import trap.model.DoublesAggregate;
 import trap.model.DoublesTeamAggregate;
 import trap.model.FiveStandData;
+import trap.model.FiveStandTeamAggregate;
 import trap.model.HandicapAggregate;
 import trap.model.HandicapTeamAggregate;
 import trap.model.SinglesAggregate;
@@ -104,25 +105,37 @@ public class ReportHelper {
             types.put("Team-Intermediate", "Intermediate Entry");
             types.put("Team-Rookie", "Rookie");
 
+            CellStyle mainTextStyle = getCellStyle(workbook);
+            CellStyle style = setFontForHeaders(workbook);
             if ("main".equals(type)) {
                 populateCleanData(workbook.getSheet("Clean Data"));
+
+                for (Map.Entry<String, String> entry : types.entrySet()) {
+                    start = System.currentTimeMillis();
+                    populateTeamData(workbook.getSheet(entry.getKey()), entry.getValue(), mainTextStyle);
+                    System.out.println("" + entry.getKey() + " data populated in " + (System.currentTimeMillis() - start) + "ms");
+                }
+
+                populateIndividualData(workbook, "Individual-Men", "M", style, mainTextStyle);
+                populateIndividualData(workbook, "Individual-Ladies", "F", style, mainTextStyle);
+
+                populateTeamIndividualData(workbook, "Team-Individual-Scores");
+                populateAllIndividualData(workbook, "Individual-All-Scores");
             } else {
                 populateFiveStandCleanData(workbook.getSheet("Clean Data"));
+
+                for (Map.Entry<String, String> entry : types.entrySet()) {
+                    start = System.currentTimeMillis();
+//                    populateFiveStandTeamData(workbook.getSheet(entry.getKey()), entry.getValue(), mainTextStyle);
+                    System.out.println("" + entry.getKey() + " data populated in " + (System.currentTimeMillis() - start) + "ms");
+                }
+
+//                populateIndividualData(workbook, "Individual-Men", "M", style, mainTextStyle);
+//                populateIndividualData(workbook, "Individual-Ladies", "F", style, mainTextStyle);
+//
+//                populateTeamIndividualData(workbook, "Team-Individual-Scores");
+//                populateAllIndividualData(workbook, "Individual-All-Scores");
             }
-
-            CellStyle mainTextStyle = getCellStyle(workbook);
-            for (Map.Entry<String, String> entry : types.entrySet()) {
-                start = System.currentTimeMillis();
-                populateTeamData(workbook.getSheet(entry.getKey()), entry.getValue(), mainTextStyle);
-                System.out.println("" + entry.getKey() + " data populated in " + (System.currentTimeMillis() - start) + "ms");
-            }
-
-            CellStyle style = setFontForHeaders(workbook);
-            populateIndividualData(workbook, "Individual-Men", "M", style, mainTextStyle);
-            populateIndividualData(workbook, "Individual-Ladies", "F", style, mainTextStyle);
-
-            populateTeamIndividualData(workbook, "Team-Individual-Scores");
-            populateAllIndividualData(workbook, "Individual-All-Scores");
 
             if ("main".equals(type)) {
                 createFile(workbook, "league-data");
@@ -424,6 +437,24 @@ public class ReportHelper {
                 row = sheet.getRow(++updateRow);
                 addTeamData(row, startColumn, claysTeamRowData.getTeam(), claysTeamRowData.getTotal(), mainTextStyle);
             }
+        }
+    }
+
+    private void populateFiveStandTeamData(Sheet sheet, String teamType, CellStyle mainTextStyle) {
+        setCurrentDateHeader(sheet);
+        setCurrentSeasonHeader(sheet);
+
+        int rows = sheet.getLastRowNum();
+        Row row;
+
+        int updateRow = rows;
+        int startColumn = 1;
+        long start = System.currentTimeMillis();
+        List<FiveStandTeamAggregate> fiveStandTeamData = fiveStandDataTeamRepository.getAllByClassificationOrderByTotalDesc(teamType);
+        System.out.println("Ran query for singles by " + teamType + " " + (System.currentTimeMillis() - start) + "ms");
+        for (FiveStandTeamAggregate fiveStandTeamRowData : fiveStandTeamData) {
+            row = sheet.createRow(++updateRow);
+            addTeamData(row, startColumn, fiveStandTeamRowData.getTeam(), fiveStandTeamRowData.getTotal(), mainTextStyle);
         }
     }
 
