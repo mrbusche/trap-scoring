@@ -46,18 +46,18 @@ public class FiveStandData {
     Integer round8 = 0;
     //    String type = "fivestand";
     @EmbeddedId
-    private AllDataIdentity allDataIdentity;
+    private FiveStandDataIdentity fiveStandDataIdentity;
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
         FiveStandData that = (FiveStandData) o;
-        return allDataIdentity != null && Objects.equals(allDataIdentity, that.allDataIdentity);
+        return fiveStandDataIdentity != null && Objects.equals(fiveStandDataIdentity, that.fiveStandDataIdentity);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(allDataIdentity);
+        return Objects.hash(fiveStandDataIdentity);
     }
 }

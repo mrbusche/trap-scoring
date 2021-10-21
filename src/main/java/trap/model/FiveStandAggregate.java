@@ -12,7 +12,7 @@ import javax.persistence.Table;
 @Setter
 @RequiredArgsConstructor
 @Entity
-@Table(name = "fivestandAggregate")
+@Table(name = "fivestandaggregate")
 public class FiveStandAggregate {
     String team;
     @Id
