@@ -830,16 +830,16 @@ CREATE VIEW fivestandalldata AS
 SELECT compid, eventid, event, locationid, location, eventdate, squadname, team, athlete, athleteid, classification, gender, round1, round2, round3, round4, round5, round6, round7, round8, 'fivestand' as type
 FROM fivestand;
 
-# DROP VIEW IF EXISTS fivestandAllTeamScores;
-# DROP TABLE IF EXISTS fivestandAllTeamScores;
-# CREATE VIEW fivestandAllTeamScores AS
-# SELECT *, 'fivestand' type
-# FROM fivestandTeamScores;
+DROP VIEW IF EXISTS fivestandallteamscores;
+DROP TABLE IF EXISTS fivestandallteamscores;
+CREATE VIEW fivestandallteamscores AS
+SELECT *, 'fivestand' type
+FROM fivestandTeamScores;
 
-# DROP VIEW IF EXISTS fivestandAllIndividualScores;
-# DROP TABLE IF EXISTS fivestandAllIndividualScores;
-# CREATE VIEW fivestandAllIndividualScores AS
-# SELECT *, 'fivestand' type
-# FROM fivestandaggregate;
+DROP VIEW IF EXISTS fivestandallindividualscores;
+DROP TABLE IF EXISTS fivestandallindividualscores;
+CREATE VIEW fivestandallindividualscores AS
+SELECT *, 'fivestand' type
+FROM fivestandaggregate;
 
 CREATE INDEX fivestandClassGen ON fivestand(classification, gender);
