@@ -19,7 +19,8 @@ import trap.model.ClaysAggregate;
 import trap.model.ClaysTeamAggregate;
 import trap.model.DoublesAggregate;
 import trap.model.DoublesTeamAggregate;
-import trap.model.FiveStandData;
+import trap.model.FiveStandAggregate;
+import trap.model.FiveStandAllData;
 import trap.model.FiveStandTeamAggregate;
 import trap.model.HandicapAggregate;
 import trap.model.HandicapTeamAggregate;
@@ -82,8 +83,8 @@ public class ReportHelper {
     private final FiveStandAllDataRepository fiveStandAllDataRepository;
     private final String currentDate = new SimpleDateFormat("MM/dd/yyyy").format(Calendar.getInstance().getTime());
     private final String[] trapTypes = new String[]{"singles", "doubles", "handicap", "skeet", "clays", "fivestand"};
-    private final String[] templateTypes = new String[]{"main", "five-stand"};
-//    private final String[] templateTypes = new String[]{"five-stand"};
+    //    private final String[] templateTypes = new String[]{"main", "five-stand"};
+    private final String[] templateTypes = new String[]{"five-stand"};
 
     public void doItAll() throws IOException {
 //        downloadFiles();
@@ -126,15 +127,15 @@ public class ReportHelper {
 
                 for (Map.Entry<String, String> entry : types.entrySet()) {
                     start = System.currentTimeMillis();
-//                    populateFiveStandTeamData(workbook.getSheet(entry.getKey()), entry.getValue(), mainTextStyle);
+                    populateFiveStandTeamData(workbook.getSheet(entry.getKey()), entry.getValue(), mainTextStyle);
                     System.out.println("" + entry.getKey() + " data populated in " + (System.currentTimeMillis() - start) + "ms");
                 }
 
-//                populateIndividualData(workbook, "Individual-Men", "M", style, mainTextStyle);
-//                populateIndividualData(workbook, "Individual-Ladies", "F", style, mainTextStyle);
-//
-//                populateTeamIndividualData(workbook, "Team-Individual-Scores");
-//                populateAllIndividualData(workbook, "Individual-All-Scores");
+                populateFiveStandIndividualData(workbook, "Individual-Men", "M", style, mainTextStyle);
+                populateFiveStandIndividualData(workbook, "Individual-Ladies", "F", style, mainTextStyle);
+
+                populateFiveStandTeamIndividualData(workbook, "Team-Individual-Scores");
+                populateAllIndividualData(workbook, "Individual-All-Scores");
             }
 
             if ("main".equals(type)) {
@@ -197,8 +198,8 @@ public class ReportHelper {
         String fivestandSql = "load data local infile 'fivestand.csv' into table fivestand fields terminated by ',' OPTIONALLY ENCLOSED BY '\"' lines terminated by '\n' IGNORE 1 LINES;";
         int fivestandCount = jdbc.update(con -> con.prepareStatement(fivestandSql));
         System.out.println("Added " + fivestandCount + " new records to database in fivestand table.");
-        List<FiveStandData> fiveStandData = fiveStandAllDataRepository.findAll();
-        System.out.println("Found " + fiveStandData.size() + " records  in fivestand table.");
+        List<FiveStandAllData> fiveStandAllData = fiveStandAllDataRepository.findAll();
+        System.out.println("Found " + fiveStandAllData.size() + " records  in fivestand table.");
         System.out.println("Database loaded in " + (System.currentTimeMillis() - start) + "ms");
     }
 
@@ -286,14 +287,14 @@ public class ReportHelper {
 
     private void populateFiveStandCleanData(Sheet sheet) {
         long start = System.currentTimeMillis();
-        List<FiveStandData> allData = fiveStandAllDataRepository.findAll();
+        List<FiveStandAllData> allData = fiveStandAllDataRepository.findAll();
         System.out.println("Ran get all data for clean data population " + (System.currentTimeMillis() - start) + "ms");
 
         int rows = sheet.getLastRowNum();
 
         Cell cell;
         Row row;
-        for (FiveStandData rowData : allData) {
+        for (FiveStandAllData rowData : allData) {
             row = sheet.createRow(++rows);
             cell = row.createCell(0);
             cell.setCellValue(rowData.getEventid());
@@ -563,6 +564,52 @@ public class ReportHelper {
         System.out.println(sheetName + " data populated in " + (System.currentTimeMillis() - initialStart) + "ms");
     }
 
+    private void populateFiveStandIndividualData(Workbook workbook, String sheetName, String gender, CellStyle style, CellStyle mainTextStyle) {
+        long initialStart = System.currentTimeMillis();
+        Sheet sheet = workbook.getSheet(sheetName);
+        setCurrentDateHeader(sheet);
+        setCurrentSeasonHeader(sheet);
+
+        int rows = sheet.getLastRowNum();
+        Cell cell;
+        Row row;
+
+        int updateRow;
+        int maxRow = rows;
+        int classificationStartRow;
+        boolean addBlankRowForHeader = false;
+        List<String> classificationList = Arrays.asList("Varsity", "Junior Varsity", "Intermediate Advanced", "Intermediate Entry", "Rookie");
+        long start;
+        for (String classification : classificationList) {
+            int column = 1;
+            updateRow = maxRow;
+            //Add blank row
+            if (addBlankRowForHeader) {
+                row = sheet.createRow(++updateRow);
+                cell = row.createCell(column);
+                cell.setCellValue("");
+            }
+            addBlankRowForHeader = true;
+            //Add row headers
+            row = sheet.createRow(++updateRow);
+            cell = row.createCell(column);
+            cell.setCellValue(classification);
+            cell.setCellStyle(style);
+
+            start = System.currentTimeMillis();
+            List<FiveStandAggregate> individualSinglesData = fiveStandDataRepository.getAllByGenderAndClassification(gender, classification);
+            System.out.println("Ran query for singles by " + gender + " and " + classification + " " + (System.currentTimeMillis() - start) + "ms");
+
+            for (FiveStandAggregate singlesRowData : individualSinglesData) {
+                row = sheet.createRow(++updateRow);
+                addPlayerData(row, column, singlesRowData.getAthlete(), singlesRowData.getTotal(), singlesRowData.getTeam(), mainTextStyle);
+            }
+
+            sheet.setAutoFilter(CellRangeAddress.valueOf("B13:D13"));
+        }
+        System.out.println(sheetName + " data populated in " + (System.currentTimeMillis() - initialStart) + "ms");
+    }
+
     private void setCurrentDateHeader(Sheet sheet) {
         sheet.getRow(9).getCell(1).setCellValue(sheet.getRow(9).getCell(1).getStringCellValue() + currentDate);
     }
@@ -578,6 +625,22 @@ public class ReportHelper {
     }
 
     private void populateTeamIndividualData(Workbook workbook, String sheetName) {
+        Sheet sheet = workbook.getSheet(sheetName);
+        long startTime = System.currentTimeMillis();
+        long start = System.currentTimeMillis();
+        List<AllTeamScores> allData = allTeamScoresRepository.findAll();
+        System.out.println("Ran query for team scores " + (System.currentTimeMillis() - start) + "ms");
+
+        int rows = sheet.getLastRowNum();
+
+        for (AllTeamScores rowData : allData) {
+            rows = getRows(sheet, rows, rowData);
+        }
+        sheet.setAutoFilter(CellRangeAddress.valueOf("A1:E1"));
+        System.out.println("Team Individual Scores data populated in " + (System.currentTimeMillis() - startTime) + "ms");
+    }
+
+    private void populateFiveStandTeamIndividualData(Workbook workbook, String sheetName) {
         Sheet sheet = workbook.getSheet(sheetName);
         long startTime = System.currentTimeMillis();
         long start = System.currentTimeMillis();

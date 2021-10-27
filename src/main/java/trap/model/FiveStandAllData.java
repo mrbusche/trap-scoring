@@ -17,8 +17,8 @@ import java.util.Objects;
 @ToString
 @RequiredArgsConstructor
 @Entity
-@Table(name = "fivestand")
-public class FiveStandData {
+@Table(name = "fivestandalldata")
+public class FiveStandAllData {
     @Column(name = "eventid", insertable = false, updatable = false)
     String eventid;
     String event;
@@ -52,7 +52,7 @@ public class FiveStandData {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
-        FiveStandData that = (FiveStandData) o;
+        FiveStandAllData that = (FiveStandAllData) o;
         return fiveStandDataIdentity != null && Objects.equals(fiveStandDataIdentity, that.fiveStandDataIdentity);
     }
 

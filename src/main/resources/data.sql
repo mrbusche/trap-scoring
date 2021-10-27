@@ -723,9 +723,9 @@ CREATE TABLE IF NOT EXISTS fivestand (
 );
 
 -- top 3 scores only
-DROP VIEW IF EXISTS fivestandData;
-DROP TABLE IF EXISTS fivestandData;
-CREATE VIEW fivestandData AS
+DROP VIEW IF EXISTS fivestanddata;
+DROP TABLE IF EXISTS fivestanddata;
+CREATE VIEW fivestanddata AS
 SELECT eventid, event, locationid, location, squadname, team, athlete, gender, classification, round1, round2, round3, round4, total, seqnum
 FROM (
          WITH s AS (
@@ -790,7 +790,7 @@ CREATE VIEW fivestandaggregate AS
 SELECT athlete, classification, gender, team, SUM(total) AS total
 FROM (
          SELECT athlete, classification, gender, total, team
-         FROM fivestandData
+         FROM fivestanddata
      ) a
 GROUP BY athlete, classification, gender, team
 ORDER BY total DESC;
@@ -824,9 +824,9 @@ FROM fivestandteamaggregate sta
                      GROUP BY team, classification, athlete) sdts ON sta.team = sdts.team AND sta.classification = sdts.classification
 ORDER BY sta.total DESC, sdts.total DESC;
 
-DROP VIEW IF EXISTS fivestandData;
-DROP TABLE IF EXISTS fivestandData;
-CREATE VIEW fivestandData AS
+DROP VIEW IF EXISTS fivestandalldata;
+DROP TABLE IF EXISTS fivestandalldata;
+CREATE VIEW fivestandalldata AS
 SELECT compid, eventid, event, locationid, location, eventdate, squadname, team, athlete, athleteid, classification, gender, round1, round2, round3, round4, round5, round6, round7, round8, 'fivestand' as type
 FROM fivestand;
 
