@@ -89,11 +89,10 @@ public class ReportHelper {
     private final FiveStandAllIndividualScoresRepository fiveStandAllIndividualScoresRepository;
     private final String currentDate = new SimpleDateFormat("MM/dd/yyyy").format(Calendar.getInstance().getTime());
     private final String[] trapTypes = new String[]{"singles", "doubles", "handicap", "skeet", "clays", "fivestand"};
-    //    private final String[] templateTypes = new String[]{"main", "five-stand"};
-    private final String[] templateTypes = new String[]{"five-stand"};
+    private final String[] templateTypes = new String[]{"main", "five-stand"};
 
     public void doItAll() throws IOException {
-//        downloadFiles();
+        downloadFiles();
         addFilesToDatabase();
         fixTeamNames();
         fixAthleteNames();
