@@ -100,6 +100,7 @@ public class ReportHelper {
         for (String type : templateTypes) {
             Workbook workbook = getWorkbook(type);
 
+            System.out.println("Starting " + type + " file creation");
             System.out.println("Workbook has " + workbook.getNumberOfSheets() + " sheets");
             workbook.forEach(sheet -> System.out.println("- " + sheet.getSheetName()));
 
@@ -149,7 +150,7 @@ public class ReportHelper {
                 createFile(workbook, "five-stand");
             }
 
-            System.out.println("Finished in " + (System.currentTimeMillis() - trueStart) + "ms");
+            System.out.println("Finished " + type + " in " + (System.currentTimeMillis() - trueStart) + "ms");
             workbook.close();
         }
     }
