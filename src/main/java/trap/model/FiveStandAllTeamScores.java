@@ -3,6 +3,7 @@ package trap.model;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 import org.hibernate.Hibernate;
 
 import javax.persistence.Column;
@@ -13,35 +14,34 @@ import java.util.Objects;
 
 @Getter
 @Setter
+@ToString
 @RequiredArgsConstructor
 @Entity
-@Table(name = "singlesaggregate")
-public class SinglesAggregate {
+@Table(name = "fivestandallteamscores")
+public class FiveStandAllTeamScores {
     @Column(name = "team", insertable = false, updatable = false)
     String team;
+    @Column(name = "classification", insertable = false, updatable = false)
+    String classification;
     @Column(name = "athlete", insertable = false, updatable = false)
     String athlete;
-    String classification;
-    String gender;
-    Integer total;
+    Integer indtotal;
+    Integer teamtotal;
+    @Column(name = "type", insertable = false, updatable = false)
+    String type;
     @EmbeddedId
-    private SinglesAggregateIdentity singlesAggregateIdentity;
-
-    @Override
-    public String toString() {
-        return team + " - " + athlete + " - " + total;
-    }
+    private AllTeamScoresIdentity allTeamScoresIdentity;
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
-        SinglesAggregate that = (SinglesAggregate) o;
-        return singlesAggregateIdentity != null && Objects.equals(singlesAggregateIdentity, that.singlesAggregateIdentity);
+        FiveStandAllTeamScores that = (FiveStandAllTeamScores) o;
+        return allTeamScoresIdentity != null && Objects.equals(allTeamScoresIdentity, that.allTeamScoresIdentity);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(singlesAggregateIdentity);
+        return Objects.hash(allTeamScoresIdentity);
     }
 }

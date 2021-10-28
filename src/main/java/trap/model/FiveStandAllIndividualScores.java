@@ -17,8 +17,8 @@ import java.util.Objects;
 @ToString
 @RequiredArgsConstructor
 @Entity
-@Table(name = "allindividualscores")
-public class AllIndividualScores {
+@Table(name = "fivestandallindividualscores")
+public class FiveStandAllIndividualScores {
     @Column(name = "team", insertable = false, updatable = false)
     String team;
     @Column(name = "classification", insertable = false, updatable = false)
@@ -32,18 +32,18 @@ public class AllIndividualScores {
     @Column(name = "type", insertable = false, updatable = false)
     String type;
     @EmbeddedId
-    private AllIndividualScoresIdentity allIndividualScoresIdentity;
+    private FiveStandAllIndividualScoresIdentity fiveStandAllIndividualScoresIdentity;
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
-        AllIndividualScores that = (AllIndividualScores) o;
-        return allIndividualScoresIdentity != null && Objects.equals(allIndividualScoresIdentity, that.allIndividualScoresIdentity);
+        FiveStandAllIndividualScores that = (FiveStandAllIndividualScores) o;
+        return fiveStandAllIndividualScoresIdentity != null && Objects.equals(fiveStandAllIndividualScoresIdentity, that.fiveStandAllIndividualScoresIdentity);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(allIndividualScoresIdentity);
+        return Objects.hash(fiveStandAllIndividualScoresIdentity);
     }
 }

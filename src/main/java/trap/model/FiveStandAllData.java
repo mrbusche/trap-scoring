@@ -17,8 +17,8 @@ import java.util.Objects;
 @ToString
 @RequiredArgsConstructor
 @Entity
-@Table(name = "alldata")
-public class AllData {
+@Table(name = "fivestandalldata")
+public class FiveStandAllData {
     @Column(name = "eventid", insertable = false, updatable = false)
     String eventid;
     String event;
@@ -44,20 +44,20 @@ public class AllData {
     Integer round6 = 0;
     Integer round7 = 0;
     Integer round8 = 0;
-    String type;
+    //    String type = "fivestand";
     @EmbeddedId
-    private AllDataIdentity allDataIdentity;
+    private FiveStandDataIdentity fiveStandDataIdentity;
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
-        AllData allData = (AllData) o;
-        return allDataIdentity != null && Objects.equals(allDataIdentity, allData.allDataIdentity);
+        FiveStandAllData that = (FiveStandAllData) o;
+        return fiveStandDataIdentity != null && Objects.equals(fiveStandDataIdentity, that.fiveStandDataIdentity);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(allDataIdentity);
+        return Objects.hash(fiveStandDataIdentity);
     }
 }

@@ -12,8 +12,8 @@ import javax.persistence.Table;
 @Setter
 @RequiredArgsConstructor
 @Entity
-@Table(name = "handicapaggregate")
-public class HandicapAggregate {
+@Table(name = "fivestandaggregate")
+public class FiveStandAggregate {
     String team;
     @Id
     String athlete;
@@ -26,3 +26,4 @@ public class HandicapAggregate {
         return athlete + " - " + team + " - " + total;
     }
 }
+
