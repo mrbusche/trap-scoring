@@ -1,10 +1,11 @@
 # Trap Scoring App
 
 - Download jar file from [latest release](https://github.com/mrbusche/trap-scoring/releases)
-- open command prompt to directory with downloaded jar file
-- run `java -Xms1024m -Xmx4096m -jar trap-3.0.0.jar`
+- You will need Java 17 to run the jar file
+- Open command prompt to directory with downloaded jar file
+- Run `java -Xms1024m -Xmx4096m -jar trap-3.0.0.jar`
 - There will be output as the process generates the file
-- When finished there will be a file generated in the directory you ran the commands from
+- When finished there will be 2 files generated in the directory you ran the commands from
 
 ## Online metabase links (no longer need to download separately)
 
