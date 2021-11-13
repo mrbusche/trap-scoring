@@ -62,12 +62,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.logging.Logger;
 
 @RequiredArgsConstructor
 @Service
 public class ReportHelper {
-    private static final Logger LOG = Logger.getLogger(ReportHelper.class.getName());
     private final JdbcTemplate jdbc;
     private final SinglesDataRepository singlesRepository;
     private final SinglesDataTeamRepository singlesDataTeamRepository;
