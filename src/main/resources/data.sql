@@ -2,26 +2,26 @@ set global local_infile=1;
 
 DROP TABLE IF EXISTS singles;
 CREATE TABLE IF NOT EXISTS singles (
-    CompId MEDIUMINT,
-    EventId VARCHAR(6),
-    Event VARCHAR(50),
-    LocationId MEDIUMINT,
-    Location VARCHAR(50),
-    EventDate VARCHAR(16),
-    SquadName VARCHAR(50),
-    Team VARCHAR(50),
-    Athlete VARCHAR(50),
-    AthleteId MEDIUMINT,
-    Classification VARCHAR(50),
-    Gender VARCHAR(6),
-    Round1 TINYINT DEFAULT 0,
-    Round2 TINYINT DEFAULT 0,
-    Round3 TINYINT DEFAULT 0,
-    Round4 TINYINT DEFAULT 0,
-    Round5 TINYINT DEFAULT 0,
-    Round6 TINYINT DEFAULT 0,
-    Round7 TINYINT DEFAULT 0,
-    Round8 TINYINT DEFAULT 0
+   CompId MEDIUMINT,
+   EventId VARCHAR(6),
+   Event VARCHAR(50),
+   LocationId MEDIUMINT,
+   Location VARCHAR(50),
+   EventDate VARCHAR(16),
+   SquadName VARCHAR(50),
+   Team VARCHAR(50),
+   Athlete VARCHAR(50),
+   AthleteId MEDIUMINT,
+   Classification VARCHAR(50),
+   Gender VARCHAR(6),
+   Round1 TINYINT DEFAULT 0,
+   Round2 TINYINT DEFAULT 0,
+   Round3 TINYINT DEFAULT 0,
+   Round4 TINYINT DEFAULT 0,
+   Round5 TINYINT DEFAULT 0,
+   Round6 TINYINT DEFAULT 0,
+   Round7 TINYINT DEFAULT 0,
+   Round8 TINYINT DEFAULT 0
 );
 
 -- top 4 scores
@@ -130,26 +130,26 @@ ORDER BY sta.total DESC, sdts.total DESC;
 
 DROP TABLE IF EXISTS doubles;
 CREATE TABLE IF NOT EXISTS doubles (
-    CompId MEDIUMINT,
-    EventId VARCHAR(6),
-    Event VARCHAR(50),
-    LocationId MEDIUMINT,
-    Location VARCHAR(50),
-    EventDate VARCHAR(16),
-    SquadName VARCHAR(50),
-    Team VARCHAR(50),
-    Athlete VARCHAR(50),
-    AthleteId MEDIUMINT,
-    Classification VARCHAR(50),
-    Gender VARCHAR(6),
-    Round1 TINYINT,
-    Round2 TINYINT DEFAULT 0,
-    Round3 TINYINT DEFAULT 0,
-    Round4 TINYINT DEFAULT 0,
-    Round5 TINYINT DEFAULT 0,
-    Round6 TINYINT DEFAULT 0,
-    Round7 TINYINT DEFAULT 0,
-    Round8 TINYINT DEFAULT 0
+   CompId MEDIUMINT,
+   EventId VARCHAR(6),
+   Event VARCHAR(50),
+   LocationId MEDIUMINT,
+   Location VARCHAR(50),
+   EventDate VARCHAR(16),
+   SquadName VARCHAR(50),
+   Team VARCHAR(50),
+   Athlete VARCHAR(50),
+   AthleteId MEDIUMINT,
+   Classification VARCHAR(50),
+   Gender VARCHAR(6),
+   Round1 TINYINT,
+   Round2 TINYINT DEFAULT 0,
+   Round3 TINYINT DEFAULT 0,
+   Round4 TINYINT DEFAULT 0,
+   Round5 TINYINT DEFAULT 0,
+   Round6 TINYINT DEFAULT 0,
+   Round7 TINYINT DEFAULT 0,
+   Round8 TINYINT DEFAULT 0
 );
 
 -- top 4 scores for individual rounds
@@ -288,28 +288,28 @@ FROM (
          WITH s AS (
              SELECT eventid, event, locationid, location, squadname, team, athlete, gender, classification, round1, round2, round3, round4, total, row_number() OVER (PARTITION BY team, athlete ORDER BY total DESC) AS seqnum
              FROM (
-                      SELECT s.eventid, s.event, s.locationid, s.location, s.squadname, s.team, s.athlete, s.gender
+                      SELECT s.eventid, s.event, s.locationid, s.location, REPLACE(s.squadname, '  ', '') squadname, s.team, s.athlete, s.gender
                            , CASE WHEN s.classification = 'Senior/Varsity' THEN 'Varsity' WHEN s.classification = 'Senior/Jr. Varsity' THEN 'Junior Varsity' WHEN s.classification = 'Intermediate/Advanced' THEN 'Intermediate Advanced' WHEN s.classification = 'Intermediate/Entry Level' THEN 'Intermediate Entry' WHEN s.classification = 'Rookie' THEN 'Rookie' ELSE s.classification END classification
                            , s.round1, s.round2, 0 round3, 0 round4
                            , s.round1 + s.round2 total
                            , row_number() OVER (PARTITION BY athlete ORDER BY s.round1 + s.round2 DESC) AS seqnum
                       FROM handicap s
                       UNION ALL
-                      SELECT s.eventid, s.event, s.locationid, s.location, s.squadname, s.team, s.athlete, s.gender
+                      SELECT s.eventid, s.event, s.locationid, s.location, REPLACE(s.squadname, '  ', '') squadname, s.team, s.athlete, s.gender
                            , CASE WHEN s.classification = 'Senior/Varsity' THEN 'Varsity' WHEN s.classification = 'Senior/Jr. Varsity' THEN 'Junior Varsity' WHEN s.classification = 'Intermediate/Advanced' THEN 'Intermediate Advanced' WHEN s.classification = 'Intermediate/Entry Level' THEN 'Intermediate Entry' WHEN s.classification = 'Rookie' THEN 'Rookie' ELSE s.classification END classification
                            , s.round3, s.round4, 0, 0
                            , s.round3 + s.round4 total
                            , row_number() OVER (PARTITION BY athlete ORDER BY s.round3 + s.round4 DESC) AS seqnum
                       FROM handicap s
                       UNION ALL
-                      SELECT s.eventid, s.event, s.locationid, s.location, s.squadname, s.team, s.athlete, s.gender
+                      SELECT s.eventid, s.event, s.locationid, s.location, REPLACE(s.squadname, '  ', '') squadname, s.team, s.athlete, s.gender
                            , CASE WHEN s.classification = 'Senior/Varsity' THEN 'Varsity' WHEN s.classification = 'Senior/Jr. Varsity' THEN 'Junior Varsity' WHEN s.classification = 'Intermediate/Advanced' THEN 'Intermediate Advanced' WHEN s.classification = 'Intermediate/Entry Level' THEN 'Intermediate Entry' WHEN s.classification = 'Rookie' THEN 'Rookie' ELSE s.classification END classification
                            , s.round5, s.round6, 0, 0
                            , s.round5 + s.round6 total
                            , row_number() OVER (PARTITION BY athlete ORDER BY s.round5 + s.round6 DESC) AS seqnum
                       FROM handicap s
                       UNION ALL
-                      SELECT s.eventid, s.event, s.locationid, s.location, s.squadname, s.team, s.athlete, s.gender
+                      SELECT s.eventid, s.event, s.locationid, s.location, REPLACE(s.squadname, '  ', '') squadname, s.team, s.athlete, s.gender
                            , CASE WHEN s.classification = 'Senior/Varsity' THEN 'Varsity' WHEN s.classification = 'Senior/Jr. Varsity' THEN 'Junior Varsity' WHEN s.classification = 'Intermediate/Advanced' THEN 'Intermediate Advanced' WHEN s.classification = 'Intermediate/Entry Level' THEN 'Intermediate Entry' WHEN s.classification = 'Rookie' THEN 'Rookie' ELSE s.classification END classification
                            , s.round7, s.round8, 0, 0
                            , s.round7 + s.round8 total
@@ -386,26 +386,26 @@ ORDER BY sta.total DESC, sdts.total DESC;
 
 DROP TABLE IF EXISTS skeet;
 CREATE TABLE IF NOT EXISTS skeet (
-    CompId MEDIUMINT,
-    EventId VARCHAR(6),
-    Event VARCHAR(50),
-    LocationId MEDIUMINT,
-    Location VARCHAR(50),
-    EventDate VARCHAR(16),
-    SquadName VARCHAR(50),
-    Team VARCHAR(50),
-    Athlete VARCHAR(50),
-    AthleteId MEDIUMINT,
-    Classification VARCHAR(50),
-    Gender VARCHAR(6),
-    Round1 TINYINT,
-    Round2 TINYINT DEFAULT 0,
-    Round3 TINYINT DEFAULT 0,
-    Round4 TINYINT DEFAULT 0,
-    Round5 TINYINT DEFAULT 0,
-    Round6 TINYINT DEFAULT 0,
-    Round7 TINYINT DEFAULT 0,
-    Round8 TINYINT DEFAULT 0
+                                     CompId MEDIUMINT,
+                                     EventId VARCHAR(6),
+                                     Event VARCHAR(50),
+                                     LocationId MEDIUMINT,
+                                     Location VARCHAR(50),
+                                     EventDate VARCHAR(16),
+                                     SquadName VARCHAR(50),
+                                     Team VARCHAR(50),
+                                     Athlete VARCHAR(50),
+                                     AthleteId MEDIUMINT,
+                                     Classification VARCHAR(50),
+                                     Gender VARCHAR(6),
+                                     Round1 TINYINT,
+                                     Round2 TINYINT DEFAULT 0,
+                                     Round3 TINYINT DEFAULT 0,
+                                     Round4 TINYINT DEFAULT 0,
+                                     Round5 TINYINT DEFAULT 0,
+                                     Round6 TINYINT DEFAULT 0,
+                                     Round7 TINYINT DEFAULT 0,
+                                     Round8 TINYINT DEFAULT 0
 );
 
 -- top 3 scores only
@@ -514,26 +514,26 @@ ORDER BY sta.total DESC, sdts.total DESC;
 
 DROP TABLE IF EXISTS clays;
 CREATE TABLE IF NOT EXISTS clays (
-    CompId MEDIUMINT,
-    EventId VARCHAR(6),
-    Event VARCHAR(50),
-    LocationId MEDIUMINT,
-    Location VARCHAR(50),
-    EventDate VARCHAR(16),
-    SquadName VARCHAR(50),
-    Team VARCHAR(50),
-    Athlete VARCHAR(50),
-    AthleteId MEDIUMINT,
-    Classification VARCHAR(50),
-    Gender VARCHAR(6),
-    Round1 TINYINT,
-    Round2 TINYINT DEFAULT 0,
-    Round3 TINYINT DEFAULT 0,
-    Round4 TINYINT DEFAULT 0,
-    Round5 TINYINT DEFAULT 0,
-    Round6 TINYINT DEFAULT 0,
-    Round7 TINYINT DEFAULT 0,
-    Round8 TINYINT DEFAULT 0
+                                     CompId MEDIUMINT,
+                                     EventId VARCHAR(6),
+                                     Event VARCHAR(50),
+                                     LocationId MEDIUMINT,
+                                     Location VARCHAR(50),
+                                     EventDate VARCHAR(16),
+                                     SquadName VARCHAR(50),
+                                     Team VARCHAR(50),
+                                     Athlete VARCHAR(50),
+                                     AthleteId MEDIUMINT,
+                                     Classification VARCHAR(50),
+                                     Gender VARCHAR(6),
+                                     Round1 TINYINT,
+                                     Round2 TINYINT DEFAULT 0,
+                                     Round3 TINYINT DEFAULT 0,
+                                     Round4 TINYINT DEFAULT 0,
+                                     Round5 TINYINT DEFAULT 0,
+                                     Round6 TINYINT DEFAULT 0,
+                                     Round7 TINYINT DEFAULT 0,
+                                     Round8 TINYINT DEFAULT 0
 );
 
 -- top 3 scores only
@@ -641,56 +641,56 @@ ORDER BY sta.total DESC, sdts.total DESC;
 DROP VIEW IF EXISTS alldata;
 DROP TABLE IF EXISTS alldata;
 CREATE VIEW alldata AS
-    SELECT compid, eventid, event, locationid, location, eventdate, squadname, team, athlete, athleteid, classification, gender, round1, round2, round3, round4, round5, round6, round7, round8, 'singles' as type
-    FROM singles
-    UNION
-    SELECT *, 'doubles' as type
-    FROM doubles
-    UNION
-    SELECT *, 'handicap' as type
-    FROM handicap
-    UNION
-    SELECT *, 'skeet' as type
-    FROM skeet
-    UNION
-    SELECT *, 'clays' as type
-    FROM clays;
+SELECT compid, eventid, event, locationid, location, eventdate, squadname, team, athlete, athleteid, classification, gender, round1, round2, round3, round4, round5, round6, round7, round8, 'singles' as type
+FROM singles
+UNION
+SELECT *, 'doubles' as type
+FROM doubles
+UNION
+SELECT *, 'handicap' as type
+FROM handicap
+UNION
+SELECT *, 'skeet' as type
+FROM skeet
+UNION
+SELECT *, 'clays' as type
+FROM clays;
 
 DROP VIEW IF EXISTS allteamscores;
 DROP TABLE IF EXISTS allteamscores;
 CREATE VIEW allteamscores AS
-    SELECT *, 'singles' type
-    FROM singlesTeamScores
-    UNION
-    SELECT *, 'doubles'
-    FROM doublesTeamScores
-    UNION
-    SELECT *, 'handicap'
-    FROM handicapTeamScores
-    UNION
-    SELECT *, 'skeet'
-    FROM skeetTeamScores
-    UNION
-    SELECT *, 'clays'
-    FROM claysTeamScores;
+SELECT *, 'singles' type
+FROM singlesTeamScores
+UNION
+SELECT *, 'doubles'
+FROM doublesTeamScores
+UNION
+SELECT *, 'handicap'
+FROM handicapTeamScores
+UNION
+SELECT *, 'skeet'
+FROM skeetTeamScores
+UNION
+SELECT *, 'clays'
+FROM claysTeamScores;
 
 DROP VIEW IF EXISTS allindividualscores;
 DROP TABLE IF EXISTS allindividualscores;
 CREATE VIEW allindividualscores AS
-    SELECT *, 'singles' type
-    FROM singlesaggregate
-    UNION
-    SELECT *, 'doubles'
-    FROM doublesaggregate
-    UNION
-    SELECT *, 'handicap'
-    FROM handicapaggregate
-    UNION
-    SELECT *, 'skeet'
-    FROM skeetaggregate
-    UNION
-    SELECT *, 'clays'
-    FROM claysaggregate;
+SELECT *, 'singles' type
+FROM singlesaggregate
+UNION
+SELECT *, 'doubles'
+FROM doublesaggregate
+UNION
+SELECT *, 'handicap'
+FROM handicapaggregate
+UNION
+SELECT *, 'skeet'
+FROM skeetaggregate
+UNION
+SELECT *, 'clays'
+FROM claysaggregate;
 
 CREATE INDEX singlesClassGen ON singles(classification, gender);
 CREATE INDEX doublesClassGen ON doubles(classification, gender);
@@ -700,26 +700,26 @@ CREATE INDEX claysClassGen ON clays(classification, gender);
 
 DROP TABLE IF EXISTS fivestand;
 CREATE TABLE IF NOT EXISTS fivestand (
-    CompId MEDIUMINT,
-    EventId VARCHAR(6),
-    Event VARCHAR(50),
-    LocationId MEDIUMINT,
-    Location VARCHAR(50),
-    EventDate VARCHAR(16),
-    SquadName VARCHAR(50),
-    Team VARCHAR(50),
-    Athlete VARCHAR(50),
-    AthleteId MEDIUMINT,
-    Classification VARCHAR(50),
-    Gender VARCHAR(6),
-    Round1 TINYINT,
-    Round2 TINYINT DEFAULT 0,
-    Round3 TINYINT DEFAULT 0,
-    Round4 TINYINT DEFAULT 0,
-    Round5 TINYINT DEFAULT 0,
-    Round6 TINYINT DEFAULT 0,
-    Round7 TINYINT DEFAULT 0,
-    Round8 TINYINT DEFAULT 0
+     CompId MEDIUMINT,
+     EventId VARCHAR(6),
+     Event VARCHAR(50),
+     LocationId MEDIUMINT,
+     Location VARCHAR(50),
+     EventDate VARCHAR(16),
+     SquadName VARCHAR(50),
+     Team VARCHAR(50),
+     Athlete VARCHAR(50),
+     AthleteId MEDIUMINT,
+     Classification VARCHAR(50),
+     Gender VARCHAR(6),
+     Round1 TINYINT,
+     Round2 TINYINT DEFAULT 0,
+     Round3 TINYINT DEFAULT 0,
+     Round4 TINYINT DEFAULT 0,
+     Round5 TINYINT DEFAULT 0,
+     Round6 TINYINT DEFAULT 0,
+     Round7 TINYINT DEFAULT 0,
+     Round8 TINYINT DEFAULT 0
 );
 
 -- top 3 scores only
