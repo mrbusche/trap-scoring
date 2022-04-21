@@ -54,6 +54,11 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -165,10 +170,18 @@ public class ReportHelper {
         fileUrls.put("clays", "https://metabase.sssfonline.com/public/question/2c6edb1a-a7ee-43c2-8180-ad199a57be55.csv");
         fileUrls.put("fivestand", "https://metabase.sssfonline.com/public/question/3c5aecf2-a9f2-49b2-a11f-36965cb1a964.csv");
 
+        Charset charset = StandardCharsets.UTF_8;
         for (String type : trapTypes) {
             System.out.println("Downloading " + type + " file");
             FileUtils.copyURLToFile(new URL(fileUrls.get(type)), new File(type + ".csv"), 60000, 60000);
             System.out.println("Finished downloading " + type + " file");
+
+            System.out.println("Replacing double spaces for " + type + " file");
+            Path path = Paths.get(type + ".csv");
+            String content = Files.readString(path, charset);
+            content = content.replaceAll(" {2}", " ");
+            Files.writeString(path, content, charset);
+            System.out.println("Finished replacing double spaces for " + type + " file");
         }
         System.out.println("Files downloaded in " + (System.currentTimeMillis() - start) + " ms");
     }
