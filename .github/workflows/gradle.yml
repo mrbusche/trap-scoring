@@ -19,5 +19,7 @@ jobs:
           cache: 'gradle'
           distribution: 'temurin'
           java-version: ${{ matrix.java-version }}
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
       - name: Build and analyze
         run: ./gradlew build --no-daemon --info -Xms2048m -Xmx4096m
