@@ -9,12 +9,16 @@ jobs:
     runs-on: ubuntu-22.04
     strategy:
       matrix:
-        java-version: [17, 19]
+        java-version: [17, 18]
 
     steps:
       - uses: actions/checkout@v3.0.2        
         with:
           fetch-depth: 0
+      - name: Set Swap Space
+        uses: pierotofy/set-swap-space@master
+        with:
+          swap-size-gb: 10
       - name: Set up JDK ${{ matrix.java-version }}
         uses: actions/setup-java@v3
         with:
