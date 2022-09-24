@@ -6,10 +6,10 @@ on:
 jobs:
   build:
     name: build
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     strategy:
       matrix:
-        java-version: [17]
+        java-version: [17, 19]
 
     steps:
       - uses: actions/checkout@v3.0.2        
