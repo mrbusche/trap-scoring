@@ -373,15 +373,17 @@ public class ReportHelper {
     }
 
     private static void addPlayerData(Row row, int column, String athlete, Integer total, String team, CellStyle mainTextStyle) {
-        Cell cell = row.createCell(column);
-        cell.setCellValue(athlete);
-        cell.setCellStyle(mainTextStyle);
-        cell = row.createCell(column + 1);
-        cell.setCellValue(total);
-        cell.setCellStyle(mainTextStyle);
-        cell = row.createCell(column + 2);
-        cell.setCellValue(team);
-        cell.setCellStyle(mainTextStyle);
+        if (row != null) {
+            Cell cell = row.createCell(column);
+            cell.setCellValue(athlete);
+            cell.setCellStyle(mainTextStyle);
+            cell = row.createCell(column + 1);
+            cell.setCellValue(total);
+            cell.setCellStyle(mainTextStyle);
+            cell = row.createCell(column + 2);
+            cell.setCellValue(team);
+            cell.setCellStyle(mainTextStyle);
+        }
     }
 
     private void populateTeamData(Sheet sheet, String teamType, CellStyle mainTextStyle) {
