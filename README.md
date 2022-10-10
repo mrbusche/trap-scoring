@@ -1,6 +1,6 @@
 # Trap Scoring App
 
-- Download jar file from [latest release](https://github.com/mrbusche/trap-scoring/releases)
+- Download jar file from the [latest release](https://github.com/mrbusche/trap-scoring/releases)
 - You will need [Java 17](https://adoptium.net/) to run the jar file
 - Open command prompt to directory with downloaded jar file
 - Run `java -Xms1024m -Xmx4096m -jar trap-3.0.0.jar` (make sure you have the correct jar filename)
