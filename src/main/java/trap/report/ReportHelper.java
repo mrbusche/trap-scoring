@@ -98,7 +98,6 @@ public class ReportHelper {
         downloadFiles();
         addFilesToDatabase();
         fixTeamNames();
-        fixAthleteNames();
 
         for (String type : templateTypes) {
             Workbook workbook = getWorkbook(type);
@@ -219,7 +218,6 @@ public class ReportHelper {
         System.out.println("Found " + fiveStandAllData.size() + " records  in fivestand table.");
         System.out.println("Database loaded in " + (System.currentTimeMillis() - start) + "ms");
     }
-
     private void fixTeamNames() {
         long start = System.currentTimeMillis();
         jdbc.execute("UPDATE singles SET team = replace(team, 'Club', 'Team') WHERE team LIKE '%Club%';");
@@ -229,17 +227,6 @@ public class ReportHelper {
         jdbc.execute("UPDATE clays SET team = replace(team, 'Club', 'Team') WHERE team LIKE '%Club%';");
         jdbc.execute("UPDATE fivestand SET team = replace(team, 'Club', 'Team') WHERE team LIKE '%Club%';");
         System.out.println("Team names fixed in " + (System.currentTimeMillis() - start) + "ms");
-    }
-
-    private void fixAthleteNames() {
-        long start = System.currentTimeMillis();
-        jdbc.execute("UPDATE singles SET athlete = replace(athlete, '  ', '') WHERE athlete LIKE '%  %';");
-        jdbc.execute("UPDATE doubles SET athlete = replace(athlete, '  ', '') WHERE athlete LIKE '%  %';");
-        jdbc.execute("UPDATE handicap SET athlete = replace(athlete, '  ', '') WHERE athlete LIKE '%  %';");
-        jdbc.execute("UPDATE skeet SET athlete = replace(athlete, '  ', '') WHERE athlete LIKE '%  %';");
-        jdbc.execute("UPDATE clays SET athlete = replace(athlete, '  ', '') WHERE athlete LIKE '%  %';");
-        jdbc.execute("UPDATE fivestand SET athlete = replace(athlete, '  ', '') WHERE athlete LIKE '%  %';");
-        System.out.println("Athlete names fixed in " + (System.currentTimeMillis() - start) + "ms");
     }
 
     private Workbook getWorkbook(String templateName) throws IOException {
