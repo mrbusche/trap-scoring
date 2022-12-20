@@ -38,7 +38,7 @@ dependencies {
     annotationProcessor 'org.projectlombok:lombok'
 
     implementation 'org.apache.poi:poi-ooxml:5.2.3'
-    implementation 'ch.vorburger.mariaDB4j:mariaDB4j:2.5.3'
+    implementation 'ch.vorburger.mariaDB4j:mariaDB4j:2.6.0'
 }
 
 test {
