@@ -745,24 +745,6 @@ FROM fivestandteamaggregate sta
                      GROUP BY team, classification, athlete) sdts ON sta.team = sdts.team AND sta.classification = sdts.classification
 ORDER BY sta.total DESC, sdts.total DESC;
 
-DROP VIEW IF EXISTS fivestandalldata;
-DROP TABLE IF EXISTS fivestandalldata;
-CREATE VIEW fivestandalldata AS
-SELECT compid, eventid, event, locationid, location, eventdate, squadname, team, athlete, athleteid, classification, gender, round1, round2, round3, round4, round5, round6, round7, round8, 'fivestand' as type
-FROM fivestand;
-
-DROP VIEW IF EXISTS fivestandallteamscores;
-DROP TABLE IF EXISTS fivestandallteamscores;
-CREATE VIEW fivestandallteamscores AS
-SELECT *, 'fivestand' type
-FROM fivestandTeamScores;
-
-DROP VIEW IF EXISTS fivestandallindividualscores;
-DROP TABLE IF EXISTS fivestandallindividualscores;
-CREATE VIEW fivestandallindividualscores AS
-SELECT *, 'fivestand' type
-FROM fivestandaggregate;
-
 DROP VIEW IF EXISTS alldata;
 DROP TABLE IF EXISTS alldata;
 CREATE VIEW alldata AS
@@ -800,7 +782,10 @@ SELECT *, 'skeet'
 FROM skeetTeamScores
 UNION
 SELECT *, 'clays'
-FROM claysTeamScores;
+FROM claysTeamScores
+UNION
+SELECT *, 'fivestand'
+FROM fivestandTeamScores;
 
 DROP VIEW IF EXISTS allindividualscores;
 DROP TABLE IF EXISTS allindividualscores;
@@ -818,7 +803,10 @@ SELECT *, 'skeet'
 FROM skeetaggregate
 UNION
 SELECT *, 'clays'
-FROM claysaggregate;
+FROM claysaggregate
+UNION
+SELECT *, 'fivestand'
+FROM fivestandaggregate;
 
 CREATE INDEX singlesClassGen ON singles(classification, gender);
 CREATE INDEX doublesClassGen ON doubles(classification, gender);

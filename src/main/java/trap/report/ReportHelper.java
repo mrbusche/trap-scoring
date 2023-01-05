@@ -129,20 +129,6 @@ public class ReportHelper {
         populateTeamIndividualData(workbook, "Team-Individual-Scores");
         populateAllIndividualData(workbook, "Individual-All-Scores");
 
-//        populateFiveStandCleanData(workbook.getSheet("Clean Data"));
-
-//        for (Map.Entry<String, String> entry : types.entrySet()) {
-//            start = System.currentTimeMillis();
-//            populateFiveStandTeamData(workbook.getSheet(entry.getKey()), entry.getValue(), mainTextStyle);
-//            System.out.println("" + entry.getKey() + " data populated in " + (System.currentTimeMillis() - start) + "ms");
-//        }
-//
-//        populateFiveStandIndividualData(workbook, "Individual-Men", "M", style, mainTextStyle);
-//        populateFiveStandIndividualData(workbook, "Individual-Ladies", "F", style, mainTextStyle);
-//
-//        populateFiveStandTeamIndividualData(workbook, "Team-Individual-Scores");
-//        populateFiveStandAllIndividualData(workbook, "Individual-All-Scores");
-
         createFile(workbook, "league-data");
 
         System.out.println("Finished creating file in " + (System.currentTimeMillis() - trueStart) + "ms");
@@ -200,7 +186,11 @@ public class ReportHelper {
         int claysCount = jdbc.update(con -> con.prepareStatement(claysSql));
         System.out.println("Added " + claysCount + " new records to database in clays table.");
 
-        int rowsAdded = singlesCount + doublesCount + handicapCount + skeetCount + claysCount;
+        String fivestandSql = "load data local infile 'fivestand.csv' into table fivestand fields terminated by ',' OPTIONALLY ENCLOSED BY '\"' lines terminated by '\n' IGNORE 1 LINES;";
+        int fivestandCount = jdbc.update(con -> con.prepareStatement(fivestandSql));
+        System.out.println("Added " + fivestandCount + " new records to database in fivestand table.");
+
+        int rowsAdded = singlesCount + doublesCount + handicapCount + skeetCount + claysCount + fivestandCount;
         System.out.println("Added " + rowsAdded + " total records to database");
         List<AllData> allData = allDataRepository.findAll();
         System.out.println("Found " + allData.size() + " total records in database");
@@ -209,12 +199,6 @@ public class ReportHelper {
             throw new Exception("rows not added to database properly");
         }
 
-        String fivestandSql = "load data local infile 'fivestand.csv' into table fivestand fields terminated by ',' OPTIONALLY ENCLOSED BY '\"' lines terminated by '\n' IGNORE 1 LINES;";
-        int fivestandCount = jdbc.update(con -> con.prepareStatement(fivestandSql));
-        System.out.println("Added " + fivestandCount + " new records to database in fivestand table.");
-
-        List<FiveStandAllData> fiveStandAllData = fiveStandAllDataRepository.findAll();
-        System.out.println("Found " + fiveStandAllData.size() + " records in fivestand table.");
         System.out.println("Database loaded in " + (System.currentTimeMillis() - start) + "ms");
     }
     private void fixTeamNames() {
@@ -499,6 +483,18 @@ public class ReportHelper {
             for (ClaysAggregate claysRowData : claysIndividualData) {
                 row = sheet.getRow(++updateRow);
                 addPlayerData(row, column, claysRowData.getAthlete(), claysRowData.getTotal(), claysRowData.getTeam(), mainTextStyle);
+            }
+            maxRow = Math.max(maxRow, updateRow);
+            column += 4;
+
+            updateRow = classificationStartRow;
+            updateRow++;
+            start = System.currentTimeMillis();
+            List<FiveStandAggregate> fiveStandIndividualData = fiveStandDataRepository.getAllByGenderAndClassification(gender, classification);
+            System.out.println("Ran query for fivestand by " + gender + " and " + classification + " " + (System.currentTimeMillis() - start) + "ms");
+            for (FiveStandAggregate fiveStandRowData: fiveStandIndividualData) {
+                row = sheet.getRow(++updateRow);
+                addPlayerData(row, column, fiveStandRowData.getAthlete(), fiveStandRowData.getTotal(), fiveStandRowData.getTeam(), mainTextStyle);
             }
             maxRow = Math.max(maxRow, updateRow);
 
