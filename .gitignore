@@ -10,3 +10,4 @@ data/
 bin
 .classpath
 *.jar
+/.jpb/persistence-units.xml

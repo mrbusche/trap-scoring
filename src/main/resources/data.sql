@@ -637,89 +637,28 @@ FROM claysteamaggregate sta
                      WHERE segnum <= 3
                      GROUP BY team, classification, athlete) sdts ON sta.team = sdts.team AND sta.classification = sdts.classification
 ORDER BY sta.total DESC, sdts.total DESC;
-
-DROP VIEW IF EXISTS alldata;
-DROP TABLE IF EXISTS alldata;
-CREATE VIEW alldata AS
-SELECT compid, eventid, event, locationid, location, eventdate, squadname, team, athlete, athleteid, classification, gender, round1, round2, round3, round4, round5, round6, round7, round8, 'singles' as type
-FROM singles
-UNION
-SELECT *, 'doubles' as type
-FROM doubles
-UNION
-SELECT *, 'handicap' as type
-FROM handicap
-UNION
-SELECT *, 'skeet' as type
-FROM skeet
-UNION
-SELECT *, 'clays' as type
-FROM clays;
-
-DROP VIEW IF EXISTS allteamscores;
-DROP TABLE IF EXISTS allteamscores;
-CREATE VIEW allteamscores AS
-SELECT *, 'singles' type
-FROM singlesTeamScores
-UNION
-SELECT *, 'doubles'
-FROM doublesTeamScores
-UNION
-SELECT *, 'handicap'
-FROM handicapTeamScores
-UNION
-SELECT *, 'skeet'
-FROM skeetTeamScores
-UNION
-SELECT *, 'clays'
-FROM claysTeamScores;
-
-DROP VIEW IF EXISTS allindividualscores;
-DROP TABLE IF EXISTS allindividualscores;
-CREATE VIEW allindividualscores AS
-SELECT *, 'singles' type
-FROM singlesaggregate
-UNION
-SELECT *, 'doubles'
-FROM doublesaggregate
-UNION
-SELECT *, 'handicap'
-FROM handicapaggregate
-UNION
-SELECT *, 'skeet'
-FROM skeetaggregate
-UNION
-SELECT *, 'clays'
-FROM claysaggregate;
-
-CREATE INDEX singlesClassGen ON singles(classification, gender);
-CREATE INDEX doublesClassGen ON doubles(classification, gender);
-CREATE INDEX handicapClassGen ON handicap(classification, gender);
-CREATE INDEX skeetClassGen ON skeet(classification, gender);
-CREATE INDEX claysClassGen ON clays(classification, gender);
-
 DROP TABLE IF EXISTS fivestand;
 CREATE TABLE IF NOT EXISTS fivestand (
-     CompId MEDIUMINT,
-     EventId VARCHAR(6),
-     Event VARCHAR(50),
-     LocationId MEDIUMINT,
-     Location VARCHAR(50),
-     EventDate VARCHAR(16),
-     SquadName VARCHAR(50),
-     Team VARCHAR(50),
-     Athlete VARCHAR(50),
-     AthleteId MEDIUMINT,
-     Classification VARCHAR(50),
-     Gender VARCHAR(6),
-     Round1 TINYINT,
-     Round2 TINYINT DEFAULT 0,
-     Round3 TINYINT DEFAULT 0,
-     Round4 TINYINT DEFAULT 0,
-     Round5 TINYINT DEFAULT 0,
-     Round6 TINYINT DEFAULT 0,
-     Round7 TINYINT DEFAULT 0,
-     Round8 TINYINT DEFAULT 0
+    CompId MEDIUMINT,
+    EventId VARCHAR(6),
+    Event VARCHAR(50),
+    LocationId MEDIUMINT,
+    Location VARCHAR(50),
+    EventDate VARCHAR(16),
+    SquadName VARCHAR(50),
+    Team VARCHAR(50),
+    Athlete VARCHAR(50),
+    AthleteId MEDIUMINT,
+    Classification VARCHAR(50),
+    Gender VARCHAR(6),
+    Round1 TINYINT DEFAULT 0,
+    Round2 TINYINT DEFAULT 0,
+    Round3 TINYINT DEFAULT 0,
+    Round4 TINYINT DEFAULT 0,
+    Round5 TINYINT DEFAULT 0,
+    Round6 TINYINT DEFAULT 0,
+    Round7 TINYINT DEFAULT 0,
+    Round8 TINYINT DEFAULT 0
 );
 
 -- top 3 scores only
@@ -824,4 +763,66 @@ CREATE VIEW fivestandallindividualscores AS
 SELECT *, 'fivestand' type
 FROM fivestandaggregate;
 
+DROP VIEW IF EXISTS alldata;
+DROP TABLE IF EXISTS alldata;
+CREATE VIEW alldata AS
+SELECT compid, eventid, event, locationid, location, eventdate, squadname, team, athlete, athleteid, classification, gender, round1, round2, round3, round4, round5, round6, round7, round8, 'singles' as type
+FROM singles
+UNION
+SELECT *, 'doubles' as type
+FROM doubles
+UNION
+SELECT *, 'handicap' as type
+FROM handicap
+UNION
+SELECT *, 'skeet' as type
+FROM skeet
+UNION
+SELECT *, 'clays' as type
+FROM clays
+UNION
+SELECT *, 'fivestand' as type
+FROM fivestand;
+
+DROP VIEW IF EXISTS allteamscores;
+DROP TABLE IF EXISTS allteamscores;
+CREATE VIEW allteamscores AS
+SELECT *, 'singles' type
+FROM singlesTeamScores
+UNION
+SELECT *, 'doubles'
+FROM doublesTeamScores
+UNION
+SELECT *, 'handicap'
+FROM handicapTeamScores
+UNION
+SELECT *, 'skeet'
+FROM skeetTeamScores
+UNION
+SELECT *, 'clays'
+FROM claysTeamScores;
+
+DROP VIEW IF EXISTS allindividualscores;
+DROP TABLE IF EXISTS allindividualscores;
+CREATE VIEW allindividualscores AS
+SELECT *, 'singles' type
+FROM singlesaggregate
+UNION
+SELECT *, 'doubles'
+FROM doublesaggregate
+UNION
+SELECT *, 'handicap'
+FROM handicapaggregate
+UNION
+SELECT *, 'skeet'
+FROM skeetaggregate
+UNION
+SELECT *, 'clays'
+FROM claysaggregate;
+
+CREATE INDEX singlesClassGen ON singles(classification, gender);
+CREATE INDEX doublesClassGen ON doubles(classification, gender);
+CREATE INDEX handicapClassGen ON handicap(classification, gender);
+CREATE INDEX skeetClassGen ON skeet(classification, gender);
+CREATE INDEX claysClassGen ON clays(classification, gender);
 CREATE INDEX fivestandClassGen ON fivestand(classification, gender);
