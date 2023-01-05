@@ -94,7 +94,7 @@ public class ReportHelper {
     private final String[] trapTypes = new String[]{"singles", "doubles", "handicap", "skeet", "clays", "fivestand"};
     private final String[] templateTypes = new String[]{"main", "five-stand"};
 
-    public void doItAll() throws IOException {
+    public void doItAll() throws Exception {
         downloadFiles();
         addFilesToDatabase();
         fixTeamNames();
@@ -185,7 +185,7 @@ public class ReportHelper {
         System.out.println("Files downloaded in " + (System.currentTimeMillis() - start) + " ms");
     }
 
-    private void addFilesToDatabase() {
+    private void addFilesToDatabase() throws Exception {
         long start = System.currentTimeMillis();
         jdbc.execute("set global local_infile=1;");
         String singlesSql = "load data local infile 'singles.csv' into table singles fields terminated by ',' OPTIONALLY ENCLOSED BY '\"' lines terminated by '\n' IGNORE 1 LINES;";
@@ -207,15 +207,22 @@ public class ReportHelper {
         String claysSql = "load data local infile 'clays.csv' into table clays fields terminated by ',' OPTIONALLY ENCLOSED BY '\"' lines terminated by '\n' IGNORE 1 LINES;";
         int claysCount = jdbc.update(con -> con.prepareStatement(claysSql));
         System.out.println("Added " + claysCount + " new records to database in clays table.");
-        System.out.println("Added " + (singlesCount + doublesCount + handicapCount + skeetCount + claysCount) + " total records to database");
+
+        int rowsAdded = singlesCount + doublesCount + handicapCount + skeetCount + claysCount;
+        System.out.println("Added " + rowsAdded + " total records to database");
         List<AllData> allData = allDataRepository.findAll();
         System.out.println("Found " + allData.size() + " total records in database");
+
+        if (rowsAdded != allData.size()) {
+            throw new Exception("rows not added to database properly");
+        }
 
         String fivestandSql = "load data local infile 'fivestand.csv' into table fivestand fields terminated by ',' OPTIONALLY ENCLOSED BY '\"' lines terminated by '\n' IGNORE 1 LINES;";
         int fivestandCount = jdbc.update(con -> con.prepareStatement(fivestandSql));
         System.out.println("Added " + fivestandCount + " new records to database in fivestand table.");
+
         List<FiveStandAllData> fiveStandAllData = fiveStandAllDataRepository.findAll();
-        System.out.println("Found " + fiveStandAllData.size() + " records  in fivestand table.");
+        System.out.println("Found " + fiveStandAllData.size() + " records in fivestand table.");
         System.out.println("Database loaded in " + (System.currentTimeMillis() - start) + "ms");
     }
     private void fixTeamNames() {
