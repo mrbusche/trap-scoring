@@ -25,8 +25,8 @@ CREATE TABLE IF NOT EXISTS singles (
 );
 
 -- top 4 scores
-DROP VIEW IF EXISTS singlesData;
-CREATE VIEW singlesData AS
+DROP VIEW IF EXISTS singlesdata;
+CREATE VIEW singlesdata AS
 SELECT eventid, event, locationid, location, squadname, team, athlete, gender, classification, round1, round2, round3, round4, total, seqnum
 FROM (
          WITH s AS (
@@ -94,7 +94,7 @@ CREATE VIEW singlesaggregate AS
 SELECT athlete, classification, gender, team, SUM(total) AS total
 FROM (
          SELECT athlete, classification, gender, total, team
-         FROM singlesData
+         FROM singlesdata
      ) AS a
 GROUP BY athlete, classification, gender, team
 ORDER BY total DESC;
@@ -112,9 +112,9 @@ WHERE segnum <= 5
 GROUP BY team, classification
 ORDER BY total DESC;
 
-DROP VIEW IF EXISTS singlesTeamScores;
-DROP TABLE IF EXISTS singlesTeamScores;
-CREATE VIEW singlesTeamScores AS
+DROP VIEW IF EXISTS singlesteamscores;
+DROP TABLE IF EXISTS singlesteamscores;
+CREATE VIEW singlesteamscores AS
 SELECT sta.team, sdts.classification, athlete, sdts.total indtotal, sta.total teamtotal
 FROM singlesteamaggregate sta
          INNER JOIN (SELECT team, classification, athlete, SUM(total) total
@@ -153,9 +153,9 @@ CREATE TABLE IF NOT EXISTS doubles (
 );
 
 -- top 4 scores for individual rounds
-DROP VIEW IF EXISTS doublesData;
-DROP TABLE IF EXISTS doublesData;
-CREATE VIEW doublesData AS
+DROP VIEW IF EXISTS doublesdata;
+DROP TABLE IF EXISTS doublesdata;
+CREATE VIEW doublesdata AS
 SELECT eventid, event, locationid, location, squadname, team, athlete, gender, classification, round1, round2, round3, round4, total, seqnum
 FROM (
          WITH s AS (
@@ -222,7 +222,7 @@ CREATE VIEW doublesaggregate AS
 SELECT athlete, classification, gender, team, SUM(total) AS total
 FROM (
          SELECT athlete, classification, gender, total, team
-         FROM doublesData
+         FROM doublesdata
      ) a
 GROUP BY athlete, classification, gender, team
 ORDER BY total DESC;
@@ -240,9 +240,9 @@ WHERE segnum <= 5
 GROUP BY team, classification
 ORDER BY total DESC;
 
-DROP VIEW IF EXISTS doublesTeamScores;
-DROP TABLE IF EXISTS doublesTeamScores;
-CREATE VIEW doublesTeamScores AS
+DROP VIEW IF EXISTS doublesteamscores;
+DROP TABLE IF EXISTS doublesteamscores;
+CREATE VIEW doublesteamscores AS
 SELECT sta.team, sdts.classification, athlete, sdts.total indtotal, sta.total teamtotal
 FROM doublesteamaggregate sta
          INNER JOIN (SELECT team, classification, athlete, SUM(total) AS total
@@ -280,9 +280,9 @@ CREATE TABLE IF NOT EXISTS handicap (
 );
 
 -- top 4 scores
-DROP VIEW IF EXISTS handicapData;
-DROP TABLE IF EXISTS handicapData;
-CREATE VIEW handicapData AS
+DROP VIEW IF EXISTS handicapdata;
+DROP TABLE IF EXISTS handicapdata;
+CREATE VIEW handicapdata AS
 SELECT eventid, event, locationid, location, squadname, team, athlete, gender, classification, round1, round2, round3, round4, total, seqnum
 FROM (
          WITH s AS (
@@ -350,7 +350,7 @@ CREATE VIEW handicapaggregate AS
 SELECT athlete, classification, gender, team, SUM(total) AS total
 FROM (
          SELECT athlete, classification, gender, total, team
-         FROM handicapData
+         FROM handicapdata
      ) a
 GROUP BY athlete, classification, gender, team
 ORDER BY total DESC;
@@ -368,9 +368,9 @@ WHERE segnum <= 5
 GROUP BY team, classification
 ORDER BY total DESC;
 
-DROP VIEW IF EXISTS handicapTeamScores;
-DROP TABLE IF EXISTS handicapTeamScores;
-CREATE VIEW handicapTeamScores AS
+DROP VIEW IF EXISTS handicapteamscores;
+DROP TABLE IF EXISTS handicapteamscores;
+CREATE VIEW handicapteamscores AS
 SELECT sta.team, sdts.classification, athlete, sdts.total indtotal, sta.total teamtotal
 FROM handicapteamaggregate sta
          INNER JOIN (SELECT team, classification, athlete, SUM(total) AS total
@@ -385,32 +385,32 @@ ORDER BY sta.total DESC, sdts.total DESC;
 
 DROP TABLE IF EXISTS skeet;
 CREATE TABLE IF NOT EXISTS skeet (
-                                     CompId MEDIUMINT,
-                                     EventId VARCHAR(6),
-                                     Event VARCHAR(50),
-                                     LocationId MEDIUMINT,
-                                     Location VARCHAR(50),
-                                     EventDate VARCHAR(16),
-                                     SquadName VARCHAR(50),
-                                     Team VARCHAR(50),
-                                     Athlete VARCHAR(50),
-                                     AthleteId MEDIUMINT,
-                                     Classification VARCHAR(50),
-                                     Gender VARCHAR(6),
-                                     Round1 TINYINT,
-                                     Round2 TINYINT DEFAULT 0,
-                                     Round3 TINYINT DEFAULT 0,
-                                     Round4 TINYINT DEFAULT 0,
-                                     Round5 TINYINT DEFAULT 0,
-                                     Round6 TINYINT DEFAULT 0,
-                                     Round7 TINYINT DEFAULT 0,
-                                     Round8 TINYINT DEFAULT 0
+    CompId MEDIUMINT,
+    EventId VARCHAR(6),
+    Event VARCHAR(50),
+    LocationId MEDIUMINT,
+    Location VARCHAR(50),
+    EventDate VARCHAR(16),
+    SquadName VARCHAR(50),
+    Team VARCHAR(50),
+    Athlete VARCHAR(50),
+    AthleteId MEDIUMINT,
+    Classification VARCHAR(50),
+    Gender VARCHAR(6),
+    Round1 TINYINT,
+    Round2 TINYINT DEFAULT 0,
+    Round3 TINYINT DEFAULT 0,
+    Round4 TINYINT DEFAULT 0,
+    Round5 TINYINT DEFAULT 0,
+    Round6 TINYINT DEFAULT 0,
+    Round7 TINYINT DEFAULT 0,
+    Round8 TINYINT DEFAULT 0
 );
 
 -- top 3 scores only
-DROP VIEW IF EXISTS skeetData;
-DROP TABLE IF EXISTS skeetData;
-CREATE VIEW skeetData AS
+DROP VIEW IF EXISTS skeetdata;
+DROP TABLE IF EXISTS skeetdata;
+CREATE VIEW skeetdata AS
 SELECT eventid, event, locationid, location, squadname, team, athlete, gender, classification, round1, round2, round3, round4, total, seqnum
 FROM (
          WITH s AS (
@@ -478,7 +478,7 @@ CREATE VIEW skeetaggregate AS
 SELECT athlete, classification, gender, team, SUM(total) AS total
 FROM (
          SELECT athlete, classification, gender, total, team
-         FROM skeetData
+         FROM skeetdata
      ) a
 GROUP BY athlete, classification, gender, team
 ORDER BY total DESC;
@@ -496,9 +496,9 @@ WHERE segnum <= 3
 GROUP BY team, classification
 ORDER BY total DESC;
 
-DROP VIEW IF EXISTS skeetTeamScores;
-DROP TABLE IF EXISTS skeetTeamScores;
-CREATE VIEW skeetTeamScores AS
+DROP VIEW IF EXISTS skeetteamscores;
+DROP TABLE IF EXISTS skeetteamscores;
+CREATE VIEW skeetteamscores AS
 SELECT sta.team, sdts.classification, athlete, sdts.total indtotal, sta.total teamtotal
 FROM skeetteamaggregate sta
          INNER JOIN (SELECT team, classification, athlete, SUM(total) AS total
@@ -513,32 +513,32 @@ ORDER BY sta.total DESC, sdts.total DESC;
 
 DROP TABLE IF EXISTS clays;
 CREATE TABLE IF NOT EXISTS clays (
-                                     CompId MEDIUMINT,
-                                     EventId VARCHAR(6),
-                                     Event VARCHAR(50),
-                                     LocationId MEDIUMINT,
-                                     Location VARCHAR(50),
-                                     EventDate VARCHAR(16),
-                                     SquadName VARCHAR(50),
-                                     Team VARCHAR(50),
-                                     Athlete VARCHAR(50),
-                                     AthleteId MEDIUMINT,
-                                     Classification VARCHAR(50),
-                                     Gender VARCHAR(6),
-                                     Round1 TINYINT,
-                                     Round2 TINYINT DEFAULT 0,
-                                     Round3 TINYINT DEFAULT 0,
-                                     Round4 TINYINT DEFAULT 0,
-                                     Round5 TINYINT DEFAULT 0,
-                                     Round6 TINYINT DEFAULT 0,
-                                     Round7 TINYINT DEFAULT 0,
-                                     Round8 TINYINT DEFAULT 0
+    CompId MEDIUMINT,
+    EventId VARCHAR(6),
+    Event VARCHAR(50),
+    LocationId MEDIUMINT,
+    Location VARCHAR(50),
+    EventDate VARCHAR(16),
+    SquadName VARCHAR(50),
+    Team VARCHAR(50),
+    Athlete VARCHAR(50),
+    AthleteId MEDIUMINT,
+    Classification VARCHAR(50),
+    Gender VARCHAR(6),
+    Round1 TINYINT,
+    Round2 TINYINT DEFAULT 0,
+    Round3 TINYINT DEFAULT 0,
+    Round4 TINYINT DEFAULT 0,
+    Round5 TINYINT DEFAULT 0,
+    Round6 TINYINT DEFAULT 0,
+    Round7 TINYINT DEFAULT 0,
+    Round8 TINYINT DEFAULT 0
 );
 
 -- top 3 scores only
-DROP VIEW IF EXISTS claysData;
-DROP TABLE IF EXISTS claysData;
-CREATE VIEW claysData AS
+DROP VIEW IF EXISTS claysdata;
+DROP TABLE IF EXISTS claysdata;
+CREATE VIEW claysdata AS
 SELECT eventid, event, locationid, location, squadname, team, athlete, gender, classification, round1, round2, round3, round4, total, seqnum
 FROM (
          WITH s AS (
@@ -603,7 +603,7 @@ CREATE VIEW claysaggregate AS
 SELECT athlete, classification, gender, team, SUM(total) AS total
 FROM (
          SELECT athlete, classification, gender, total, team
-         FROM claysData
+         FROM claysdata
      ) a
 GROUP BY athlete, classification, gender, team
 ORDER BY total DESC;
@@ -622,9 +622,9 @@ WHERE segnum <= 3
 GROUP BY team, classification
 ORDER BY total DESC;
 
-DROP VIEW IF EXISTS claysTeamScores;
-DROP TABLE IF EXISTS claysTeamScores;
-CREATE VIEW claysTeamScores AS
+DROP VIEW IF EXISTS claysteamscores;
+DROP TABLE IF EXISTS claysteamscores;
+CREATE VIEW claysteamscores AS
 SELECT sta.team, sdts.classification, athlete, sdts.total indtotal, sta.total teamtotal
 FROM claysteamaggregate sta
          INNER JOIN (SELECT team, classification, athlete, SUM(total) total
@@ -636,6 +636,7 @@ FROM claysteamaggregate sta
                      WHERE segnum <= 3
                      GROUP BY team, classification, athlete) sdts ON sta.team = sdts.team AND sta.classification = sdts.classification
 ORDER BY sta.total DESC, sdts.total DESC;
+
 DROP TABLE IF EXISTS fivestand;
 CREATE TABLE IF NOT EXISTS fivestand (
     CompId MEDIUMINT,
@@ -729,9 +730,9 @@ WHERE segnum <= 3
 GROUP BY team, classification
 ORDER BY total DESC;
 
-DROP VIEW IF EXISTS fivestandTeamScores;
-DROP TABLE IF EXISTS fivestandTeamScores;
-CREATE VIEW fivestandTeamScores AS
+DROP VIEW IF EXISTS fivestandteamscores;
+DROP TABLE IF EXISTS fivestandteamscores;
+CREATE VIEW fivestandteamscores AS
 SELECT sta.team, sdts.classification, athlete, sdts.total indtotal, sta.total teamtotal
 FROM fivestandteamaggregate sta
          INNER JOIN (SELECT team, classification, athlete, SUM(total) total
@@ -769,9 +770,9 @@ CREATE TABLE IF NOT EXISTS doublesskeet (
 );
 
 -- top 3 scores only
-DROP VIEW IF EXISTS doublesskeetData;
-DROP TABLE IF EXISTS doublesskeetData;
-CREATE VIEW doublesskeetData AS
+DROP VIEW IF EXISTS doublesskeetdata;
+DROP TABLE IF EXISTS doublesskeetdata;
+CREATE VIEW doublesskeetdata AS
 SELECT eventid, event, locationid, location, squadname, team, athlete, gender, classification, round1, round2, round3, round4, total, seqnum
 FROM (
          WITH s AS (
@@ -839,7 +840,7 @@ CREATE VIEW doublesskeetaggregate AS
 SELECT athlete, classification, gender, team, SUM(total) AS total
 FROM (
          SELECT athlete, classification, gender, total, team
-         FROM doublesskeetData
+         FROM doublesskeetdata
      ) a
 GROUP BY athlete, classification, gender, team
 ORDER BY total DESC;
@@ -857,9 +858,9 @@ WHERE segnum <= 3
 GROUP BY team, classification
 ORDER BY total DESC;
 
-DROP VIEW IF EXISTS doublesskeetTeamScores;
-DROP TABLE IF EXISTS doublesskeetTeamScores;
-CREATE VIEW doublesskeetTeamScores AS
+DROP VIEW IF EXISTS doublesskeetteamscores;
+DROP TABLE IF EXISTS doublesskeetteamscores;
+CREATE VIEW doublesskeetteamscores AS
 SELECT sta.team, sdts.classification, athlete, sdts.total indtotal, sta.total teamtotal
 FROM doublesskeetteamaggregate sta
          INNER JOIN (SELECT team, classification, athlete, SUM(total) AS total
@@ -900,25 +901,25 @@ DROP VIEW IF EXISTS allteamscores;
 DROP TABLE IF EXISTS allteamscores;
 CREATE VIEW allteamscores AS
 SELECT *, 'singles' type
-FROM singlesTeamScores
+FROM singlesteamscores
 UNION
 SELECT *, 'doubles'
-FROM doublesTeamScores
+FROM doublesteamscores
 UNION
 SELECT *, 'handicap'
-FROM handicapTeamScores
+FROM handicapteamscores
 UNION
 SELECT *, 'skeet'
-FROM skeetTeamScores
+FROM skeetteamscores
 UNION
 SELECT *, 'clays'
-FROM claysTeamScores
+FROM claysteamscores
 UNION
 SELECT *, 'fivestand'
-FROM fivestandTeamScores
+FROM fivestandteamscores
 UNION
 SELECT *, 'doublesskeet'
-FROM doublesskeetTeamScores;
+FROM doublesskeetteamscores;
 
 DROP VIEW IF EXISTS allindividualscores;
 DROP TABLE IF EXISTS allindividualscores;
