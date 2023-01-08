@@ -1,7 +1,6 @@
 package trap.report;
 
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.io.FileUtils;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.Font;
@@ -18,6 +17,8 @@ import trap.model.AllTeamScores;
 import trap.model.ClaysAggregate;
 import trap.model.ClaysTeamAggregate;
 import trap.model.DoublesAggregate;
+import trap.model.DoublesSkeetAggregate;
+import trap.model.DoublesSkeetTeamAggregate;
 import trap.model.DoublesTeamAggregate;
 import trap.model.FiveStandAggregate;
 import trap.model.FiveStandTeamAggregate;
@@ -34,9 +35,8 @@ import trap.repository.ClaysDataRepository;
 import trap.repository.ClaysDataTeamRepository;
 import trap.repository.DoublesDataRepository;
 import trap.repository.DoublesDataTeamRepository;
-import trap.repository.FiveStandAllDataRepository;
-import trap.repository.FiveStandAllIndividualScoresRepository;
-import trap.repository.FiveStandAllTeamScoresRepository;
+import trap.repository.DoublesSkeetDataRepository;
+import trap.repository.DoublesSkeetDataTeamRepository;
 import trap.repository.FiveStandDataRepository;
 import trap.repository.FiveStandDataTeamRepository;
 import trap.repository.HandicapDataRepository;
@@ -65,6 +65,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import static org.apache.commons.io.FileUtils.copyURLToFile;
+
 @RequiredArgsConstructor
 @Service
 public class ReportHelper {
@@ -84,11 +86,10 @@ public class ReportHelper {
     private final AllIndividualScoresRepository allIndividualScoresRepository;
     private final FiveStandDataRepository fiveStandDataRepository;
     private final FiveStandDataTeamRepository fiveStandDataTeamRepository;
-    private final FiveStandAllDataRepository fiveStandAllDataRepository;
-    private final FiveStandAllTeamScoresRepository fiveStandAllTeamScoresRepository;
-    private final FiveStandAllIndividualScoresRepository fiveStandAllIndividualScoresRepository;
+    private final DoublesSkeetDataRepository doublesSkeetDataRepository;
+    private final DoublesSkeetDataTeamRepository doublesSkeetDataTeamRepository;
     private final String currentDate = new SimpleDateFormat("MM/dd/yyyy").format(Calendar.getInstance().getTime());
-    private final String[] trapTypes = new String[]{"singles", "doubles", "handicap", "skeet", "clays", "fivestand"};
+    private final String[] trapTypes = new String[]{"singles", "doubles", "handicap", "skeet", "clays", "fivestand", "doublesskeet"};
 
     public void doItAll() throws Exception {
         downloadFiles();
@@ -143,11 +144,12 @@ public class ReportHelper {
         fileUrls.put("skeet", "https://metabase.sssfonline.com/public/question/c697d744-0e06-4c3f-a640-fea02f9c9ecd.csv");
         fileUrls.put("clays", "https://metabase.sssfonline.com/public/question/2c6edb1a-a7ee-43c2-8180-ad199a57be55.csv");
         fileUrls.put("fivestand", "https://metabase.sssfonline.com/public/question/3c5aecf2-a9f2-49b2-a11f-36965cb1a964.csv");
+        fileUrls.put("doublesskeet", "https://metabase.sssfonline.com/public/question/bdd61066-6e29-4242-b6e9-adf286c2c4ae.csv");
 
         Charset charset = StandardCharsets.UTF_8;
         for (String type : trapTypes) {
             System.out.println("Downloading " + type + " file");
-            FileUtils.copyURLToFile(new URL(fileUrls.get(type)), new File(type + ".csv"), 60000, 60000);
+            copyURLToFile(new URL(fileUrls.get(type)), new File(type + ".csv"), 60000, 60000);
             System.out.println("Finished downloading " + type + " file");
 
             System.out.println("Replacing double spaces for " + type + " file");
@@ -187,7 +189,11 @@ public class ReportHelper {
         int fivestandCount = jdbc.update(con -> con.prepareStatement(fivestandSql));
         System.out.println("Added " + fivestandCount + " new records to database in fivestand table.");
 
-        int rowsAdded = singlesCount + doublesCount + handicapCount + skeetCount + claysCount + fivestandCount;
+        String doublesSkeetSql = "load data local infile 'doublesskeet.csv' into table doublesskeet fields terminated by ',' OPTIONALLY ENCLOSED BY '\"' lines terminated by '\n' IGNORE 1 LINES;";
+        int doublesSkeetCount = jdbc.update(con -> con.prepareStatement(doublesSkeetSql));
+        System.out.println("Added " + doublesSkeetCount + " new records to database in doublesSkeet table.");
+
+        int rowsAdded = singlesCount + doublesCount + handicapCount + skeetCount + claysCount + fivestandCount + doublesSkeetCount;
         System.out.println("Added " + rowsAdded + " total records to database");
         List<AllData> allData = allDataRepository.findAll();
         System.out.println("Found " + allData.size() + " total records in database");
@@ -206,6 +212,7 @@ public class ReportHelper {
         jdbc.execute("UPDATE skeet SET team = replace(team, 'Club', 'Team') WHERE team LIKE '%Club%';");
         jdbc.execute("UPDATE clays SET team = replace(team, 'Club', 'Team') WHERE team LIKE '%Club%';");
         jdbc.execute("UPDATE fivestand SET team = replace(team, 'Club', 'Team') WHERE team LIKE '%Club%';");
+        jdbc.execute("UPDATE doublesskeet SET team = replace(team, 'Club', 'Team') WHERE team LIKE '%Club%';");
         System.out.println("Team names fixed in " + (System.currentTimeMillis() - start) + "ms");
     }
 
@@ -379,6 +386,16 @@ public class ReportHelper {
                 row = sheet.getRow(++updateRow);
                 addTeamData(row, startColumn, fiveStandTeamRowData.getTeam(), fiveStandTeamRowData.getTotal(), mainTextStyle);
             }
+            startColumn += 3;
+
+            updateRow = rows;
+            start = System.currentTimeMillis();
+            List<DoublesSkeetTeamAggregate> doublesSkeetTeamData = doublesSkeetDataTeamRepository.getAllByClassificationOrderByTotalDesc(teamType);
+            System.out.println("Ran query for doublesskeet by " + teamType + " " + (System.currentTimeMillis() - start) + "ms");
+            for (DoublesSkeetTeamAggregate doublesSkeetTeamRowData : doublesSkeetTeamData) {
+                row = sheet.getRow(++updateRow);
+                addTeamData(row, startColumn, doublesSkeetTeamRowData.getTeam(), doublesSkeetTeamRowData.getTotal(), mainTextStyle);
+            }
         }
     }
 
@@ -493,8 +510,20 @@ public class ReportHelper {
                 addPlayerData(row, column, fiveStandRowData.getAthlete(), fiveStandRowData.getTotal(), fiveStandRowData.getTeam(), mainTextStyle);
             }
             maxRow = Math.max(maxRow, updateRow);
+            column += 4;
 
-            sheet.setAutoFilter(CellRangeAddress.valueOf("A13:T13"));
+            updateRow = classificationStartRow;
+            updateRow++;
+            start = System.currentTimeMillis();
+            List<DoublesSkeetAggregate> doubleSkeetIndividualData = doublesSkeetDataRepository.getAllByGenderAndClassification(gender, classification);
+            System.out.println("Ran query for doubleskeet by " + gender + " and " + classification + " " + (System.currentTimeMillis() - start) + "ms");
+            for (DoublesSkeetAggregate doublesSkeetRowData: doubleSkeetIndividualData) {
+                row = sheet.getRow(++updateRow);
+                addPlayerData(row, column, doublesSkeetRowData.getAthlete(), doublesSkeetRowData.getTotal(), doublesSkeetRowData.getTeam(), mainTextStyle);
+            }
+            maxRow = Math.max(maxRow, updateRow);
+
+            sheet.setAutoFilter(CellRangeAddress.valueOf("A13:AB13"));
         }
         System.out.println(sheetName + " data populated in " + (System.currentTimeMillis() - initialStart) + "ms");
     }

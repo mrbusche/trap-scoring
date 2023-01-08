@@ -1,6 +1,3 @@
-mariaDB4j:
-  dataDir: ./data/local
-  port: 3307
 app:
   mariaDB4j:
     databaseName: ${random.uuid}
