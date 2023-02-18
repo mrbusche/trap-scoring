@@ -2,7 +2,7 @@ plugins {
     id("org.springframework.boot") version "2.4.13"
     id("io.spring.dependency-management") version "1.1.0"
     id("java")
-    id("org.sonarqube") version "3.5.0.2730"
+    id("org.sonarqube") version "4.0.0.2929"
 }
 
 group = "com.trap-scoring"
