@@ -46,8 +46,10 @@ import trap.repository.SinglesDataTeamRepository;
 import trap.repository.SkeetDataRepository;
 import trap.repository.SkeetDataTeamRepository;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -57,6 +59,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
@@ -64,12 +67,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Scanner;
 
 import static org.apache.commons.io.FileUtils.copyURLToFile;
 
 @RequiredArgsConstructor
 @Service
 public class ReportHelper {
+    private static final String COMMA_DELIMITER = ",";
     private final JdbcTemplate jdbc;
     private final SinglesDataRepository singlesRepository;
     private final SinglesDataTeamRepository singlesDataTeamRepository;
@@ -92,7 +97,7 @@ public class ReportHelper {
     private final String[] trapTypes = new String[]{"singles", "doubles", "handicap", "skeet", "clays", "fivestand", "doublesskeet"};
 
     public void doItAll() throws Exception {
-        downloadFiles();
+//        downloadFiles();
         addFilesToDatabase();
         fixTeamNames();
 
@@ -115,17 +120,17 @@ public class ReportHelper {
 
         populateCleanData(workbook.getSheet("Clean Data"));
 
-        for (Map.Entry<String, String> entry : types.entrySet()) {
-            start = System.currentTimeMillis();
-            populateTeamData(workbook.getSheet(entry.getKey()), entry.getValue(), mainTextStyle);
-            System.out.println("" + entry.getKey() + " data populated in " + (System.currentTimeMillis() - start) + "ms");
-        }
-
-        populateIndividualData(workbook, "Individual-Men", "M", style, mainTextStyle);
-        populateIndividualData(workbook, "Individual-Ladies", "F", style, mainTextStyle);
-
-        populateTeamIndividualData(workbook, "Team-Individual-Scores");
-        populateAllIndividualData(workbook, "Individual-All-Scores");
+//        for (Map.Entry<String, String> entry : types.entrySet()) {
+//            start = System.currentTimeMillis();
+//            populateTeamData(workbook.getSheet(entry.getKey()), entry.getValue(), mainTextStyle);
+//            System.out.println("" + entry.getKey() + " data populated in " + (System.currentTimeMillis() - start) + "ms");
+//        }
+//
+//        populateIndividualData(workbook, "Individual-Men", "M", style, mainTextStyle);
+//        populateIndividualData(workbook, "Individual-Ladies", "F", style, mainTextStyle);
+//
+//        populateTeamIndividualData(workbook, "Team-Individual-Scores");
+//        populateAllIndividualData(workbook, "Individual-All-Scores");
 
         createFile(workbook, "league-data");
 
@@ -204,6 +209,7 @@ public class ReportHelper {
 
         System.out.println("Database loaded in " + (System.currentTimeMillis() - start) + "ms");
     }
+
     private void fixTeamNames() {
         long start = System.currentTimeMillis();
         jdbc.execute("UPDATE singles SET team = replace(team, 'Club', 'Team') WHERE team LIKE '%Club%';");
@@ -221,55 +227,89 @@ public class ReportHelper {
         return WorkbookFactory.create(Objects.requireNonNull(in));
     }
 
+    private List<String> getRecordFromLine(String line, String type) {
+        List<String> values = new ArrayList<String>();
+        try (Scanner rowScanner = new Scanner(line)) {
+            rowScanner.useDelimiter(COMMA_DELIMITER);
+            while (rowScanner.hasNext()) {
+                values.add(rowScanner.next() );
+            }
+            while (values.size() < 20) {
+                values.add("0");
+            }
+            values.add(type);
+        }
+        return values;
+    }
+
     private void populateCleanData(Sheet sheet) {
         long start = System.currentTimeMillis();
-        List<AllData> allData = allDataRepository.findAll();
-        System.out.println("Ran get all data for clean data population " + (System.currentTimeMillis() - start) + "ms");
+        List<List<String>> records = new ArrayList<>();
+
+        for (String type : trapTypes) {
+            try (BufferedReader br = new BufferedReader(new FileReader(type + ".csv"))) {
+                try (Scanner scanner = new Scanner(new File(type + ".csv"));) {
+                    scanner.nextLine();
+                    while (scanner.hasNextLine()) {
+                        records.add(getRecordFromLine(scanner.nextLine(), type));
+                    }
+                }
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+//        List<AllData> allData = allDataRepository.findAll();
+//        System.out.println("Ran get all data for clean data population " + (System.currentTimeMillis() - start) + "ms");
 
         int rows = sheet.getLastRowNum();
 
         Cell cell;
         Row row;
-        for (AllData rowData : allData) {
+
+        for (List<String> record : records) {
             row = sheet.createRow(++rows);
-            cell = row.createCell(0);
-            cell.setCellValue(rowData.getEventid());
-            cell = row.createCell(1);
-            cell.setCellValue(rowData.getEvent());
-            cell = row.createCell(2);
-            cell.setCellValue(rowData.getLocationid());
-            cell = row.createCell(3);
-            cell.setCellValue(rowData.getLocation());
-            cell = row.createCell(4);
-            cell.setCellValue(rowData.getEventdate());
-            cell = row.createCell(5);
-            cell.setCellValue(rowData.getSquadname());
-            cell = row.createCell(6);
-            cell.setCellValue(rowData.getTeam());
-            cell = row.createCell(7);
-            cell.setCellValue(rowData.getAthlete());
-            cell = row.createCell(8);
-            cell.setCellValue(rowData.getClassification());
-            cell = row.createCell(9);
-            cell.setCellValue(rowData.getGender());
-            cell = row.createCell(10);
-            cell.setCellValue(rowData.getRound1());
-            cell = row.createCell(11);
-            cell.setCellValue(rowData.getRound2());
-            cell = row.createCell(12);
-            cell.setCellValue(rowData.getRound3());
-            cell = row.createCell(13);
-            cell.setCellValue(rowData.getRound4());
-            cell = row.createCell(14);
-            cell.setCellValue(rowData.getRound5());
-            cell = row.createCell(15);
-            cell.setCellValue(rowData.getRound6());
-            cell = row.createCell(16);
-            cell.setCellValue(rowData.getRound7());
-            cell = row.createCell(17);
-            cell.setCellValue(rowData.getRound8());
-            cell = row.createCell(18);
-            cell.setCellValue(rowData.getType());
+            try {
+                cell = row.createCell(0);
+                cell.setCellValue(Integer.parseInt(record.get(1)));
+                cell = row.createCell(1);
+                cell.setCellValue(record.get(2));
+                cell = row.createCell(2);
+                cell.setCellValue(record.get(3));
+                cell = row.createCell(3);
+                cell.setCellValue(record.get(4));
+                cell = row.createCell(4);
+                cell.setCellValue(record.get(5));
+                cell = row.createCell(5);
+                cell.setCellValue(record.get(6));
+                cell = row.createCell(6);
+                cell.setCellValue(record.get(7));
+                cell = row.createCell(7);
+                cell.setCellValue(record.get(8));
+                cell = row.createCell(8);
+                cell.setCellValue(record.get(10));
+                cell = row.createCell(9);
+                cell.setCellValue(record.get(11));
+                cell = row.createCell(10);
+                cell.setCellValue("".equals(record.get(12)) ? 0 : Integer.parseInt(record.get(12)));
+                cell = row.createCell(11);
+                cell.setCellValue("".equals(record.get(13)) ? 0 : Integer.parseInt(record.get(13)));
+                cell = row.createCell(12);
+                cell.setCellValue("".equals(record.get(14)) ? 0 : Integer.parseInt(record.get(14)));
+                cell = row.createCell(13);
+                cell.setCellValue("".equals(record.get(15)) ? 0 : Integer.parseInt(record.get(15)));
+                cell = row.createCell(14);
+                cell.setCellValue("".equals(record.get(16)) ? 0 : Integer.parseInt(record.get(16)));
+                cell = row.createCell(15);
+                cell.setCellValue("".equals(record.get(17)) ? 0 : Integer.parseInt(record.get(17)));
+                cell = row.createCell(16);
+                cell.setCellValue("".equals(record.get(18)) ? 0 : Integer.parseInt(record.get(18)));
+                cell = row.createCell(17);
+                cell.setCellValue("".equals(record.get(19)) ? 0 : Integer.parseInt(record.get(19)));
+                cell = row.createCell(18);
+                cell.setCellValue(record.get(20));
+            } catch (Exception e) {
+                System.out.println(row.toString());
+            }
         }
         sheet.setAutoFilter(CellRangeAddress.valueOf("A1:S1"));
         System.out.println("Clean data populated in " + (System.currentTimeMillis() - start) + "ms");
@@ -505,7 +545,7 @@ public class ReportHelper {
             start = System.currentTimeMillis();
             List<FiveStandAggregate> fiveStandIndividualData = fiveStandDataRepository.getAllByGenderAndClassification(gender, classification);
             System.out.println("Ran query for fivestand by " + gender + " and " + classification + " " + (System.currentTimeMillis() - start) + "ms");
-            for (FiveStandAggregate fiveStandRowData: fiveStandIndividualData) {
+            for (FiveStandAggregate fiveStandRowData : fiveStandIndividualData) {
                 row = sheet.getRow(++updateRow);
                 addPlayerData(row, column, fiveStandRowData.getAthlete(), fiveStandRowData.getTotal(), fiveStandRowData.getTeam(), mainTextStyle);
             }
@@ -517,7 +557,7 @@ public class ReportHelper {
             start = System.currentTimeMillis();
             List<DoublesSkeetAggregate> doubleSkeetIndividualData = doublesSkeetDataRepository.getAllByGenderAndClassification(gender, classification);
             System.out.println("Ran query for doubleskeet by " + gender + " and " + classification + " " + (System.currentTimeMillis() - start) + "ms");
-            for (DoublesSkeetAggregate doublesSkeetRowData: doubleSkeetIndividualData) {
+            for (DoublesSkeetAggregate doublesSkeetRowData : doubleSkeetIndividualData) {
                 row = sheet.getRow(++updateRow);
                 addPlayerData(row, column, doublesSkeetRowData.getAthlete(), doublesSkeetRowData.getTotal(), doublesSkeetRowData.getTeam(), mainTextStyle);
             }
