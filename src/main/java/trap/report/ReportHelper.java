@@ -63,6 +63,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import static org.apache.commons.io.FileUtils.copyURLToFile;
 
@@ -114,7 +115,8 @@ public class ReportHelper {
             CellStyle mainTextStyle = getCellStyle(workbook);
             CellStyle style = setFontForHeaders(workbook);
 
-            populateCleanData(workbook.getSheet("Clean Data"));
+            List<RoundScore> allRoundScores = generateRoundScores();
+            populateCleanData(workbook.getSheet("Clean Data"), allRoundScores);
 
 //        for (Map.Entry<String, String> entry : types.entrySet()) {
 //            start = System.currentTimeMillis();
@@ -164,6 +166,30 @@ public class ReportHelper {
             System.out.println("Finished replacing double spaces for " + type + " file");
         }
         System.out.println("Files downloaded in " + (System.currentTimeMillis() - start) + " ms");
+    }
+
+    private List<RoundScore> generateRoundScores() {
+        List<RoundScore> allRoundScores;
+        try {
+            List<RoundScore> singles = generateRoundScores("singles");
+            List<RoundScore> doubles = generateRoundScores("doubles");
+            List<RoundScore> handicap = generateRoundScores("handicap");
+            List<RoundScore> skeet = generateRoundScores("skeet");
+            List<RoundScore> clays = generateRoundScores("clays");
+            List<RoundScore> fivestand = generateRoundScores("fivestand");
+            List<RoundScore> doublesskeet = generateRoundScores("doublesskeet");
+
+            allRoundScores = new ArrayList<>(singles);
+            allRoundScores.addAll(doubles);
+            allRoundScores.addAll(handicap);
+            allRoundScores.addAll(skeet);
+            allRoundScores.addAll(clays);
+            allRoundScores.addAll(fivestand);
+            allRoundScores.addAll(doublesskeet);
+            return allRoundScores;
+        } catch (IOException | CsvException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private void addFilesToDatabase() throws Exception {
@@ -237,63 +263,20 @@ public class ReportHelper {
         return roundScoresList;
     }
 
-    private void populateCleanData(Sheet sheet) {
+    private void populateCleanData(Sheet sheet, List<RoundScore> allRoundScores) {
         long start = System.currentTimeMillis();
-        List<RoundScore> singles;
-        List<RoundScore> doubles;
-        List<RoundScore> handicap;
-        List<RoundScore> skeet;
-        List<RoundScore> clays;
-        List<RoundScore> fivestand;
-        List<RoundScore> doublesskeet;
-        try {
-            singles = generateRoundScores("singles");
-            doubles = generateRoundScores("doubles");
-            handicap = generateRoundScores("handicap");
-            skeet = generateRoundScores("skeet");
-            clays = generateRoundScores("clays");
-            fivestand = generateRoundScores("fivestand");
-            doublesskeet = generateRoundScores("doublesskeet");
-        } catch (IOException | CsvException e) {
-            throw new RuntimeException(e);
-        }
 
         System.out.println("Ran get all data for clean data population " + (System.currentTimeMillis() - start) + "ms");
 
         int rows = sheet.getLastRowNum();
         Row row;
 
-        for (RoundScore record : singles) {
-            row = sheet.createRow(++rows);
-            addCleanData(row, record, "singles");
-        }
-        for (RoundScore record : doubles) {
-            row = sheet.createRow(++rows);
-            addCleanData(row, record, "doubles");
-        }
-        for (RoundScore record : handicap) {
-            row = sheet.createRow(++rows);
-            addCleanData(row, record, "handicap");
-        }
-        for (RoundScore record : skeet) {
-            row = sheet.createRow(++rows);
-            addCleanData(row, record, "skeet");
-        }
-        for (RoundScore record : singles) {
-            row = sheet.createRow(++rows);
-            addCleanData(row, record, "singles");
-        }
-        for (RoundScore record : clays) {
-            row = sheet.createRow(++rows);
-            addCleanData(row, record, "clays");
-        }
-        for (RoundScore record : fivestand) {
-            row = sheet.createRow(++rows);
-            addCleanData(row, record, "fivestand");
-        }
-        for (RoundScore record : doublesskeet) {
-            row = sheet.createRow(++rows);
-            addCleanData(row, record, "doublesskeet");
+        for (String type : trapTypes) {
+            List<RoundScore> typeRoundScores = allRoundScores.stream().filter(t -> t.getType().equals(type)).toList();
+            for (RoundScore record : typeRoundScores) {
+                row = sheet.createRow(++rows);
+                addCleanData(row, record, type);
+            }
         }
 
         sheet.setAutoFilter(CellRangeAddress.valueOf("A1:S1"));
