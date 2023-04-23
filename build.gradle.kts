@@ -30,12 +30,12 @@ dependencies {
 
     implementation("org.apache.poi:poi-ooxml:5.2.3")
     implementation("ch.vorburger.mariaDB4j:mariaDB4j:2.5.3")
+
+    implementation("com.opencsv:opencsv:5.7.1")
+
+    testCompileOnly("org.junit.jupiter:junit-jupiter-api")
 }
 
-sonarqube {
-  properties {
-    property("sonar.projectKey", "mrbusche_trap-scoring")
-    property("sonar.organization", "mrbusche")
-    property("sonar.host.url", "https://sonarcloud.io")
-  }
+tasks.test {
+    useJUnitPlatform()
 }

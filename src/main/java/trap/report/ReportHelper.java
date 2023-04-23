@@ -1,5 +1,7 @@
 package trap.report;
 
+import com.opencsv.CSVReader;
+import com.opencsv.exceptions.CsvException;
 import lombok.RequiredArgsConstructor;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
@@ -15,19 +17,14 @@ import trap.model.AllData;
 import trap.model.AllIndividualScores;
 import trap.model.AllTeamScores;
 import trap.model.ClaysAggregate;
-import trap.model.ClaysTeamAggregate;
 import trap.model.DoublesAggregate;
 import trap.model.DoublesSkeetAggregate;
-import trap.model.DoublesSkeetTeamAggregate;
-import trap.model.DoublesTeamAggregate;
 import trap.model.FiveStandAggregate;
-import trap.model.FiveStandTeamAggregate;
 import trap.model.HandicapAggregate;
-import trap.model.HandicapTeamAggregate;
+import trap.model.RoundScore;
 import trap.model.SinglesAggregate;
 import trap.model.SinglesTeamAggregate;
 import trap.model.SkeetAggregate;
-import trap.model.SkeetTeamAggregate;
 import trap.repository.AllDataRepository;
 import trap.repository.AllIndividualScoresRepository;
 import trap.repository.AllTeamScoresRepository;
@@ -46,7 +43,6 @@ import trap.repository.SinglesDataTeamRepository;
 import trap.repository.SkeetDataRepository;
 import trap.repository.SkeetDataTeamRepository;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileReader;
@@ -67,7 +63,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Scanner;
 
 import static org.apache.commons.io.FileUtils.copyURLToFile;
 
@@ -98,44 +93,48 @@ public class ReportHelper {
 
     public void doItAll() throws Exception {
 //        downloadFiles();
-        addFilesToDatabase();
-        fixTeamNames();
+//        addFilesToDatabase();
+//        fixTeamNames();
 
         Workbook workbook = getWorkbook("main");
 
-        System.out.println("Starting file creation");
-        System.out.println("Workbook has " + workbook.getNumberOfSheets() + " sheets");
-        workbook.forEach(sheet -> System.out.println("- " + sheet.getSheetName()));
+        try {
+            System.out.println("Starting file creation");
+            System.out.println("Workbook has " + workbook.getNumberOfSheets() + " sheets");
+            workbook.forEach(sheet -> System.out.println("- " + sheet.getSheetName()));
 
-        long start;
-        long trueStart = System.currentTimeMillis();
+            long start;
+            long trueStart = System.currentTimeMillis();
 
-        Map<String, String> types = new HashMap<>();
-        types.put("Team-Senior", "Varsity");
-        types.put("Team-Intermediate", "Intermediate Entry");
-        types.put("Team-Rookie", "Rookie");
+            Map<String, String> types = new HashMap<>();
+            types.put("Team-Senior", "Varsity");
+            types.put("Team-Intermediate", "Intermediate Entry");
+            types.put("Team-Rookie", "Rookie");
 
-        CellStyle mainTextStyle = getCellStyle(workbook);
-        CellStyle style = setFontForHeaders(workbook);
+            CellStyle mainTextStyle = getCellStyle(workbook);
+            CellStyle style = setFontForHeaders(workbook);
 
-        populateCleanData(workbook.getSheet("Clean Data"));
+            populateCleanData(workbook.getSheet("Clean Data"));
 
 //        for (Map.Entry<String, String> entry : types.entrySet()) {
 //            start = System.currentTimeMillis();
 //            populateTeamData(workbook.getSheet(entry.getKey()), entry.getValue(), mainTextStyle);
 //            System.out.println("" + entry.getKey() + " data populated in " + (System.currentTimeMillis() - start) + "ms");
 //        }
-//
-//        populateIndividualData(workbook, "Individual-Men", "M", style, mainTextStyle);
+
+            populateIndividualData(workbook, "Individual-Men", "M", style, mainTextStyle);
 //        populateIndividualData(workbook, "Individual-Ladies", "F", style, mainTextStyle);
 //
 //        populateTeamIndividualData(workbook, "Team-Individual-Scores");
 //        populateAllIndividualData(workbook, "Individual-All-Scores");
 
-        createFile(workbook, "league-data");
+            createFile(workbook, "league-data");
 
-        System.out.println("Finished creating file in " + (System.currentTimeMillis() - trueStart) + "ms");
-        workbook.close();
+            System.out.println("Finished creating file in " + (System.currentTimeMillis() - trueStart) + "ms");
+            workbook.close();
+        } catch (Exception e) {
+            workbook.close();
+        }
     }
 
     private void downloadFiles() throws IOException {
@@ -227,92 +226,124 @@ public class ReportHelper {
         return WorkbookFactory.create(Objects.requireNonNull(in));
     }
 
-    private List<String> getRecordFromLine(String line, String type) {
-        List<String> values = new ArrayList<String>();
-        try (Scanner rowScanner = new Scanner(line)) {
-            rowScanner.useDelimiter(COMMA_DELIMITER);
-            while (rowScanner.hasNext()) {
-                values.add(rowScanner.next() );
-            }
-            while (values.size() < 20) {
-                values.add("0");
-            }
-            values.add(type);
-        }
-        return values;
+    private List<RoundScore> generateRoundScores(String type) throws IOException, CsvException {
+        CSVReader reader = new CSVReader(new FileReader(type + ".csv"));
+        List<String[]> roundScores = reader.readAll();
+        roundScores.remove(0);
+        List<RoundScore> roundScoresList = new ArrayList<>();
+        roundScores.forEach((s) -> {
+            roundScoresList.add(new RoundScore(Integer.parseInt(s[1]), s[2], Integer.parseInt(s[3]), s[4], s[5], s[6], s[7].replace("Club", "Team"), s[8], s[10], s[11], "".equals(s[12]) ? 0 : Integer.parseInt(s[12]), "".equals(s[13]) ? 0 : Integer.parseInt(s[13]), "".equals(s[14]) ? 0 : Integer.parseInt(s[14]), "".equals(s[15]) ? 0 : Integer.parseInt(s[15]), "".equals(s[16]) ? 0 : Integer.parseInt(s[16]), "".equals(s[17]) ? 0 : Integer.parseInt(s[17]), "".equals(s[18]) ? 0 : Integer.parseInt(s[18]), "".equals(s[19]) ? 0 : Integer.parseInt(s[19]), type));
+        });
+        return roundScoresList;
     }
 
     private void populateCleanData(Sheet sheet) {
         long start = System.currentTimeMillis();
-        List<List<String>> records = new ArrayList<>();
-
-        for (String type : trapTypes) {
-            try (BufferedReader br = new BufferedReader(new FileReader(type + ".csv"))) {
-                try (Scanner scanner = new Scanner(new File(type + ".csv"));) {
-                    scanner.nextLine();
-                    while (scanner.hasNextLine()) {
-                        records.add(getRecordFromLine(scanner.nextLine(), type));
-                    }
-                }
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
+        List<RoundScore> singles;
+        List<RoundScore> doubles;
+        List<RoundScore> handicap;
+        List<RoundScore> skeet;
+        List<RoundScore> clays;
+        List<RoundScore> fivestand;
+        List<RoundScore> doublesskeet;
+        try {
+            singles = generateRoundScores("singles");
+            doubles = generateRoundScores("doubles");
+            handicap = generateRoundScores("handicap");
+            skeet = generateRoundScores("skeet");
+            clays = generateRoundScores("clays");
+            fivestand = generateRoundScores("fivestand");
+            doublesskeet = generateRoundScores("doublesskeet");
+        } catch (IOException | CsvException e) {
+            throw new RuntimeException(e);
         }
-//        List<AllData> allData = allDataRepository.findAll();
-//        System.out.println("Ran get all data for clean data population " + (System.currentTimeMillis() - start) + "ms");
+
+        System.out.println("Ran get all data for clean data population " + (System.currentTimeMillis() - start) + "ms");
 
         int rows = sheet.getLastRowNum();
-
-        Cell cell;
         Row row;
 
-        for (List<String> record : records) {
+        for (RoundScore record : singles) {
             row = sheet.createRow(++rows);
-            try {
-                cell = row.createCell(0);
-                cell.setCellValue(Integer.parseInt(record.get(1)));
-                cell = row.createCell(1);
-                cell.setCellValue(record.get(2));
-                cell = row.createCell(2);
-                cell.setCellValue(record.get(3));
-                cell = row.createCell(3);
-                cell.setCellValue(record.get(4));
-                cell = row.createCell(4);
-                cell.setCellValue(record.get(5));
-                cell = row.createCell(5);
-                cell.setCellValue(record.get(6));
-                cell = row.createCell(6);
-                cell.setCellValue(record.get(7));
-                cell = row.createCell(7);
-                cell.setCellValue(record.get(8));
-                cell = row.createCell(8);
-                cell.setCellValue(record.get(10));
-                cell = row.createCell(9);
-                cell.setCellValue(record.get(11));
-                cell = row.createCell(10);
-                cell.setCellValue("".equals(record.get(12)) ? 0 : Integer.parseInt(record.get(12)));
-                cell = row.createCell(11);
-                cell.setCellValue("".equals(record.get(13)) ? 0 : Integer.parseInt(record.get(13)));
-                cell = row.createCell(12);
-                cell.setCellValue("".equals(record.get(14)) ? 0 : Integer.parseInt(record.get(14)));
-                cell = row.createCell(13);
-                cell.setCellValue("".equals(record.get(15)) ? 0 : Integer.parseInt(record.get(15)));
-                cell = row.createCell(14);
-                cell.setCellValue("".equals(record.get(16)) ? 0 : Integer.parseInt(record.get(16)));
-                cell = row.createCell(15);
-                cell.setCellValue("".equals(record.get(17)) ? 0 : Integer.parseInt(record.get(17)));
-                cell = row.createCell(16);
-                cell.setCellValue("".equals(record.get(18)) ? 0 : Integer.parseInt(record.get(18)));
-                cell = row.createCell(17);
-                cell.setCellValue("".equals(record.get(19)) ? 0 : Integer.parseInt(record.get(19)));
-                cell = row.createCell(18);
-                cell.setCellValue(record.get(20));
-            } catch (Exception e) {
-                System.out.println(row.toString());
-            }
+            addCleanData(row, record, "singles");
         }
+        for (RoundScore record : doubles) {
+            row = sheet.createRow(++rows);
+            addCleanData(row, record, "doubles");
+        }
+        for (RoundScore record : handicap) {
+            row = sheet.createRow(++rows);
+            addCleanData(row, record, "handicap");
+        }
+        for (RoundScore record : skeet) {
+            row = sheet.createRow(++rows);
+            addCleanData(row, record, "skeet");
+        }
+        for (RoundScore record : singles) {
+            row = sheet.createRow(++rows);
+            addCleanData(row, record, "singles");
+        }
+        for (RoundScore record : clays) {
+            row = sheet.createRow(++rows);
+            addCleanData(row, record, "clays");
+        }
+        for (RoundScore record : fivestand) {
+            row = sheet.createRow(++rows);
+            addCleanData(row, record, "fivestand");
+        }
+        for (RoundScore record : doublesskeet) {
+            row = sheet.createRow(++rows);
+            addCleanData(row, record, "doublesskeet");
+        }
+
         sheet.setAutoFilter(CellRangeAddress.valueOf("A1:S1"));
         System.out.println("Clean data populated in " + (System.currentTimeMillis() - start) + "ms");
+    }
+
+    private void addCleanData(Row row, RoundScore record, String type) {
+        Cell cell;
+        try {
+            cell = row.createCell(0);
+            cell.setCellValue(record.getEventId());
+            cell = row.createCell(1);
+            cell.setCellValue(record.getEvent());
+            cell = row.createCell(2);
+            cell.setCellValue(record.getLocationId());
+            cell = row.createCell(3);
+            cell.setCellValue(record.getLocation());
+            cell = row.createCell(4);
+            cell.setCellValue(record.getEventDate());
+            cell = row.createCell(5);
+            cell.setCellValue(record.getSquadName());
+            cell = row.createCell(6);
+            cell.setCellValue(record.getTeam());
+            cell = row.createCell(7);
+            cell.setCellValue(record.getAthlete());
+            cell = row.createCell(8);
+            cell.setCellValue(record.getClassification());
+            cell = row.createCell(9);
+            cell.setCellValue(record.getGender());
+            cell = row.createCell(10);
+            cell.setCellValue(record.getRound1());
+            cell = row.createCell(11);
+            cell.setCellValue(record.getRound2());
+            cell = row.createCell(12);
+            cell.setCellValue(record.getRound3());
+            cell = row.createCell(13);
+            cell.setCellValue(record.getRound4());
+            cell = row.createCell(14);
+            cell.setCellValue(record.getRound5());
+            cell = row.createCell(15);
+            cell.setCellValue(record.getRound6());
+            cell = row.createCell(16);
+            cell.setCellValue(record.getRound7());
+            cell = row.createCell(17);
+            cell.setCellValue(record.getRound8());
+            cell = row.createCell(18);
+            cell.setCellValue(record.getType());
+        } catch (Exception e) {
+            System.out.println(row.toString());
+        }
     }
 
     private CellStyle setFontForHeaders(Workbook workbook) {
@@ -375,68 +406,68 @@ public class ReportHelper {
             addTeamData(row, startColumn, singlesTeamRowData.getTeam(), singlesTeamRowData.getTotal(), mainTextStyle);
         }
 
-        if (!"Rookie".equals(teamType)) {
-            startColumn += 3;
-
-            updateRow = rows;
-            start = System.currentTimeMillis();
-            List<HandicapTeamAggregate> handicapTeamData = handicapDataTeamRepository.getAllByClassificationOrderByTotalDesc(teamType);
-            System.out.println("Ran query for handicap by " + teamType + " " + (System.currentTimeMillis() - start) + "ms");
-            for (HandicapTeamAggregate handicapTeamRowData : handicapTeamData) {
-                row = sheet.getRow(++updateRow);
-                addTeamData(row, startColumn, handicapTeamRowData.getTeam(), handicapTeamRowData.getTotal(), mainTextStyle);
-            }
-            startColumn += 3;
-
-            updateRow = rows;
-            start = System.currentTimeMillis();
-            List<DoublesTeamAggregate> doublesTeamData = doublesDataTeamRepository.getAllByClassificationOrderByTotalDesc(teamType);
-            System.out.println("Ran query for doubles by " + teamType + " " + (System.currentTimeMillis() - start) + "ms");
-            for (DoublesTeamAggregate doublesTeamRowData : doublesTeamData) {
-                row = sheet.getRow(++updateRow);
-                addTeamData(row, startColumn, doublesTeamRowData.getTeam(), doublesTeamRowData.getTotal(), mainTextStyle);
-            }
-            startColumn += 3;
-
-            updateRow = rows;
-            start = System.currentTimeMillis();
-            List<SkeetTeamAggregate> skeetTeamData = skeetDataTeamRepository.getAllByClassificationOrderByTotalDesc(teamType);
-            System.out.println("Ran query for skeet by " + teamType + " " + (System.currentTimeMillis() - start) + "ms");
-            for (SkeetTeamAggregate skeetTeamRowData : skeetTeamData) {
-                row = sheet.getRow(++updateRow);
-                addTeamData(row, startColumn, skeetTeamRowData.getTeam(), skeetTeamRowData.getTotal(), mainTextStyle);
-            }
-            startColumn += 3;
-
-            updateRow = rows;
-            start = System.currentTimeMillis();
-            List<ClaysTeamAggregate> claysTeamData = claysDataTeamRepository.getAllByClassificationOrderByTotalDesc(teamType);
-            System.out.println("Ran query for clays by " + teamType + " " + (System.currentTimeMillis() - start) + "ms");
-            for (ClaysTeamAggregate claysTeamRowData : claysTeamData) {
-                row = sheet.getRow(++updateRow);
-                addTeamData(row, startColumn, claysTeamRowData.getTeam(), claysTeamRowData.getTotal(), mainTextStyle);
-            }
-            startColumn += 3;
-
-            updateRow = rows;
-            start = System.currentTimeMillis();
-            List<FiveStandTeamAggregate> fivestandTeamData = fiveStandDataTeamRepository.getAllByClassificationOrderByTotalDesc(teamType);
-            System.out.println("Ran query for fivestand by " + teamType + " " + (System.currentTimeMillis() - start) + "ms");
-            for (FiveStandTeamAggregate fiveStandTeamRowData : fivestandTeamData) {
-                row = sheet.getRow(++updateRow);
-                addTeamData(row, startColumn, fiveStandTeamRowData.getTeam(), fiveStandTeamRowData.getTotal(), mainTextStyle);
-            }
-            startColumn += 3;
-
-            updateRow = rows;
-            start = System.currentTimeMillis();
-            List<DoublesSkeetTeamAggregate> doublesSkeetTeamData = doublesSkeetDataTeamRepository.getAllByClassificationOrderByTotalDesc(teamType);
-            System.out.println("Ran query for doublesskeet by " + teamType + " " + (System.currentTimeMillis() - start) + "ms");
-            for (DoublesSkeetTeamAggregate doublesSkeetTeamRowData : doublesSkeetTeamData) {
-                row = sheet.getRow(++updateRow);
-                addTeamData(row, startColumn, doublesSkeetTeamRowData.getTeam(), doublesSkeetTeamRowData.getTotal(), mainTextStyle);
-            }
-        }
+//        if (!"Rookie".equals(teamType)) {
+//            startColumn += 3;
+//
+//            updateRow = rows;
+//            start = System.currentTimeMillis();
+//            List<HandicapTeamAggregate> handicapTeamData = handicapDataTeamRepository.getAllByClassificationOrderByTotalDesc(teamType);
+//            System.out.println("Ran query for handicap by " + teamType + " " + (System.currentTimeMillis() - start) + "ms");
+//            for (HandicapTeamAggregate handicapTeamRowData : handicapTeamData) {
+//                row = sheet.getRow(++updateRow);
+//                addTeamData(row, startColumn, handicapTeamRowData.getTeam(), handicapTeamRowData.getTotal(), mainTextStyle);
+//            }
+//            startColumn += 3;
+//
+//            updateRow = rows;
+//            start = System.currentTimeMillis();
+//            List<DoublesTeamAggregate> doublesTeamData = doublesDataTeamRepository.getAllByClassificationOrderByTotalDesc(teamType);
+//            System.out.println("Ran query for doubles by " + teamType + " " + (System.currentTimeMillis() - start) + "ms");
+//            for (DoublesTeamAggregate doublesTeamRowData : doublesTeamData) {
+//                row = sheet.getRow(++updateRow);
+//                addTeamData(row, startColumn, doublesTeamRowData.getTeam(), doublesTeamRowData.getTotal(), mainTextStyle);
+//            }
+//            startColumn += 3;
+//
+//            updateRow = rows;
+//            start = System.currentTimeMillis();
+//            List<SkeetTeamAggregate> skeetTeamData = skeetDataTeamRepository.getAllByClassificationOrderByTotalDesc(teamType);
+//            System.out.println("Ran query for skeet by " + teamType + " " + (System.currentTimeMillis() - start) + "ms");
+//            for (SkeetTeamAggregate skeetTeamRowData : skeetTeamData) {
+//                row = sheet.getRow(++updateRow);
+//                addTeamData(row, startColumn, skeetTeamRowData.getTeam(), skeetTeamRowData.getTotal(), mainTextStyle);
+//            }
+//            startColumn += 3;
+//
+//            updateRow = rows;
+//            start = System.currentTimeMillis();
+//            List<ClaysTeamAggregate> claysTeamData = claysDataTeamRepository.getAllByClassificationOrderByTotalDesc(teamType);
+//            System.out.println("Ran query for clays by " + teamType + " " + (System.currentTimeMillis() - start) + "ms");
+//            for (ClaysTeamAggregate claysTeamRowData : claysTeamData) {
+//                row = sheet.getRow(++updateRow);
+//                addTeamData(row, startColumn, claysTeamRowData.getTeam(), claysTeamRowData.getTotal(), mainTextStyle);
+//            }
+//            startColumn += 3;
+//
+//            updateRow = rows;
+//            start = System.currentTimeMillis();
+//            List<FiveStandTeamAggregate> fivestandTeamData = fiveStandDataTeamRepository.getAllByClassificationOrderByTotalDesc(teamType);
+//            System.out.println("Ran query for fivestand by " + teamType + " " + (System.currentTimeMillis() - start) + "ms");
+//            for (FiveStandTeamAggregate fiveStandTeamRowData : fivestandTeamData) {
+//                row = sheet.getRow(++updateRow);
+//                addTeamData(row, startColumn, fiveStandTeamRowData.getTeam(), fiveStandTeamRowData.getTotal(), mainTextStyle);
+//            }
+//            startColumn += 3;
+//
+//            updateRow = rows;
+//            start = System.currentTimeMillis();
+//            List<DoublesSkeetTeamAggregate> doublesSkeetTeamData = doublesSkeetDataTeamRepository.getAllByClassificationOrderByTotalDesc(teamType);
+//            System.out.println("Ran query for doublesskeet by " + teamType + " " + (System.currentTimeMillis() - start) + "ms");
+//            for (DoublesSkeetTeamAggregate doublesSkeetTeamRowData : doublesSkeetTeamData) {
+//                row = sheet.getRow(++updateRow);
+//                addTeamData(row, startColumn, doublesSkeetTeamRowData.getTeam(), doublesSkeetTeamRowData.getTotal(), mainTextStyle);
+//            }
+//        }
     }
 
     private void populateIndividualData(Workbook workbook, String sheetName, String gender, CellStyle style, CellStyle mainTextStyle) {
