@@ -71,7 +71,7 @@ public class ReportHelper {
         CellStyle style = setFontForHeaders(workbook);
 
         List<RoundScore> allRoundScores = generateRoundScores();
-        populateCleanData(workbook.getSheet("Clean Data"), allRoundScores);
+//        populateCleanData(workbook.getSheet("Clean Data"), allRoundScores);
 
         for (Map.Entry<String, String> entry : types.entrySet()) {
             start = System.currentTimeMillis();
@@ -82,11 +82,11 @@ public class ReportHelper {
         var playerRoundTotals = trapHelper.calculatePlayerRoundTotals(allRoundScores);
         var playerIndividualTotal = trapHelper.calculatePlayerIndividualTotal(allRoundScores, playerRoundTotals);
         var playerFinalTotal = trapHelper.calculatePlayerFinalTotal(playerIndividualTotal);
-        populateIndividualData(workbook, "Individual-Men", "M", style, mainTextStyle, playerFinalTotal);
-        populateIndividualData(workbook, "Individual-Ladies", "F", style, mainTextStyle, playerFinalTotal);
+//        populateIndividualData(workbook, "Individual-Men", "M", style, mainTextStyle, playerFinalTotal);
+//        populateIndividualData(workbook, "Individual-Ladies", "F", style, mainTextStyle, playerFinalTotal);
 
 //        populateTeamIndividualData(workbook, "Team-Individual-Scores");
-//        populateAllIndividualData(workbook, "Individual-All-Scores");
+        populateAllIndividualData(workbook, "Individual-All-Scores", playerFinalTotal);
 
         createFile(workbook, "league-data");
 
@@ -534,32 +534,34 @@ public class ReportHelper {
 //        return rows;
 //    }
 
-    private void populateAllIndividualData(Workbook workbook, String sheetName) {
+    private void populateAllIndividualData(Workbook workbook, String sheetName, HashMap<String, IndividualTotal> allRoundScores) {
         Sheet sheet = workbook.getSheet(sheetName);
         long trueStart = System.currentTimeMillis();
         long start = System.currentTimeMillis();
-//        List<AllIndividualScores> allIndividualScores = allIndividualScoresRepository.findAllByOrderByTeamAscTypeAscClassificationAscGenderAscTotalDesc();
+
+        List<IndividualTotal> justValues = new ArrayList<>(allRoundScores.values());
+        justValues.sort(Comparator.comparing(IndividualTotal::getTeam));
         System.out.println("Ran query for all scores " + (System.currentTimeMillis() - start) + "ms");
 
         int rows = sheet.getLastRowNum();
 
         Cell cell;
         Row row;
-//        for (AllIndividualScores rowData : allIndividualScores) {
-//            row = sheet.createRow(++rows);
-//            cell = row.createCell(0);
-//            cell.setCellValue(rowData.getType());
-//            cell = row.createCell(1);
-//            cell.setCellValue(rowData.getTeam());
-//            cell = row.createCell(2);
-//            cell.setCellValue(rowData.getClassification());
-//            cell = row.createCell(3);
-//            cell.setCellValue(rowData.getAthlete());
-//            cell = row.createCell(4);
-//            cell.setCellValue(rowData.getTotal());
-//            cell = row.createCell(5);
-//            cell.setCellValue(rowData.getGender());
-//        }
+        for (IndividualTotal rowData : justValues) {
+            row = sheet.createRow(++rows);
+            cell = row.createCell(0);
+            cell.setCellValue(rowData.getType());
+            cell = row.createCell(1);
+            cell.setCellValue(rowData.getTeam());
+            cell = row.createCell(2);
+            cell.setCellValue(rowData.getClassification());
+            cell = row.createCell(3);
+            cell.setCellValue(rowData.getAthlete());
+            cell = row.createCell(4);
+            cell.setCellValue(rowData.getTotal());
+            cell = row.createCell(5);
+            cell.setCellValue(rowData.getGender());
+        }
         sheet.setAutoFilter(CellRangeAddress.valueOf("A1:F1"));
         System.out.println("Individual All Scores data populated in " + (System.currentTimeMillis() - trueStart) + "ms");
     }
