@@ -14,7 +14,6 @@ import org.apache.poi.ss.util.CellRangeAddress;
 import org.springframework.stereotype.Service;
 import trap.model.IndividualTotal;
 import trap.model.RoundScore;
-import trap.model.RoundTotal;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -27,16 +26,13 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.sql.Array;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -67,10 +63,10 @@ public class ReportHelper {
             long start;
             long trueStart = System.currentTimeMillis();
 
-            Map<String, String> types = new HashMap<>();
-            types.put("Team-Senior", "Varsity");
-            types.put("Team-Intermediate", "Intermediate Entry");
-            types.put("Team-Rookie", "Rookie");
+//            Map<String, String> types = new HashMap<>();
+//            types.put("Team-Senior", "Varsity");
+//            types.put("Team-Intermediate", "Intermediate Entry");
+//            types.put("Team-Rookie", "Rookie");
 
             CellStyle mainTextStyle = getCellStyle(workbook);
             CellStyle style = setFontForHeaders(workbook);
@@ -165,9 +161,7 @@ public class ReportHelper {
         List<String[]> roundScores = reader.readAll();
         roundScores.remove(0);
         List<RoundScore> roundScoresList = new ArrayList<>();
-        roundScores.forEach((s) -> {
-            roundScoresList.add(new RoundScore(Integer.parseInt(s[1]), s[2], Integer.parseInt(s[3]), s[4], s[5], s[6], s[7].replace("Club", "Team"), s[8], s[10].replace("Senior/Varsity", "Varsity").replace("Senior/Jr. Varsity", "Junior Varsity").replace("Intermediate/Advanced", "Intermediate Advanced").replace("Intermediate/Entry Level", "Intermediate Entry"), s[11], "".equals(s[12]) ? 0 : Integer.parseInt(s[12]), "".equals(s[13]) ? 0 : Integer.parseInt(s[13]), "".equals(s[14]) ? 0 : Integer.parseInt(s[14]), "".equals(s[15]) ? 0 : Integer.parseInt(s[15]), "".equals(s[16]) ? 0 : Integer.parseInt(s[16]), "".equals(s[17]) ? 0 : Integer.parseInt(s[17]), "".equals(s[18]) ? 0 : Integer.parseInt(s[18]), "".equals(s[19]) ? 0 : Integer.parseInt(s[19]), type));
-        });
+        roundScores.forEach((s) -> roundScoresList.add(new RoundScore(Integer.parseInt(s[1]), s[2], Integer.parseInt(s[3]), s[4], s[5], s[6], s[7].replace("Club", "Team"), s[8], s[10].replace("Senior/Varsity", "Varsity").replace("Senior/Jr. Varsity", "Junior Varsity").replace("Intermediate/Advanced", "Intermediate Advanced").replace("Intermediate/Entry Level", "Intermediate Entry"), s[11], "".equals(s[12]) ? 0 : Integer.parseInt(s[12]), "".equals(s[13]) ? 0 : Integer.parseInt(s[13]), "".equals(s[14]) ? 0 : Integer.parseInt(s[14]), "".equals(s[15]) ? 0 : Integer.parseInt(s[15]), "".equals(s[16]) ? 0 : Integer.parseInt(s[16]), "".equals(s[17]) ? 0 : Integer.parseInt(s[17]), "".equals(s[18]) ? 0 : Integer.parseInt(s[18]), "".equals(s[19]) ? 0 : Integer.parseInt(s[19]), type)));
         return roundScoresList;
     }
 
@@ -191,47 +185,47 @@ public class ReportHelper {
         System.out.println("Clean data populated in " + (System.currentTimeMillis() - start) + "ms");
     }
 
-    private void addCleanData(Row row, RoundScore record, String type) {
+    private void addCleanData(Row row, RoundScore rowData, String type) {
         Cell cell;
         try {
             cell = row.createCell(0);
-            cell.setCellValue(record.getEventId());
+            cell.setCellValue(rowData.getEventId());
             cell = row.createCell(1);
-            cell.setCellValue(record.getEvent());
+            cell.setCellValue(rowData.getEvent());
             cell = row.createCell(2);
-            cell.setCellValue(record.getLocationId());
+            cell.setCellValue(rowData.getLocationId());
             cell = row.createCell(3);
-            cell.setCellValue(record.getLocation());
+            cell.setCellValue(rowData.getLocation());
             cell = row.createCell(4);
-            cell.setCellValue(record.getEventDate());
+            cell.setCellValue(rowData.getEventDate());
             cell = row.createCell(5);
-            cell.setCellValue(record.getSquadName());
+            cell.setCellValue(rowData.getSquadName());
             cell = row.createCell(6);
-            cell.setCellValue(record.getTeam());
+            cell.setCellValue(rowData.getTeam());
             cell = row.createCell(7);
-            cell.setCellValue(record.getAthlete());
+            cell.setCellValue(rowData.getAthlete());
             cell = row.createCell(8);
-            cell.setCellValue(record.getClassification());
+            cell.setCellValue(rowData.getClassification());
             cell = row.createCell(9);
-            cell.setCellValue(record.getGender());
+            cell.setCellValue(rowData.getGender());
             cell = row.createCell(10);
-            cell.setCellValue(record.getRound1());
+            cell.setCellValue(rowData.getRound1());
             cell = row.createCell(11);
-            cell.setCellValue(record.getRound2());
+            cell.setCellValue(rowData.getRound2());
             cell = row.createCell(12);
-            cell.setCellValue(record.getRound3());
+            cell.setCellValue(rowData.getRound3());
             cell = row.createCell(13);
-            cell.setCellValue(record.getRound4());
+            cell.setCellValue(rowData.getRound4());
             cell = row.createCell(14);
-            cell.setCellValue(record.getRound5());
+            cell.setCellValue(rowData.getRound5());
             cell = row.createCell(15);
-            cell.setCellValue(record.getRound6());
+            cell.setCellValue(rowData.getRound6());
             cell = row.createCell(16);
-            cell.setCellValue(record.getRound7());
+            cell.setCellValue(rowData.getRound7());
             cell = row.createCell(17);
-            cell.setCellValue(record.getRound8());
+            cell.setCellValue(rowData.getRound8());
             cell = row.createCell(18);
-            cell.setCellValue(record.getType());
+            cell.setCellValue(rowData.getType());
         } catch (Exception e) {
             System.out.println(row.toString());
         }
@@ -409,10 +403,7 @@ public class ReportHelper {
             start = System.currentTimeMillis();
 
 //            var individualSinglesData = allRoundScores.entrySet().stream().filter(a -> a.getValue().getGender().equals(gender) && a.getValue().getClassification().equals(classification) && a.getValue().getType().equals("singles")).toList();
-            List<IndividualTotal> justValues = new ArrayList<>();
-            for (IndividualTotal value: allRoundScores.values()) {
-                justValues.add(value);
-            }
+            List<IndividualTotal> justValues = new ArrayList<>(allRoundScores.values());
             justValues.sort(Comparator.comparingInt(IndividualTotal::getTotal).reversed());
 
             start = System.currentTimeMillis();
@@ -499,7 +490,8 @@ public class ReportHelper {
 //            column += 4;
 
             sheet.setAutoFilter(CellRangeAddress.valueOf("A13:AB13"));
-        } System.out.println(sheetName + " data populated in " + (System.currentTimeMillis() - initialStart) + "ms");
+        }
+        System.out.println(sheetName + " data populated in " + (System.currentTimeMillis() - initialStart) + "ms");
     }
 
     private void setCurrentDateHeader(Sheet sheet) {
