@@ -44,18 +44,19 @@ class TrapHelperTest {
 
         return roundScores;
     }
+
     private List<RoundScore> getRoundScoresPlayer3() {
         List<RoundScore> roundScores = new ArrayList();
 
-        roundScores.add(new RoundScore(16892,"Pleasant Valley Invitational Trap Meet - 1st 50 Singles",1132,"Clinton County Sportsman Club","2022-09-24","DYT HS 1 Singles 1st 50","Minnesota Vikings","Justin Jefferson","Senior/Varsity","M",24,23,0,0,0,0,0,0,"singles"));
-        roundScores.add(new RoundScore(16920,"NORTH SCOTT TRAP FALL INVITATIONAL FIRST 50 SINGLES",1132,"Clinton County Sportsman Club","2022-09-17","DYT HS Singles 1 1st 50","Minnesota Vikings","Justin Jefferson","Senior/Varsity","M",25,25,0,0,0,0,0,0,"singles"));
-        roundScores.add(new RoundScore(16945,"Stockdale/Jags season Opener! Sunday",73,"Stockdale Gun Club","2022-09-04","DYT 1","Minnesota Vikings","Justin Jefferson","Senior/Varsity","M",24,25,25,25,0,0,0,0,"singles"));
-        roundScores.add(new RoundScore(16946,"Stockdale/Jags season Opener! Monday",73,"Stockdale Gun Club","2022-09-05","DYT1","Minnesota Vikings","Justin Jefferson","Senior/Varsity","M",25,25,25,25,0,0,0,0,"singles"));
-        roundScores.add(new RoundScore(16948,"Stockdale/Jags season Opener! Saturday",73,"Stockdale Gun Club","2022-09-03","Davenport 1","Minnesota Vikings","Justin Jefferson","Senior/Varsity","M",25,25,25,25,0,0,0,0,"singles"));
-        roundScores.add(new RoundScore(17163,"NORTH SCOTT FALL INVITATIONAL SECOND 50 SINGLES",1132,"Clinton County Sportsman Club","2022-09-17","DYT HS Singles 1 2nd 50","Minnesota Vikings","Justin Jefferson","Senior/Varsity","M",25,24,0,0,0,0,0,0,"singles"));
-        roundScores.add(new RoundScore(17267,"Davenport Youth Trap Fall Invite 1st 50",1132,"Clinton County Sportsman Club","2022-10-15","DYT Mix 1 1st 50","Minnesota Vikings","Justin Jefferson","Senior/Varsity","M",25,23,0,0,0,0,0,0,"singles"));
-        roundScores.add(new RoundScore(17751,"Singles Spring Shoot",1132,"Clinton County Sportsman Club","2023-04-08","DYT SENIOR SINGLES 3","Minnesota Vikings","Justin Jefferson","Senior/Varsity","M",25,24,0,0,0,0,0,0,"singles"));
-        roundScores.add(new RoundScore(18511,"Bettendorf Bulldog Trap (CCSC ATA)",1132,"Clinton County Sportsman Club","2023-04-23","Davenport trap","Minnesota Vikings","Justin Jefferson","Senior/Varsity","M",25,25,25,24,0,0,0,0,"singles"));
+        roundScores.add(new RoundScore(16892, "Pleasant Valley Invitational Trap Meet - 1st 50 Singles", 1132, "Clinton County Sportsman Club", "2022-09-24", "DYT HS 1 Singles 1st 50", "Minnesota Vikings", "Justin Jefferson", "Senior/Varsity", "M", 24, 23, 0, 0, 0, 0, 0, 0, "singles"));
+        roundScores.add(new RoundScore(16920, "NORTH SCOTT TRAP FALL INVITATIONAL FIRST 50 SINGLES", 1132, "Clinton County Sportsman Club", "2022-09-17", "DYT HS Singles 1 1st 50", "Minnesota Vikings", "Justin Jefferson", "Senior/Varsity", "M", 25, 25, 0, 0, 0, 0, 0, 0, "singles"));
+        roundScores.add(new RoundScore(16945, "Stockdale/Jags season Opener! Sunday", 73, "Stockdale Gun Club", "2022-09-04", "DYT 1", "Minnesota Vikings", "Justin Jefferson", "Senior/Varsity", "M", 24, 25, 25, 25, 0, 0, 0, 0, "singles"));
+        roundScores.add(new RoundScore(16946, "Stockdale/Jags season Opener! Monday", 73, "Stockdale Gun Club", "2022-09-05", "DYT1", "Minnesota Vikings", "Justin Jefferson", "Senior/Varsity", "M", 25, 25, 25, 25, 0, 0, 0, 0, "singles"));
+        roundScores.add(new RoundScore(16948, "Stockdale/Jags season Opener! Saturday", 73, "Stockdale Gun Club", "2022-09-03", "Davenport 1", "Minnesota Vikings", "Justin Jefferson", "Senior/Varsity", "M", 25, 25, 25, 25, 0, 0, 0, 0, "singles"));
+        roundScores.add(new RoundScore(17163, "NORTH SCOTT FALL INVITATIONAL SECOND 50 SINGLES", 1132, "Clinton County Sportsman Club", "2022-09-17", "DYT HS Singles 1 2nd 50", "Minnesota Vikings", "Justin Jefferson", "Senior/Varsity", "M", 25, 24, 0, 0, 0, 0, 0, 0, "singles"));
+        roundScores.add(new RoundScore(17267, "Davenport Youth Trap Fall Invite 1st 50", 1132, "Clinton County Sportsman Club", "2022-10-15", "DYT Mix 1 1st 50", "Minnesota Vikings", "Justin Jefferson", "Senior/Varsity", "M", 25, 23, 0, 0, 0, 0, 0, 0, "singles"));
+        roundScores.add(new RoundScore(17751, "Singles Spring Shoot", 1132, "Clinton County Sportsman Club", "2023-04-08", "DYT SENIOR SINGLES 3", "Minnesota Vikings", "Justin Jefferson", "Senior/Varsity", "M", 25, 24, 0, 0, 0, 0, 0, 0, "singles"));
+        roundScores.add(new RoundScore(18511, "Bettendorf Bulldog Trap (CCSC ATA)", 1132, "Clinton County Sportsman Club", "2023-04-23", "Davenport trap", "Minnesota Vikings", "Justin Jefferson", "Senior/Varsity", "M", 25, 25, 25, 24, 0, 0, 0, 0, "singles"));
 
         return roundScores;
     }
@@ -63,13 +64,13 @@ class TrapHelperTest {
     private List<RoundScore> getRoundScoresPlayer4() {
         List<RoundScore> roundScores = new ArrayList();
 
-        roundScores.add(new RoundScore(16933,"September 3/4 NSCA/SCTP Sporting Clays 1st 100 rounds",986,"Black Oak Clays","2022-09-03","Ankeny Jags","Ankeny Centennial Jaguars Shooting Sports","Sam LaPorta","Senior/Varsity","M",48,48,0,0,0,0,0,0,"clays"));
-        roundScores.add(new RoundScore(16940,"NPGC NSCA SPORTING CLAYS",50,"New Pioneer Clay Target Center","2022-09-11","Ankeny Centennial Jaguars Shooting Sports","Ankeny Centennial Jaguars Shooting Sports","Sam LaPorta","Senior/Varsity","M",45,44,0,0,0,0,0,0,"clays"));
-        roundScores.add(new RoundScore(16941,"NPGC NSCA SPORTING CLAYS (TRUE PAIR EVENT)",50,"New Pioneer Clay Target Center","2022-10-09","Ankeny Centennial Jaguars Shooting Sports 2","Ankeny Centennial Jaguars Shooting Sports","Sam LaPorta","Senior/Varsity","M",44,40,0,0,0,0,0,0,"clays"));
-        roundScores.add(new RoundScore(17159,"Sporting Clays 9/24-9/25 NSCA/SCTP First 100",986,"Black Oak Clays","2022-09-24","Ankeny Jags mIx","Ankeny Centennial Jaguars Shooting Sports","Sam LaPorta","Senior/Varsity","M",43,46,0,0,0,0,0,0,"clays"));
-        roundScores.add(new RoundScore(17987,"Spring Begins shoot 4/1-4/2",1070,"Anita Shooting Complex","2023-04-01","Jags","Ankeny Centennial Jaguars Shooting Sports","Sam LaPorta","Senior/Varsity","M",41,41,0,0,0,0,0,0,"clays"));
-        roundScores.add(new RoundScore(18168,"April Sporting",42,"Mahaska County Ikes","2023-04-09","Ankeny Centennial Jaguars Shooting Sports 2","Ankeny Centennial Jaguars Shooting Sports","Sam LaPorta","Senior/Varsity","M",42,45,0,0,0,0,0,0,"clays"));
-        roundScores.add(new RoundScore(18220,"NPGC March Monthly",50,"New Pioneer Clay Target Center","2023-03-26","Ankeny Centennial Jaguars Shooting Sports","Ankeny Centennial Jaguars Shooting Sports","Sam LaPorta","Senior/Varsity","M",38,43,0,0,0,0,0,0,"clays"));
+        roundScores.add(new RoundScore(16933, "September 3/4 NSCA/SCTP Sporting Clays 1st 100 rounds", 986, "Black Oak Clays", "2022-09-03", "Ankeny Jags", "Ankeny Centennial Jaguars Shooting Sports", "Sam LaPorta", "Senior/Varsity", "M", 48, 48, 0, 0, 0, 0, 0, 0, "clays"));
+        roundScores.add(new RoundScore(16940, "NPGC NSCA SPORTING CLAYS", 50, "New Pioneer Clay Target Center", "2022-09-11", "Ankeny Centennial Jaguars Shooting Sports", "Ankeny Centennial Jaguars Shooting Sports", "Sam LaPorta", "Senior/Varsity", "M", 45, 44, 0, 0, 0, 0, 0, 0, "clays"));
+        roundScores.add(new RoundScore(16941, "NPGC NSCA SPORTING CLAYS (TRUE PAIR EVENT)", 50, "New Pioneer Clay Target Center", "2022-10-09", "Ankeny Centennial Jaguars Shooting Sports 2", "Ankeny Centennial Jaguars Shooting Sports", "Sam LaPorta", "Senior/Varsity", "M", 44, 40, 0, 0, 0, 0, 0, 0, "clays"));
+        roundScores.add(new RoundScore(17159, "Sporting Clays 9/24-9/25 NSCA/SCTP First 100", 986, "Black Oak Clays", "2022-09-24", "Ankeny Jags mIx", "Ankeny Centennial Jaguars Shooting Sports", "Sam LaPorta", "Senior/Varsity", "M", 43, 46, 0, 0, 0, 0, 0, 0, "clays"));
+        roundScores.add(new RoundScore(17987, "Spring Begins shoot 4/1-4/2", 1070, "Anita Shooting Complex", "2023-04-01", "Jags", "Ankeny Centennial Jaguars Shooting Sports", "Sam LaPorta", "Senior/Varsity", "M", 41, 41, 0, 0, 0, 0, 0, 0, "clays"));
+        roundScores.add(new RoundScore(18168, "April Sporting", 42, "Mahaska County Ikes", "2023-04-09", "Ankeny Centennial Jaguars Shooting Sports 2", "Ankeny Centennial Jaguars Shooting Sports", "Sam LaPorta", "Senior/Varsity", "M", 42, 45, 0, 0, 0, 0, 0, 0, "clays"));
+        roundScores.add(new RoundScore(18220, "NPGC March Monthly", 50, "New Pioneer Clay Target Center", "2023-03-26", "Ankeny Centennial Jaguars Shooting Sports", "Ankeny Centennial Jaguars Shooting Sports", "Sam LaPorta", "Senior/Varsity", "M", 38, 43, 0, 0, 0, 0, 0, 0, "clays"));
 
         return roundScores;
     }
@@ -166,6 +167,7 @@ class TrapHelperTest {
         assertEquals(40, playerFinalTotal.get(thirdResult).getTotal());
         assertEquals("doubles", playerFinalTotal.get(thirdResult).getType());
     }
+
     @Test
     void testPlayerFinalTotal2() {
         List<RoundScore> roundScores = getRoundScoresPlayer3();
