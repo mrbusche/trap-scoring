@@ -22,14 +22,14 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-test")
 
-    runtimeOnly("mysql:mysql-connector-java")
-    implementation("org.springframework.boot:spring-boot-starter-data-jpa")
+//    runtimeOnly("mysql:mysql-connector-java")
+//    implementation("org.springframework.boot:spring-boot-starter-data-jpa")
 
     compileOnly("org.projectlombok:lombok")
     annotationProcessor("org.projectlombok:lombok")
 
     implementation("org.apache.poi:poi-ooxml:5.2.3")
-    implementation("ch.vorburger.mariaDB4j:mariaDB4j:2.5.3")
+//    implementation("ch.vorburger.mariaDB4j:mariaDB4j:2.5.3")
 
     implementation("com.opencsv:opencsv:5.7.1")
 
