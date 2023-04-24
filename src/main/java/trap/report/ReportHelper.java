@@ -55,47 +55,43 @@ public class ReportHelper {
 
         Workbook workbook = getWorkbook("main");
 
-        try {
-            System.out.println("Starting file creation");
-            System.out.println("Workbook has " + workbook.getNumberOfSheets() + " sheets");
-            workbook.forEach(sheet -> System.out.println("- " + sheet.getSheetName()));
+        System.out.println("Starting file creation");
+        System.out.println("Workbook has " + workbook.getNumberOfSheets() + " sheets");
+        workbook.forEach(sheet -> System.out.println("- " + sheet.getSheetName()));
 
-            long start;
-            long trueStart = System.currentTimeMillis();
+        long start;
+        long trueStart = System.currentTimeMillis();
 
-//            Map<String, String> types = new HashMap<>();
-//            types.put("Team-Senior", "Varsity");
-//            types.put("Team-Intermediate", "Intermediate Entry");
-//            types.put("Team-Rookie", "Rookie");
+//        Map<String, String> types = new HashMap<>();
+//        types.put("Team-Senior", "Varsity");
+//        types.put("Team-Intermediate", "Intermediate Entry");
+//        types.put("Team-Rookie", "Rookie");
 
-            CellStyle mainTextStyle = getCellStyle(workbook);
-            CellStyle style = setFontForHeaders(workbook);
+        CellStyle mainTextStyle = getCellStyle(workbook);
+        CellStyle style = setFontForHeaders(workbook);
 
-            List<RoundScore> allRoundScores = generateRoundScores();
-//            populateCleanData(workbook.getSheet("Clean Data"), allRoundScores);
-
+        List<RoundScore> allRoundScores = generateRoundScores();
+//        populateCleanData(workbook.getSheet("Clean Data"), allRoundScores);
+//
 //        for (Map.Entry<String, String> entry : types.entrySet()) {
 //            start = System.currentTimeMillis();
 //            populateTeamData(workbook.getSheet(entry.getKey()), entry.getValue(), mainTextStyle);
 //            System.out.println("" + entry.getKey() + " data populated in " + (System.currentTimeMillis() - start) + "ms");
 //        }
 
-            var playerRoundTotals = trapHelper.calculatePlayerRoundTotals(allRoundScores);
-            var playerIndividualTotal = trapHelper.calculatePlayerIndividualTotal(allRoundScores, playerRoundTotals);
-            var playerFinalTotal = trapHelper.calculatePlayerFinalTotal(playerIndividualTotal);
-            populateIndividualData(workbook, "Individual-Men", "M", style, mainTextStyle, playerFinalTotal);
+        var playerRoundTotals = trapHelper.calculatePlayerRoundTotals(allRoundScores);
+        var playerIndividualTotal = trapHelper.calculatePlayerIndividualTotal(allRoundScores, playerRoundTotals);
+        var playerFinalTotal = trapHelper.calculatePlayerFinalTotal(playerIndividualTotal);
+        populateIndividualData(workbook, "Individual-Men", "M", style, mainTextStyle, playerFinalTotal);
 //        populateIndividualData(workbook, "Individual-Ladies", "F", style, mainTextStyle);
 //
 //        populateTeamIndividualData(workbook, "Team-Individual-Scores");
 //        populateAllIndividualData(workbook, "Individual-All-Scores");
 
-            createFile(workbook, "league-data");
+        createFile(workbook, "league-data");
 
-            System.out.println("Finished creating file in " + (System.currentTimeMillis() - trueStart) + "ms");
-            workbook.close();
-        } catch (Exception e) {
-            workbook.close();
-        }
+        System.out.println("Finished creating file in " + (System.currentTimeMillis() - trueStart) + "ms");
+        workbook.close();
     }
 
     private void downloadFiles() throws IOException {
@@ -429,65 +425,65 @@ public class ReportHelper {
             maxRow = Math.max(maxRow, updateRow);
             column += 4;
 //
-//            updateRow = classificationStartRow;
-//            updateRow++;
-//            start = System.currentTimeMillis();
-//            var individualDoublesData = justValues.stream().filter(f -> f.getGender().equals(gender) && f.getClassification().equals(classification) && f.getType().equals("doubles")).toList();
-//            System.out.println("Ran query for handicap by " + gender + " and " + classification + " " + (System.currentTimeMillis() - start) + "ms");
-//            for (IndividualTotal doublesRowData : individualDoublesData) {
-//                row = sheet.createRow(++updateRow);
-//                addPlayerData(row, column, doublesRowData.getAthlete(), doublesRowData.getTotal(), doublesRowData.getTeam(), mainTextStyle);
-//            }
-//            maxRow = Math.max(maxRow, updateRow);
-//            column += 4;
-//
-//            updateRow = classificationStartRow;
-//            updateRow++;
-//            start = System.currentTimeMillis();
-//            var individualSkeetData = justValues.stream().filter(f -> f.getGender().equals(gender) && f.getClassification().equals(classification) && f.getType().equals("skeet")).toList();
-//            System.out.println("Ran query for skeet by " + gender + " and " + classification + " " + (System.currentTimeMillis() - start) + "ms");
-//            for (IndividualTotal skeetRowData : individualSkeetData) {
-//                row = sheet.createRow(++updateRow);
-//                addPlayerData(row, column, skeetRowData.getAthlete(), skeetRowData.getTotal(), skeetRowData.getTeam(), mainTextStyle);
-//            }
-//            maxRow = Math.max(maxRow, updateRow);
-//            column += 4;
-//
-//            updateRow = classificationStartRow;
-//            updateRow++;
-//            start = System.currentTimeMillis();
-//            var individualClaysData = justValues.stream().filter(f -> f.getGender().equals(gender) && f.getClassification().equals(classification) && f.getType().equals("clays")).toList();
-//            System.out.println("Ran query for clays by " + gender + " and " + classification + " " + (System.currentTimeMillis() - start) + "ms");
-//            for (IndividualTotal claysRowData : individualClaysData) {
-//                row = sheet.createRow(++updateRow);
-//                addPlayerData(row, column, claysRowData.getAthlete(), claysRowData.getTotal(), claysRowData.getTeam(), mainTextStyle);
-//            }
-//            maxRow = Math.max(maxRow, updateRow);
-//            column += 4;
-//
-//            updateRow = classificationStartRow;
-//            updateRow++;
-//            start = System.currentTimeMillis();
-//            var individualFivestandData = justValues.stream().filter(f -> f.getGender().equals(gender) && f.getClassification().equals(classification) && f.getType().equals("fivestand")).toList();
-//            System.out.println("Ran query for fivestand by " + gender + " and " + classification + " " + (System.currentTimeMillis() - start) + "ms");
-//            for (IndividualTotal fivestandRowData : individualFivestandData) {
-//                row = sheet.createRow(++updateRow);
-//                addPlayerData(row, column, fivestandRowData.getAthlete(), fivestandRowData.getTotal(), fivestandRowData.getTeam(), mainTextStyle);
-//            }
-//            maxRow = Math.max(maxRow, updateRow);
-//            column += 4;
-//
-//            updateRow = classificationStartRow;
-//            updateRow++;
-//            start = System.currentTimeMillis();
-//            var individualDoubleSkeetData = justValues.stream().filter(f -> f.getGender().equals(gender) && f.getClassification().equals(classification) && f.getType().equals("doubleSkeet")).toList();
-//            System.out.println("Ran query for doubleSkeet by " + gender + " and " + classification + " " + (System.currentTimeMillis() - start) + "ms");
-//            for (IndividualTotal doubleSkeetRowData : individualDoubleSkeetData) {
-//                row = sheet.createRow(++updateRow);
-//                addPlayerData(row, column, doubleSkeetRowData.getAthlete(), doubleSkeetRowData.getTotal(), doubleSkeetRowData.getTeam(), mainTextStyle);
-//            }
-//            maxRow = Math.max(maxRow, updateRow);
-//            column += 4;
+            updateRow = classificationStartRow;
+            updateRow++;
+            start = System.currentTimeMillis();
+            var individualDoublesData = justValues.stream().filter(f -> f.getGender().equals(gender) && f.getClassification().equals(classification) && f.getType().equals("doubles")).toList();
+            System.out.println("Ran query for handicap by " + gender + " and " + classification + " " + (System.currentTimeMillis() - start) + "ms");
+            for (IndividualTotal doublesRowData : individualDoublesData) {
+                row = sheet.createRow(++updateRow);
+                addPlayerData(row, column, doublesRowData.getAthlete(), doublesRowData.getTotal(), doublesRowData.getTeam(), mainTextStyle);
+            }
+            maxRow = Math.max(maxRow, updateRow);
+            column += 4;
+
+            updateRow = classificationStartRow;
+            updateRow++;
+            start = System.currentTimeMillis();
+            var individualSkeetData = justValues.stream().filter(f -> f.getGender().equals(gender) && f.getClassification().equals(classification) && f.getType().equals("skeet")).toList();
+            System.out.println("Ran query for skeet by " + gender + " and " + classification + " " + (System.currentTimeMillis() - start) + "ms");
+            for (IndividualTotal skeetRowData : individualSkeetData) {
+                row = sheet.createRow(++updateRow);
+                addPlayerData(row, column, skeetRowData.getAthlete(), skeetRowData.getTotal(), skeetRowData.getTeam(), mainTextStyle);
+            }
+            maxRow = Math.max(maxRow, updateRow);
+            column += 4;
+
+            updateRow = classificationStartRow;
+            updateRow++;
+            start = System.currentTimeMillis();
+            var individualClaysData = justValues.stream().filter(f -> f.getGender().equals(gender) && f.getClassification().equals(classification) && f.getType().equals("clays")).toList();
+            System.out.println("Ran query for clays by " + gender + " and " + classification + " " + (System.currentTimeMillis() - start) + "ms");
+            for (IndividualTotal claysRowData : individualClaysData) {
+                row = sheet.createRow(++updateRow);
+                addPlayerData(row, column, claysRowData.getAthlete(), claysRowData.getTotal(), claysRowData.getTeam(), mainTextStyle);
+            }
+            maxRow = Math.max(maxRow, updateRow);
+            column += 4;
+
+            updateRow = classificationStartRow;
+            updateRow++;
+            start = System.currentTimeMillis();
+            var individualFivestandData = justValues.stream().filter(f -> f.getGender().equals(gender) && f.getClassification().equals(classification) && f.getType().equals("fivestand")).toList();
+            System.out.println("Ran query for fivestand by " + gender + " and " + classification + " " + (System.currentTimeMillis() - start) + "ms");
+            for (IndividualTotal fivestandRowData : individualFivestandData) {
+                row = sheet.createRow(++updateRow);
+                addPlayerData(row, column, fivestandRowData.getAthlete(), fivestandRowData.getTotal(), fivestandRowData.getTeam(), mainTextStyle);
+            }
+            maxRow = Math.max(maxRow, updateRow);
+            column += 4;
+
+            updateRow = classificationStartRow;
+            updateRow++;
+            start = System.currentTimeMillis();
+            var individualDoubleSkeetData = justValues.stream().filter(f -> f.getGender().equals(gender) && f.getClassification().equals(classification) && f.getType().equals("doubleSkeet")).toList();
+            System.out.println("Ran query for doubleSkeet by " + gender + " and " + classification + " " + (System.currentTimeMillis() - start) + "ms");
+            for (IndividualTotal doubleSkeetRowData : individualDoubleSkeetData) {
+                row = sheet.createRow(++updateRow);
+                addPlayerData(row, column, doubleSkeetRowData.getAthlete(), doubleSkeetRowData.getTotal(), doubleSkeetRowData.getTeam(), mainTextStyle);
+            }
+            maxRow = Math.max(maxRow, updateRow);
+            column += 4;
 
             sheet.setAutoFilter(CellRangeAddress.valueOf("A13:AB13"));
         }
