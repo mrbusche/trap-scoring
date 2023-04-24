@@ -415,6 +415,7 @@ public class ReportHelper {
             }
             justValues.sort(Comparator.comparingInt(IndividualTotal::getTotal).reversed());
 
+            start = System.currentTimeMillis();
             var individualSinglesData = justValues.stream().filter(f -> f.getGender().equals(gender) && f.getClassification().equals(classification) && f.getType().equals("singles")).toList();
             System.out.println("Ran query for singles by " + gender + " and " + classification + " " + (System.currentTimeMillis() - start) + "ms");
 
@@ -430,69 +431,72 @@ public class ReportHelper {
             start = System.currentTimeMillis();
             var individualHandicapData = justValues.stream().filter(f -> f.getGender().equals(gender) && f.getClassification().equals(classification) && f.getType().equals("handicap")).toList();
             System.out.println("Ran query for handicap by " + gender + " and " + classification + " " + (System.currentTimeMillis() - start) + "ms");
-
             for (IndividualTotal handicapRowData : individualHandicapData) {
                 row = sheet.createRow(++updateRow);
                 addPlayerData(row, column, handicapRowData.getAthlete(), handicapRowData.getTotal(), handicapRowData.getTeam(), mainTextStyle);
             }
+            maxRow = Math.max(maxRow, updateRow);
             column += 4;
-
-            updateRow = classificationStartRow;
-            updateRow++;
-            start = System.currentTimeMillis();
-//            List<DoublesAggregate> doublesIndividualData = doublesDataRepository.getAllByGenderAndClassification(gender, classification);
-            System.out.println("Ran query for doubles by " + gender + " and " + classification + " " + (System.currentTimeMillis() - start) + "ms");
-//            for (DoublesAggregate doublesRowData : doublesIndividualData) {
-//                row = sheet.getRow(++updateRow);
+//
+//            updateRow = classificationStartRow;
+//            updateRow++;
+//            start = System.currentTimeMillis();
+//            var individualDoublesData = justValues.stream().filter(f -> f.getGender().equals(gender) && f.getClassification().equals(classification) && f.getType().equals("doubles")).toList();
+//            System.out.println("Ran query for handicap by " + gender + " and " + classification + " " + (System.currentTimeMillis() - start) + "ms");
+//            for (IndividualTotal doublesRowData : individualDoublesData) {
+//                row = sheet.createRow(++updateRow);
 //                addPlayerData(row, column, doublesRowData.getAthlete(), doublesRowData.getTotal(), doublesRowData.getTeam(), mainTextStyle);
 //            }
-            column += 4;
-
-            updateRow = classificationStartRow;
-            updateRow++;
-            start = System.currentTimeMillis();
-//            List<SkeetAggregate> skeetIndividualData = skeetDataRepository.getAllByGenderAndClassification(gender, classification);
-            System.out.println("Ran query for skeet by " + gender + " and " + classification + " " + (System.currentTimeMillis() - start) + "ms");
-//            for (SkeetAggregate skeetRowData : skeetIndividualData) {
-//                row = sheet.getRow(++updateRow);
+//            maxRow = Math.max(maxRow, updateRow);
+//            column += 4;
+//
+//            updateRow = classificationStartRow;
+//            updateRow++;
+//            start = System.currentTimeMillis();
+//            var individualSkeetData = justValues.stream().filter(f -> f.getGender().equals(gender) && f.getClassification().equals(classification) && f.getType().equals("skeet")).toList();
+//            System.out.println("Ran query for skeet by " + gender + " and " + classification + " " + (System.currentTimeMillis() - start) + "ms");
+//            for (IndividualTotal skeetRowData : individualSkeetData) {
+//                row = sheet.createRow(++updateRow);
 //                addPlayerData(row, column, skeetRowData.getAthlete(), skeetRowData.getTotal(), skeetRowData.getTeam(), mainTextStyle);
 //            }
-            column += 4;
-
-            updateRow = classificationStartRow;
-            updateRow++;
-            start = System.currentTimeMillis();
-//            List<ClaysAggregate> claysIndividualData = claysDataRepository.getAllByGenderAndClassification(gender, classification);
-            System.out.println("Ran query for clays by " + gender + " and " + classification + " " + (System.currentTimeMillis() - start) + "ms");
-//            for (ClaysAggregate claysRowData : claysIndividualData) {
-//                row = sheet.getRow(++updateRow);
+//            maxRow = Math.max(maxRow, updateRow);
+//            column += 4;
+//
+//            updateRow = classificationStartRow;
+//            updateRow++;
+//            start = System.currentTimeMillis();
+//            var individualClaysData = justValues.stream().filter(f -> f.getGender().equals(gender) && f.getClassification().equals(classification) && f.getType().equals("clays")).toList();
+//            System.out.println("Ran query for clays by " + gender + " and " + classification + " " + (System.currentTimeMillis() - start) + "ms");
+//            for (IndividualTotal claysRowData : individualClaysData) {
+//                row = sheet.createRow(++updateRow);
 //                addPlayerData(row, column, claysRowData.getAthlete(), claysRowData.getTotal(), claysRowData.getTeam(), mainTextStyle);
 //            }
-            maxRow = Math.max(maxRow, updateRow);
-            column += 4;
-
-            updateRow = classificationStartRow;
-            updateRow++;
-            start = System.currentTimeMillis();
-//            List<FiveStandAggregate> fiveStandIndividualData = fiveStandDataRepository.getAllByGenderAndClassification(gender, classification);
-            System.out.println("Ran query for fivestand by " + gender + " and " + classification + " " + (System.currentTimeMillis() - start) + "ms");
-//            for (FiveStandAggregate fiveStandRowData : fiveStandIndividualData) {
-//                row = sheet.getRow(++updateRow);
-//                addPlayerData(row, column, fiveStandRowData.getAthlete(), fiveStandRowData.getTotal(), fiveStandRowData.getTeam(), mainTextStyle);
+//            maxRow = Math.max(maxRow, updateRow);
+//            column += 4;
+//
+//            updateRow = classificationStartRow;
+//            updateRow++;
+//            start = System.currentTimeMillis();
+//            var individualFivestandData = justValues.stream().filter(f -> f.getGender().equals(gender) && f.getClassification().equals(classification) && f.getType().equals("fivestand")).toList();
+//            System.out.println("Ran query for fivestand by " + gender + " and " + classification + " " + (System.currentTimeMillis() - start) + "ms");
+//            for (IndividualTotal fivestandRowData : individualFivestandData) {
+//                row = sheet.createRow(++updateRow);
+//                addPlayerData(row, column, fivestandRowData.getAthlete(), fivestandRowData.getTotal(), fivestandRowData.getTeam(), mainTextStyle);
 //            }
-            maxRow = Math.max(maxRow, updateRow);
-            column += 4;
-
-            updateRow = classificationStartRow;
-            updateRow++;
-            start = System.currentTimeMillis();
-//            List<DoublesSkeetAggregate> doubleSkeetIndividualData = doublesSkeetDataRepository.getAllByGenderAndClassification(gender, classification);
-            System.out.println("Ran query for doubleskeet by " + gender + " and " + classification + " " + (System.currentTimeMillis() - start) + "ms");
-//            for (DoublesSkeetAggregate doublesSkeetRowData : doubleSkeetIndividualData) {
-//                row = sheet.getRow(++updateRow);
-//                addPlayerData(row, column, doublesSkeetRowData.getAthlete(), doublesSkeetRowData.getTotal(), doublesSkeetRowData.getTeam(), mainTextStyle);
+//            maxRow = Math.max(maxRow, updateRow);
+//            column += 4;
+//
+//            updateRow = classificationStartRow;
+//            updateRow++;
+//            start = System.currentTimeMillis();
+//            var individualDoubleSkeetData = justValues.stream().filter(f -> f.getGender().equals(gender) && f.getClassification().equals(classification) && f.getType().equals("doubleSkeet")).toList();
+//            System.out.println("Ran query for doubleSkeet by " + gender + " and " + classification + " " + (System.currentTimeMillis() - start) + "ms");
+//            for (IndividualTotal doubleSkeetRowData : individualDoubleSkeetData) {
+//                row = sheet.createRow(++updateRow);
+//                addPlayerData(row, column, doubleSkeetRowData.getAthlete(), doubleSkeetRowData.getTotal(), doubleSkeetRowData.getTeam(), mainTextStyle);
 //            }
-            maxRow = Math.max(maxRow, updateRow);
+//            maxRow = Math.max(maxRow, updateRow);
+//            column += 4;
 
             sheet.setAutoFilter(CellRangeAddress.valueOf("A13:AB13"));
         } System.out.println(sheetName + " data populated in " + (System.currentTimeMillis() - initialStart) + "ms");
