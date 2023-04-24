@@ -83,8 +83,8 @@ public class ReportHelper {
         var playerIndividualTotal = trapHelper.calculatePlayerIndividualTotal(allRoundScores, playerRoundTotals);
         var playerFinalTotal = trapHelper.calculatePlayerFinalTotal(playerIndividualTotal);
         populateIndividualData(workbook, "Individual-Men", "M", style, mainTextStyle, playerFinalTotal);
-//        populateIndividualData(workbook, "Individual-Ladies", "F", style, mainTextStyle);
-//
+        populateIndividualData(workbook, "Individual-Ladies", "F", style, mainTextStyle, playerFinalTotal);
+
 //        populateTeamIndividualData(workbook, "Team-Individual-Scores");
 //        populateAllIndividualData(workbook, "Individual-All-Scores");
 
@@ -476,11 +476,11 @@ public class ReportHelper {
             updateRow = classificationStartRow;
             updateRow++;
             start = System.currentTimeMillis();
-            var individualDoubleSkeetData = justValues.stream().filter(f -> f.getGender().equals(gender) && f.getClassification().equals(classification) && f.getType().equals("doubleSkeet")).toList();
-            System.out.println("Ran query for doubleSkeet by " + gender + " and " + classification + " " + (System.currentTimeMillis() - start) + "ms");
-            for (IndividualTotal doubleSkeetRowData : individualDoubleSkeetData) {
+            var individualDoubleSkeetData = justValues.stream().filter(f -> f.getGender().equals(gender) && f.getClassification().equals(classification) && f.getType().equals("doublesskeet")).toList();
+            System.out.println("Ran query for doublesskeet by " + gender + " and " + classification + " " + (System.currentTimeMillis() - start) + "ms");
+            for (IndividualTotal doublesskeetRowData : individualDoubleSkeetData) {
                 row = sheet.getRow(++updateRow);
-                addPlayerData(row, column, doubleSkeetRowData.getAthlete(), doubleSkeetRowData.getTotal(), doubleSkeetRowData.getTeam(), mainTextStyle);
+                addPlayerData(row, column, doublesskeetRowData.getAthlete(), doublesskeetRowData.getTotal(), doublesskeetRowData.getTeam(), mainTextStyle);
             }
             maxRow = Math.max(maxRow, updateRow);
 

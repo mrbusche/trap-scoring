@@ -22,13 +22,21 @@ public class TrapHelper {
         }
         for (RoundScore r : roundScores) {
             var currentPlayerRoundTotal = playerRoundTotals.get(r.getUniqueName());
-            currentPlayerRoundTotal.add(new RoundTotal(r.getEventId(), r.getLocationId(), r.getTeam(), r.getAthlete(), r.getClassification(), r.getGender(), r.getRound1() + r.getRound2(), r.getType()));
-            if (r.getRound3() + r.getRound4() > 0) {
-                currentPlayerRoundTotal.add(new RoundTotal(r.getEventId(), r.getLocationId(), r.getTeam(), r.getAthlete(), r.getClassification(), r.getGender(), r.getRound3() + r.getRound4(), r.getType()));
-                if (r.getRound5() + r.getRound6() > 0) {
-                    currentPlayerRoundTotal.add(new RoundTotal(r.getEventId(), r.getLocationId(), r.getTeam(), r.getAthlete(), r.getClassification(), r.getGender(), r.getRound5() + r.getRound6(), r.getType()));
-                    if (r.getRound7() + r.getRound8() > 0) {
-                        currentPlayerRoundTotal.add(new RoundTotal(r.getEventId(), r.getLocationId(), r.getTeam(), r.getAthlete(), r.getClassification(), r.getGender(), r.getRound7() + r.getRound8(), r.getType()));
+            // clays and doubles do not combine rounds
+            if (r.getType().equals("clays") || r.getType().equals("doubles")) {
+                currentPlayerRoundTotal.add(new RoundTotal(r.getEventId(), r.getLocationId(), r.getTeam(), r.getAthlete(), r.getClassification(), r.getGender(), r.getRound1(), r.getType()));
+                if (r.getRound2() > 0) {
+                    currentPlayerRoundTotal.add(new RoundTotal(r.getEventId(), r.getLocationId(), r.getTeam(), r.getAthlete(), r.getClassification(), r.getGender(), r.getRound2(), r.getType()));
+                }
+            } else {
+                currentPlayerRoundTotal.add(new RoundTotal(r.getEventId(), r.getLocationId(), r.getTeam(), r.getAthlete(), r.getClassification(), r.getGender(), r.getRound1() + r.getRound2(), r.getType()));
+                if (r.getRound3() + r.getRound4() > 0) {
+                    currentPlayerRoundTotal.add(new RoundTotal(r.getEventId(), r.getLocationId(), r.getTeam(), r.getAthlete(), r.getClassification(), r.getGender(), r.getRound3() + r.getRound4(), r.getType()));
+                    if (r.getRound5() + r.getRound6() > 0) {
+                        currentPlayerRoundTotal.add(new RoundTotal(r.getEventId(), r.getLocationId(), r.getTeam(), r.getAthlete(), r.getClassification(), r.getGender(), r.getRound5() + r.getRound6(), r.getType()));
+                        if (r.getRound7() + r.getRound8() > 0) {
+                            currentPlayerRoundTotal.add(new RoundTotal(r.getEventId(), r.getLocationId(), r.getTeam(), r.getAthlete(), r.getClassification(), r.getGender(), r.getRound7() + r.getRound8(), r.getType()));
+                        }
                     }
                 }
             }
@@ -44,10 +52,12 @@ public class TrapHelper {
         }
         ArrayList<IndividualTotal> allIndTotals = new ArrayList<>();
         for (ArrayList<RoundTotal> playerRoundTotal : playerRoundTotals.values()) {
+            // clays, skeet, and fivestand are top 3 scores only, minimum 2 locations
+            var subtractScores = playerRoundTotal.get(0).getType().equals("clays") || playerRoundTotal.get(0).getType().equals("skeet") || playerRoundTotal.get(0).getType().equals("fivestand") ? 1 : 0;
             ArrayList<IndividualTotal> indTotal = new ArrayList<>();
             playerRoundTotal.sort(Comparator.comparingInt(RoundTotal::getTotal).reversed());
-            for(RoundTotal t: playerRoundTotal) {
-                if (indTotal.size() < 3) {
+            for (RoundTotal t : playerRoundTotal) {
+                if (indTotal.size() < (3 - subtractScores)) {
                     indTotal.add(new IndividualTotal(t.getLocationId(), t.getTeam(), t.getAthlete(), t.getClassification(), t.getGender(), t.getTotal(), t.getType()));
                 } else {
                     Set<Integer> locationIds = new HashSet<>();
@@ -58,7 +68,7 @@ public class TrapHelper {
                         break;
                     }
                     // if location isn't the same as the other 3
-                    if (locationIds.size() == 1 && indTotal.get(0).getLocationId() != t.getLocationId()){
+                    if (locationIds.size() == 2) {
                         indTotal.add(new IndividualTotal(t.getLocationId(), t.getTeam(), t.getAthlete(), t.getClassification(), t.getGender(), t.getTotal(), t.getType()));
                         break;
                     }
