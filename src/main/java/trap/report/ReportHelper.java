@@ -62,22 +62,22 @@ public class ReportHelper {
         long start;
         long trueStart = System.currentTimeMillis();
 
-//        Map<String, String> types = new HashMap<>();
-//        types.put("Team-Senior", "Varsity");
-//        types.put("Team-Intermediate", "Intermediate Entry");
-//        types.put("Team-Rookie", "Rookie");
+        Map<String, String> types = new HashMap<>();
+        types.put("Team-Senior", "Varsity");
+        types.put("Team-Intermediate", "Intermediate Entry");
+        types.put("Team-Rookie", "Rookie");
 
         CellStyle mainTextStyle = getCellStyle(workbook);
         CellStyle style = setFontForHeaders(workbook);
 
         List<RoundScore> allRoundScores = generateRoundScores();
-//        populateCleanData(workbook.getSheet("Clean Data"), allRoundScores);
-//
-//        for (Map.Entry<String, String> entry : types.entrySet()) {
-//            start = System.currentTimeMillis();
+        populateCleanData(workbook.getSheet("Clean Data"), allRoundScores);
+
+        for (Map.Entry<String, String> entry : types.entrySet()) {
+            start = System.currentTimeMillis();
 //            populateTeamData(workbook.getSheet(entry.getKey()), entry.getValue(), mainTextStyle);
-//            System.out.println("" + entry.getKey() + " data populated in " + (System.currentTimeMillis() - start) + "ms");
-//        }
+            System.out.println(entry.getKey() + " data populated in " + (System.currentTimeMillis() - start) + "ms");
+        }
 
         var playerRoundTotals = trapHelper.calculatePlayerRoundTotals(allRoundScores);
         var playerIndividualTotal = trapHelper.calculatePlayerIndividualTotal(allRoundScores, playerRoundTotals);
