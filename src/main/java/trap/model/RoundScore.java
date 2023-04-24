@@ -25,4 +25,8 @@ public class RoundScore {
     int round7;
     int round8;
     String type;
+
+    public String getUniqueName() {
+        return this.getAthlete() + " " + this.getTeam() + " " + this.getClassification() + " " + this.getType();
+    }
 }

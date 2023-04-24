@@ -14,4 +14,8 @@ public class RoundTotal {
     String gender;
     int total;
     String type;
+
+    public String getUniqueName() {
+        return this.getAthlete() + " " + this.getTeam() + " " + this.getClassification() + " " + this.getType();
+    }
 }

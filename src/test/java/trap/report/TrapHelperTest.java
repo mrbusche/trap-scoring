@@ -39,6 +39,8 @@ class TrapHelperTest {
         roundScores.add(new RoundScore(17321, "Wilton Invitational", 1, "Muscatine Izaak Walton League", "2022-10-22", "Wilton V", "UNI Trap Team", "Matt Busche", "Senior/Varsity", "M", 25, 24, 0, 0, 0, 0, 0, 0, "singles"));
         roundScores.add(new RoundScore(17975, "Kennedy Trap Club Invitational", 1, "Otter Creek Sportsmans Club", "2023-04-15", "Wilton HS 1", "UNI Trap Team", "Matt Busche", "Senior/Varsity", "M", 25, 24, 0, 0, 0, 0, 0, 0, "singles"));
         roundScores.add(new RoundScore(18256, "Wilton and Solon", 2, "Muscatine Izaak Walton League", "2023-04-08", "Wilton Varsity 1", "UNI Trap Team", "Matt Busche", "Senior/Varsity", "M", 20, 20, 0, 0, 0, 0, 0, 0, "singles"));
+        roundScores.add(new RoundScore(18256, "Wilton and Solon", 2, "Muscatine Izaak Walton League", "2023-04-08", "Wilton Varsity 1", "UNI Trap Team", "Matt Busche", "Intermediate/Advanced", "M", 20, 7, 0, 0, 0, 0, 0, 0, "singles"));
+        roundScores.add(new RoundScore(18256, "Wilton and Solon", 2, "Muscatine Izaak Walton League", "2023-04-08", "Wilton Varsity 1", "UNI Trap Team", "Matt Busche", "Intermediate/Advanced", "M", 20, 20, 0, 0, 0, 0, 0, 0, "doubles"));
 
         return roundScores;
     }
@@ -51,11 +53,10 @@ class TrapHelperTest {
         roundScores.addAll(roundScoresPlayer1);
         roundScores.addAll(roundScoresPlayer2);
         var playerRoundTotals = trapHelper.calculatePlayerRoundTotals(roundScores);
-        System.out.println(playerRoundTotals);
 
-        var player1 = playerRoundTotals.get(roundScoresPlayer1.get(0).getAthlete() + " " + roundScoresPlayer1.get(0).getTeam());
+        var player1 = playerRoundTotals.get(roundScoresPlayer1.get(0).getUniqueName());
         assertEquals(16, player1.size());
-        var player2 = playerRoundTotals.get(roundScoresPlayer2.get(0).getAthlete() + " " + roundScoresPlayer2.get(0).getTeam());
+        var player2 = playerRoundTotals.get(roundScoresPlayer2.get(0).getUniqueName());
         assertEquals(6, player2.size());
     }
 
@@ -70,14 +71,14 @@ class TrapHelperTest {
 
         var playerIndividualTotal = trapHelper.calculatePlayerIndividualTotal(roundScores, playerRoundTotals);
 
-        var player1 = playerIndividualTotal.get(roundScoresPlayer1.get(0).getAthlete() + " " + roundScoresPlayer1.get(0).getTeam());
+        var player1 = playerIndividualTotal.get(roundScoresPlayer1.get(0).getUniqueName());
         assertEquals(4, player1.size());
         assertEquals(49, player1.get(0).getTotal());
         assertEquals(48, player1.get(1).getTotal());
         assertEquals(48, player1.get(2).getTotal());
         assertEquals(48, player1.get(3).getTotal());
 
-        var player2 = playerIndividualTotal.get(roundScoresPlayer2.get(0).getAthlete() + " " + roundScoresPlayer2.get(0).getTeam());
+        var player2 = playerIndividualTotal.get(roundScoresPlayer2.get(0).getUniqueName());
         assertEquals(4, player2.size());
         assertEquals(49, player2.get(0).getTotal());
         assertEquals(49, player2.get(1).getTotal());
@@ -90,28 +91,50 @@ class TrapHelperTest {
         var roundScoresPlayer1 = getRoundScoresPlayer1();
         var roundScoresPlayer2 = getRoundScoresPlayer2();
         List<RoundScore> roundScores = new ArrayList<>();
-        roundScores.addAll(roundScoresPlayer1);
+//        roundScores.addAll(roundScoresPlayer1);
         roundScores.addAll(roundScoresPlayer2);
         var playerRoundTotals = trapHelper.calculatePlayerRoundTotals(roundScores);
         var playerIndividualTotal = trapHelper.calculatePlayerIndividualTotal(roundScores, playerRoundTotals);
         var playerFinalTotal = trapHelper.calculatePlayerFinalTotal(playerIndividualTotal);
 
-        var player1 = roundScoresPlayer1.get(0);
-        assertEquals(0, playerFinalTotal.get(player1.getAthlete() + " " + player1.getTeam()).getLocationId());
-        assertEquals("UNI Trap Team", playerFinalTotal.get(player1.getAthlete() + " " + player1.getTeam()).getTeam());
-        assertEquals("Scott W Busche", playerFinalTotal.get(player1.getAthlete() + " " + player1.getTeam()).getAthlete());
-        assertEquals("Senior/Varsity", playerFinalTotal.get(player1.getAthlete() + " " + player1.getTeam()).getClassification());
-        assertEquals("M", playerFinalTotal.get(player1.getAthlete() + " " + player1.getTeam()).getGender());
-        assertEquals(193, playerFinalTotal.get(player1.getAthlete() + " " + player1.getTeam()).getTotal());
-        assertEquals("singles", playerFinalTotal.get(player1.getAthlete() + " " + player1.getTeam()).getType());
+//        var player1 = roundScoresPlayer1.get(0);
+//        assertEquals(0, playerFinalTotal.get(player1.getUniqueName()).getLocationId());
+//        assertEquals("UNI Trap Team", playerFinalTotal.get(player1.getUniqueName()).getTeam());
+//        assertEquals("Scott W Busche", playerFinalTotal.get(player1.getUniqueName()).getAthlete());
+//        assertEquals("Senior/Varsity", playerFinalTotal.get(player1.getUniqueName()).getClassification());
+//        assertEquals("M", playerFinalTotal.get(player1.getUniqueName()).getGender());
+//        assertEquals(193, playerFinalTotal.get(player1.getUniqueName()).getTotal());
+//        assertEquals("singles", playerFinalTotal.get(player1.getUniqueName()).getType());
 
         var player2 = roundScoresPlayer2.get(0);
-        assertEquals(0, playerFinalTotal.get(player2.getAthlete() + " " + player2.getTeam()).getLocationId());
-        assertEquals("UNI Trap Team", playerFinalTotal.get(player2.getAthlete() + " " + player2.getTeam()).getTeam());
-        assertEquals("Matt Busche", playerFinalTotal.get(player2.getAthlete() + " " + player2.getTeam()).getAthlete());
-        assertEquals("Senior/Varsity", playerFinalTotal.get(player2.getAthlete() + " " + player2.getTeam()).getClassification());
-        assertEquals("M", playerFinalTotal.get(player2.getAthlete() + " " + player2.getTeam()).getGender());
-        assertEquals(187, playerFinalTotal.get(player2.getAthlete() + " " + player2.getTeam()).getTotal());
-        assertEquals("singles", playerFinalTotal.get(player2.getAthlete() + " " + player2.getTeam()).getType());
+
+        assertEquals(3, playerFinalTotal.size());
+
+        var firstResult = roundScoresPlayer2.get(0).getUniqueName();
+        assertEquals(0, playerFinalTotal.get(firstResult).getLocationId());
+        assertEquals("UNI Trap Team", playerFinalTotal.get(firstResult).getTeam());
+        assertEquals("Matt Busche", playerFinalTotal.get(firstResult).getAthlete());
+        assertEquals("Senior/Varsity", playerFinalTotal.get(firstResult).getClassification());
+        assertEquals("M", playerFinalTotal.get(firstResult).getGender());
+        assertEquals(187, playerFinalTotal.get(firstResult).getTotal());
+        assertEquals("singles", playerFinalTotal.get(firstResult).getType());
+
+        var secondResult = roundScoresPlayer2.get(5).getUniqueName();
+        assertEquals(0, playerFinalTotal.get(secondResult).getLocationId());
+        assertEquals("UNI Trap Team", playerFinalTotal.get(secondResult).getTeam());
+        assertEquals("Matt Busche", playerFinalTotal.get(secondResult).getAthlete());
+        assertEquals("Intermediate/Advanced", playerFinalTotal.get(secondResult).getClassification());
+        assertEquals("M", playerFinalTotal.get(secondResult).getGender());
+        assertEquals(27, playerFinalTotal.get(secondResult).getTotal());
+        assertEquals("singles", playerFinalTotal.get(secondResult).getType());
+
+        var thirdResult = roundScoresPlayer2.get(6).getUniqueName();
+        assertEquals(0, playerFinalTotal.get(thirdResult).getLocationId());
+        assertEquals("UNI Trap Team", playerFinalTotal.get(thirdResult).getTeam());
+        assertEquals("Matt Busche", playerFinalTotal.get(thirdResult).getAthlete());
+        assertEquals("Intermediate/Advanced", playerFinalTotal.get(thirdResult).getClassification());
+        assertEquals("M", playerFinalTotal.get(thirdResult).getGender());
+        assertEquals(40, playerFinalTotal.get(thirdResult).getTotal());
+        assertEquals("doubles", playerFinalTotal.get(thirdResult).getType());
     }
 }

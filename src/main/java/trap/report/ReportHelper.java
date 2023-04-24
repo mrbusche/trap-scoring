@@ -11,37 +11,9 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.apache.poi.ss.util.CellRangeAddress;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
-import trap.model.AllData;
-import trap.model.AllIndividualScores;
-import trap.model.AllTeamScores;
-import trap.model.ClaysAggregate;
-import trap.model.DoublesAggregate;
-import trap.model.DoublesSkeetAggregate;
-import trap.model.FiveStandAggregate;
-import trap.model.HandicapAggregate;
+import trap.model.IndividualTotal;
 import trap.model.RoundScore;
-import trap.model.SinglesAggregate;
-import trap.model.SinglesTeamAggregate;
-import trap.model.SkeetAggregate;
-import trap.repository.AllDataRepository;
-import trap.repository.AllIndividualScoresRepository;
-import trap.repository.AllTeamScoresRepository;
-import trap.repository.ClaysDataRepository;
-import trap.repository.ClaysDataTeamRepository;
-import trap.repository.DoublesDataRepository;
-import trap.repository.DoublesDataTeamRepository;
-import trap.repository.DoublesSkeetDataRepository;
-import trap.repository.DoublesSkeetDataTeamRepository;
-import trap.repository.FiveStandDataRepository;
-import trap.repository.FiveStandDataTeamRepository;
-import trap.repository.HandicapDataRepository;
-import trap.repository.HandicapDataTeamRepository;
-import trap.repository.SinglesDataRepository;
-import trap.repository.SinglesDataTeamRepository;
-import trap.repository.SkeetDataRepository;
-import trap.repository.SkeetDataTeamRepository;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -63,7 +35,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 import static org.apache.commons.io.FileUtils.copyURLToFile;
 
@@ -71,26 +42,10 @@ import static org.apache.commons.io.FileUtils.copyURLToFile;
 @Service
 public class ReportHelper {
     private static final String COMMA_DELIMITER = ",";
-    private final JdbcTemplate jdbc;
-    private final SinglesDataRepository singlesRepository;
-    private final SinglesDataTeamRepository singlesDataTeamRepository;
-    private final DoublesDataRepository doublesDataRepository;
-    private final DoublesDataTeamRepository doublesDataTeamRepository;
-    private final HandicapDataRepository handicapDataRepository;
-    private final HandicapDataTeamRepository handicapDataTeamRepository;
-    private final SkeetDataRepository skeetDataRepository;
-    private final SkeetDataTeamRepository skeetDataTeamRepository;
-    private final ClaysDataRepository claysDataRepository;
-    private final ClaysDataTeamRepository claysDataTeamRepository;
-    private final AllDataRepository allDataRepository;
-    private final AllTeamScoresRepository allTeamScoresRepository;
-    private final AllIndividualScoresRepository allIndividualScoresRepository;
-    private final FiveStandDataRepository fiveStandDataRepository;
-    private final FiveStandDataTeamRepository fiveStandDataTeamRepository;
-    private final DoublesSkeetDataRepository doublesSkeetDataRepository;
-    private final DoublesSkeetDataTeamRepository doublesSkeetDataTeamRepository;
     private final String currentDate = new SimpleDateFormat("MM/dd/yyyy").format(Calendar.getInstance().getTime());
     private final String[] trapTypes = new String[]{"singles", "doubles", "handicap", "skeet", "clays", "fivestand", "doublesskeet"};
+
+    TrapHelper trapHelper = new TrapHelper();
 
     public void doItAll() throws Exception {
 //        downloadFiles();
@@ -116,7 +71,7 @@ public class ReportHelper {
             CellStyle style = setFontForHeaders(workbook);
 
             List<RoundScore> allRoundScores = generateRoundScores();
-            populateCleanData(workbook.getSheet("Clean Data"), allRoundScores);
+//            populateCleanData(workbook.getSheet("Clean Data"), allRoundScores);
 
 //        for (Map.Entry<String, String> entry : types.entrySet()) {
 //            start = System.currentTimeMillis();
@@ -124,7 +79,10 @@ public class ReportHelper {
 //            System.out.println("" + entry.getKey() + " data populated in " + (System.currentTimeMillis() - start) + "ms");
 //        }
 
-            populateIndividualData(workbook, "Individual-Men", "M", style, mainTextStyle);
+            var playerRoundTotals = trapHelper.calculatePlayerRoundTotals(allRoundScores);
+            var playerIndividualTotal = trapHelper.calculatePlayerIndividualTotal(allRoundScores, playerRoundTotals);
+            var playerFinalTotal = trapHelper.calculatePlayerFinalTotal(playerIndividualTotal);
+            populateIndividualData(workbook, "Individual-Men", "M", style, mainTextStyle, playerFinalTotal);
 //        populateIndividualData(workbook, "Individual-Ladies", "F", style, mainTextStyle);
 //
 //        populateTeamIndividualData(workbook, "Team-Individual-Scores");
@@ -192,61 +150,6 @@ public class ReportHelper {
         }
     }
 
-    private void addFilesToDatabase() throws Exception {
-        long start = System.currentTimeMillis();
-        jdbc.execute("set global local_infile=1;");
-        String singlesSql = "load data local infile 'singles.csv' into table singles fields terminated by ',' OPTIONALLY ENCLOSED BY '\"' lines terminated by '\n' IGNORE 1 LINES;";
-        int singlesCount = jdbc.update(con -> con.prepareStatement(singlesSql));
-        System.out.println("Added " + singlesCount + " new records to database in singles table.");
-
-        String doublesSql = "load data local infile 'doubles.csv' into table doubles fields terminated by ',' OPTIONALLY ENCLOSED BY '\"' lines terminated by '\n' IGNORE 1 LINES;";
-        int doublesCount = jdbc.update(con -> con.prepareStatement(doublesSql));
-        System.out.println("Added " + doublesCount + " new records to database in doubles table.");
-
-        String handicapSql = "load data local infile 'handicap.csv' into table handicap fields terminated by ',' OPTIONALLY ENCLOSED BY '\"' lines terminated by '\n' IGNORE 1 LINES;";
-        int handicapCount = jdbc.update(con -> con.prepareStatement(handicapSql));
-        System.out.println("Added " + handicapCount + " new records to database in handicap table.");
-
-        String skeetSql = "load data local infile 'skeet.csv' into table skeet fields terminated by ',' OPTIONALLY ENCLOSED BY '\"' lines terminated by '\n' IGNORE 1 LINES;";
-        int skeetCount = jdbc.update(con -> con.prepareStatement(skeetSql));
-        System.out.println("Added " + skeetCount + " new records to database in skeet table.");
-
-        String claysSql = "load data local infile 'clays.csv' into table clays fields terminated by ',' OPTIONALLY ENCLOSED BY '\"' lines terminated by '\n' IGNORE 1 LINES;";
-        int claysCount = jdbc.update(con -> con.prepareStatement(claysSql));
-        System.out.println("Added " + claysCount + " new records to database in clays table.");
-
-        String fivestandSql = "load data local infile 'fivestand.csv' into table fivestand fields terminated by ',' OPTIONALLY ENCLOSED BY '\"' lines terminated by '\n' IGNORE 1 LINES;";
-        int fivestandCount = jdbc.update(con -> con.prepareStatement(fivestandSql));
-        System.out.println("Added " + fivestandCount + " new records to database in fivestand table.");
-
-        String doublesSkeetSql = "load data local infile 'doublesskeet.csv' into table doublesskeet fields terminated by ',' OPTIONALLY ENCLOSED BY '\"' lines terminated by '\n' IGNORE 1 LINES;";
-        int doublesSkeetCount = jdbc.update(con -> con.prepareStatement(doublesSkeetSql));
-        System.out.println("Added " + doublesSkeetCount + " new records to database in doublesSkeet table.");
-
-        int rowsAdded = singlesCount + doublesCount + handicapCount + skeetCount + claysCount + fivestandCount + doublesSkeetCount;
-        System.out.println("Added " + rowsAdded + " total records to database");
-        List<AllData> allData = allDataRepository.findAll();
-        System.out.println("Found " + allData.size() + " total records in database");
-
-        if (rowsAdded != allData.size()) {
-            throw new Exception("rows not added to database properly");
-        }
-
-        System.out.println("Database loaded in " + (System.currentTimeMillis() - start) + "ms");
-    }
-
-    private void fixTeamNames() {
-        long start = System.currentTimeMillis();
-        jdbc.execute("UPDATE singles SET team = replace(team, 'Club', 'Team') WHERE team LIKE '%Club%';");
-        jdbc.execute("UPDATE doubles SET team = replace(team, 'Club', 'Team') WHERE team LIKE '%Club%';");
-        jdbc.execute("UPDATE handicap SET team = replace(team, 'Club', 'Team') WHERE team LIKE '%Club%';");
-        jdbc.execute("UPDATE skeet SET team = replace(team, 'Club', 'Team') WHERE team LIKE '%Club%';");
-        jdbc.execute("UPDATE clays SET team = replace(team, 'Club', 'Team') WHERE team LIKE '%Club%';");
-        jdbc.execute("UPDATE fivestand SET team = replace(team, 'Club', 'Team') WHERE team LIKE '%Club%';");
-        jdbc.execute("UPDATE doublesskeet SET team = replace(team, 'Club', 'Team') WHERE team LIKE '%Club%';");
-        System.out.println("Team names fixed in " + (System.currentTimeMillis() - start) + "ms");
-    }
-
     private Workbook getWorkbook(String templateName) throws IOException {
         InputStream in = getClass().getResourceAsStream("/" + templateName + "-template.xlsx");
         return WorkbookFactory.create(Objects.requireNonNull(in));
@@ -258,7 +161,7 @@ public class ReportHelper {
         roundScores.remove(0);
         List<RoundScore> roundScoresList = new ArrayList<>();
         roundScores.forEach((s) -> {
-            roundScoresList.add(new RoundScore(Integer.parseInt(s[1]), s[2], Integer.parseInt(s[3]), s[4], s[5], s[6], s[7].replace("Club", "Team"), s[8], s[10], s[11], "".equals(s[12]) ? 0 : Integer.parseInt(s[12]), "".equals(s[13]) ? 0 : Integer.parseInt(s[13]), "".equals(s[14]) ? 0 : Integer.parseInt(s[14]), "".equals(s[15]) ? 0 : Integer.parseInt(s[15]), "".equals(s[16]) ? 0 : Integer.parseInt(s[16]), "".equals(s[17]) ? 0 : Integer.parseInt(s[17]), "".equals(s[18]) ? 0 : Integer.parseInt(s[18]), "".equals(s[19]) ? 0 : Integer.parseInt(s[19]), type));
+            roundScoresList.add(new RoundScore(Integer.parseInt(s[1]), s[2], Integer.parseInt(s[3]), s[4], s[5], s[6], s[7].replace("Club", "Team"), s[8], s[10].replace("Senior/Varsity", "Varsity").replace("Senior/Jr. Varsity", "Junior Varsity").replace("Intermediate/Advanced", "Intermediate Advanced").replace("Intermediate/Entry Level", "Intermediate Entry"), s[11], "".equals(s[12]) ? 0 : Integer.parseInt(s[12]), "".equals(s[13]) ? 0 : Integer.parseInt(s[13]), "".equals(s[14]) ? 0 : Integer.parseInt(s[14]), "".equals(s[15]) ? 0 : Integer.parseInt(s[15]), "".equals(s[16]) ? 0 : Integer.parseInt(s[16]), "".equals(s[17]) ? 0 : Integer.parseInt(s[17]), "".equals(s[18]) ? 0 : Integer.parseInt(s[18]), "".equals(s[19]) ? 0 : Integer.parseInt(s[19]), type));
         });
         return roundScoresList;
     }
@@ -382,12 +285,12 @@ public class ReportHelper {
         int updateRow = rows;
         int startColumn = 1;
         long start = System.currentTimeMillis();
-        List<SinglesTeamAggregate> singlesTeamData = singlesDataTeamRepository.getAllByClassificationOrderByTotalDesc(teamType);
+//        List<SinglesTeamAggregate> singlesTeamData = singlesDataTeamRepository.getAllByClassificationOrderByTotalDesc(teamType);
         System.out.println("Ran query for singles by " + teamType + " " + (System.currentTimeMillis() - start) + "ms");
-        for (SinglesTeamAggregate singlesTeamRowData : singlesTeamData) {
-            row = sheet.createRow(++updateRow);
-            addTeamData(row, startColumn, singlesTeamRowData.getTeam(), singlesTeamRowData.getTotal(), mainTextStyle);
-        }
+//        for (SinglesTeamAggregate singlesTeamRowData : singlesTeamData) {
+//            row = sheet.createRow(++updateRow);
+//            addTeamData(row, startColumn, singlesTeamRowData.getTeam(), singlesTeamRowData.getTotal(), mainTextStyle);
+//        }
 
 //        if (!"Rookie".equals(teamType)) {
 //            startColumn += 3;
@@ -453,7 +356,7 @@ public class ReportHelper {
 //        }
     }
 
-    private void populateIndividualData(Workbook workbook, String sheetName, String gender, CellStyle style, CellStyle mainTextStyle) {
+    private void populateIndividualData(Workbook workbook, String sheetName, String gender, CellStyle style, CellStyle mainTextStyle, HashMap<String, IndividualTotal> allRoundScores) {
         long initialStart = System.currentTimeMillis();
         Sheet sheet = workbook.getSheet(sheetName);
         setCurrentDateHeader(sheet);
@@ -499,83 +402,87 @@ public class ReportHelper {
             cell.setCellStyle(style);
 
             start = System.currentTimeMillis();
-            List<SinglesAggregate> individualSinglesData = singlesRepository.getAllByGenderAndClassification(gender, classification);
+
+            var x = "y";
+//            List<RoundScore> typeRoundScores = allRoundScores.stream().filter(t -> t.getGender().equals(gender) && t.getClassification().equals(classification)).toList();
+
+//            List<SinglesAggregate> individualSinglesData = singlesRepository.getAllByGenderAndClassification(gender, classification);
             System.out.println("Ran query for singles by " + gender + " and " + classification + " " + (System.currentTimeMillis() - start) + "ms");
 
-            for (SinglesAggregate singlesRowData : individualSinglesData) {
-                row = sheet.createRow(++updateRow);
-                addPlayerData(row, column, singlesRowData.getAthlete(), singlesRowData.getTotal(), singlesRowData.getTeam(), mainTextStyle);
-            }
-            column += 4;
-            maxRow = Math.max(maxRow, updateRow);
-
-            updateRow = classificationStartRow;
-            updateRow++;
-            start = System.currentTimeMillis();
-            List<HandicapAggregate> individualHandicapData = handicapDataRepository.getAllByGenderAndClassification(gender, classification);
-            System.out.println("Ran query for handicap by " + gender + " and " + classification + " " + (System.currentTimeMillis() - start) + "ms");
-            for (HandicapAggregate handicapRowData : individualHandicapData) {
-                row = sheet.getRow(++updateRow);
-                addPlayerData(row, column, handicapRowData.getAthlete(), handicapRowData.getTotal(), handicapRowData.getTeam(), mainTextStyle);
-            }
-            column += 4;
-
-            updateRow = classificationStartRow;
-            updateRow++;
-            start = System.currentTimeMillis();
-            List<DoublesAggregate> doublesIndividualData = doublesDataRepository.getAllByGenderAndClassification(gender, classification);
-            System.out.println("Ran query for doubles by " + gender + " and " + classification + " " + (System.currentTimeMillis() - start) + "ms");
-            for (DoublesAggregate doublesRowData : doublesIndividualData) {
-                row = sheet.getRow(++updateRow);
-                addPlayerData(row, column, doublesRowData.getAthlete(), doublesRowData.getTotal(), doublesRowData.getTeam(), mainTextStyle);
-            }
-            column += 4;
-
-            updateRow = classificationStartRow;
-            updateRow++;
-            start = System.currentTimeMillis();
-            List<SkeetAggregate> skeetIndividualData = skeetDataRepository.getAllByGenderAndClassification(gender, classification);
-            System.out.println("Ran query for skeet by " + gender + " and " + classification + " " + (System.currentTimeMillis() - start) + "ms");
-            for (SkeetAggregate skeetRowData : skeetIndividualData) {
-                row = sheet.getRow(++updateRow);
-                addPlayerData(row, column, skeetRowData.getAthlete(), skeetRowData.getTotal(), skeetRowData.getTeam(), mainTextStyle);
-            }
-            column += 4;
-
-            updateRow = classificationStartRow;
-            updateRow++;
-            start = System.currentTimeMillis();
-            List<ClaysAggregate> claysIndividualData = claysDataRepository.getAllByGenderAndClassification(gender, classification);
-            System.out.println("Ran query for clays by " + gender + " and " + classification + " " + (System.currentTimeMillis() - start) + "ms");
-            for (ClaysAggregate claysRowData : claysIndividualData) {
-                row = sheet.getRow(++updateRow);
-                addPlayerData(row, column, claysRowData.getAthlete(), claysRowData.getTotal(), claysRowData.getTeam(), mainTextStyle);
-            }
-            maxRow = Math.max(maxRow, updateRow);
-            column += 4;
-
-            updateRow = classificationStartRow;
-            updateRow++;
-            start = System.currentTimeMillis();
-            List<FiveStandAggregate> fiveStandIndividualData = fiveStandDataRepository.getAllByGenderAndClassification(gender, classification);
-            System.out.println("Ran query for fivestand by " + gender + " and " + classification + " " + (System.currentTimeMillis() - start) + "ms");
-            for (FiveStandAggregate fiveStandRowData : fiveStandIndividualData) {
-                row = sheet.getRow(++updateRow);
-                addPlayerData(row, column, fiveStandRowData.getAthlete(), fiveStandRowData.getTotal(), fiveStandRowData.getTeam(), mainTextStyle);
-            }
-            maxRow = Math.max(maxRow, updateRow);
-            column += 4;
-
-            updateRow = classificationStartRow;
-            updateRow++;
-            start = System.currentTimeMillis();
-            List<DoublesSkeetAggregate> doubleSkeetIndividualData = doublesSkeetDataRepository.getAllByGenderAndClassification(gender, classification);
-            System.out.println("Ran query for doubleskeet by " + gender + " and " + classification + " " + (System.currentTimeMillis() - start) + "ms");
-            for (DoublesSkeetAggregate doublesSkeetRowData : doubleSkeetIndividualData) {
-                row = sheet.getRow(++updateRow);
-                addPlayerData(row, column, doublesSkeetRowData.getAthlete(), doublesSkeetRowData.getTotal(), doublesSkeetRowData.getTeam(), mainTextStyle);
-            }
-            maxRow = Math.max(maxRow, updateRow);
+//            for (SinglesAggregate singlesRowData : individualSinglesData) {
+//                row = sheet.createRow(++updateRow);
+//                addPlayerData(row, column, singlesRowData.getAthlete(), singlesRowData.getTotal(), singlesRowData.getTeam(), mainTextStyle);
+//            }
+//            column += 4;
+//            maxRow = Math.max(maxRow, updateRow);
+//
+//            updateRow = classificationStartRow;
+//            updateRow++;
+//            start = System.currentTimeMillis();
+//            List<HandicapAggregate> individualHandicapData = handicapDataRepository.getAllByGenderAndClassification(gender, classification);
+//            System.out.println("Ran query for handicap by " + gender + " and " + classification + " " + (System.currentTimeMillis() - start) + "ms");
+//            for (HandicapAggregate handicapRowData : individualHandicapData) {
+//                row = sheet.getRow(++updateRow);
+//                addPlayerData(row, column, handicapRowData.getAthlete(), handicapRowData.getTotal(), handicapRowData.getTeam(), mainTextStyle);
+//            }
+//            column += 4;
+//
+//            updateRow = classificationStartRow;
+//            updateRow++;
+//            start = System.currentTimeMillis();
+//            List<DoublesAggregate> doublesIndividualData = doublesDataRepository.getAllByGenderAndClassification(gender, classification);
+//            System.out.println("Ran query for doubles by " + gender + " and " + classification + " " + (System.currentTimeMillis() - start) + "ms");
+//            for (DoublesAggregate doublesRowData : doublesIndividualData) {
+//                row = sheet.getRow(++updateRow);
+//                addPlayerData(row, column, doublesRowData.getAthlete(), doublesRowData.getTotal(), doublesRowData.getTeam(), mainTextStyle);
+//            }
+//            column += 4;
+//
+//            updateRow = classificationStartRow;
+//            updateRow++;
+//            start = System.currentTimeMillis();
+//            List<SkeetAggregate> skeetIndividualData = skeetDataRepository.getAllByGenderAndClassification(gender, classification);
+//            System.out.println("Ran query for skeet by " + gender + " and " + classification + " " + (System.currentTimeMillis() - start) + "ms");
+//            for (SkeetAggregate skeetRowData : skeetIndividualData) {
+//                row = sheet.getRow(++updateRow);
+//                addPlayerData(row, column, skeetRowData.getAthlete(), skeetRowData.getTotal(), skeetRowData.getTeam(), mainTextStyle);
+//            }
+//            column += 4;
+//
+//            updateRow = classificationStartRow;
+//            updateRow++;
+//            start = System.currentTimeMillis();
+//            List<ClaysAggregate> claysIndividualData = claysDataRepository.getAllByGenderAndClassification(gender, classification);
+//            System.out.println("Ran query for clays by " + gender + " and " + classification + " " + (System.currentTimeMillis() - start) + "ms");
+//            for (ClaysAggregate claysRowData : claysIndividualData) {
+//                row = sheet.getRow(++updateRow);
+//                addPlayerData(row, column, claysRowData.getAthlete(), claysRowData.getTotal(), claysRowData.getTeam(), mainTextStyle);
+//            }
+//            maxRow = Math.max(maxRow, updateRow);
+//            column += 4;
+//
+//            updateRow = classificationStartRow;
+//            updateRow++;
+//            start = System.currentTimeMillis();
+//            List<FiveStandAggregate> fiveStandIndividualData = fiveStandDataRepository.getAllByGenderAndClassification(gender, classification);
+//            System.out.println("Ran query for fivestand by " + gender + " and " + classification + " " + (System.currentTimeMillis() - start) + "ms");
+//            for (FiveStandAggregate fiveStandRowData : fiveStandIndividualData) {
+//                row = sheet.getRow(++updateRow);
+//                addPlayerData(row, column, fiveStandRowData.getAthlete(), fiveStandRowData.getTotal(), fiveStandRowData.getTeam(), mainTextStyle);
+//            }
+//            maxRow = Math.max(maxRow, updateRow);
+//            column += 4;
+//
+//            updateRow = classificationStartRow;
+//            updateRow++;
+//            start = System.currentTimeMillis();
+//            List<DoublesSkeetAggregate> doubleSkeetIndividualData = doublesSkeetDataRepository.getAllByGenderAndClassification(gender, classification);
+//            System.out.println("Ran query for doubleskeet by " + gender + " and " + classification + " " + (System.currentTimeMillis() - start) + "ms");
+//            for (DoublesSkeetAggregate doublesSkeetRowData : doubleSkeetIndividualData) {
+//                row = sheet.getRow(++updateRow);
+//                addPlayerData(row, column, doublesSkeetRowData.getAthlete(), doublesSkeetRowData.getTotal(), doublesSkeetRowData.getTeam(), mainTextStyle);
+//            }
+//            maxRow = Math.max(maxRow, updateRow);
 
             sheet.setAutoFilter(CellRangeAddress.valueOf("A13:AB13"));
         }
@@ -600,59 +507,59 @@ public class ReportHelper {
         Sheet sheet = workbook.getSheet(sheetName);
         long startTime = System.currentTimeMillis();
         long start = System.currentTimeMillis();
-        List<AllTeamScores> allData = allTeamScoresRepository.findAll();
+//        List<AllTeamScores> allData = allTeamScoresRepository.findAll();
         System.out.println("Ran query for team scores " + (System.currentTimeMillis() - start) + "ms");
 
         int rows = sheet.getLastRowNum();
 
-        for (AllTeamScores rowData : allData) {
-            rows = getRows(sheet, rows, rowData);
-        }
+//        for (AllTeamScores rowData : allData) {
+//            rows = getRows(sheet, rows, rowData);
+//        }
         sheet.setAutoFilter(CellRangeAddress.valueOf("A1:E1"));
         System.out.println("Team Individual Scores data populated in " + (System.currentTimeMillis() - startTime) + "ms");
     }
 
-    private static int getRows(Sheet sheet, int rows, AllTeamScores rowData) {
-        Row row = sheet.createRow(++rows);
-        Cell cell = row.createCell(0);
-        cell.setCellValue(rowData.getType());
-        cell = row.createCell(1);
-        cell.setCellValue(rowData.getTeam());
-        cell = row.createCell(2);
-        cell.setCellValue(rowData.getClassification());
-        cell = row.createCell(3);
-        cell.setCellValue(rowData.getAthlete());
-        cell = row.createCell(4);
-        cell.setCellValue(rowData.getIndtotal());
-        return rows;
-    }
+//    private static int getRows(Sheet sheet, int rows, AllTeamScores rowData) {
+//        Row row = sheet.createRow(++rows);
+//        Cell cell = row.createCell(0);
+//        cell.setCellValue(rowData.getType());
+//        cell = row.createCell(1);
+//        cell.setCellValue(rowData.getTeam());
+//        cell = row.createCell(2);
+//        cell.setCellValue(rowData.getClassification());
+//        cell = row.createCell(3);
+//        cell.setCellValue(rowData.getAthlete());
+//        cell = row.createCell(4);
+//        cell.setCellValue(rowData.getIndtotal());
+//        return rows;
+//    }
 
     private void populateAllIndividualData(Workbook workbook, String sheetName) {
         Sheet sheet = workbook.getSheet(sheetName);
         long trueStart = System.currentTimeMillis();
         long start = System.currentTimeMillis();
-        List<AllIndividualScores> allIndividualScores = allIndividualScoresRepository.findAllByOrderByTeamAscTypeAscClassificationAscGenderAscTotalDesc();
+//        List<AllIndividualScores> allIndividualScores = allIndividualScoresRepository.findAllByOrderByTeamAscTypeAscClassificationAscGenderAscTotalDesc();
         System.out.println("Ran query for all scores " + (System.currentTimeMillis() - start) + "ms");
 
         int rows = sheet.getLastRowNum();
 
         Cell cell;
         Row row;
-        for (AllIndividualScores rowData : allIndividualScores) {
-            row = sheet.createRow(++rows);
-            cell = row.createCell(0);
-            cell.setCellValue(rowData.getType());
-            cell = row.createCell(1);
-            cell.setCellValue(rowData.getTeam());
-            cell = row.createCell(2);
-            cell.setCellValue(rowData.getClassification());
-            cell = row.createCell(3);
-            cell.setCellValue(rowData.getAthlete());
-            cell = row.createCell(4);
-            cell.setCellValue(rowData.getTotal());
-            cell = row.createCell(5);
-            cell.setCellValue(rowData.getGender());
-        }
+//        for (AllIndividualScores rowData : allIndividualScores) {
+//            row = sheet.createRow(++rows);
+//            cell = row.createCell(0);
+//            cell.setCellValue(rowData.getType());
+//            cell = row.createCell(1);
+//            cell.setCellValue(rowData.getTeam());
+//            cell = row.createCell(2);
+//            cell.setCellValue(rowData.getClassification());
+//            cell = row.createCell(3);
+//            cell.setCellValue(rowData.getAthlete());
+//            cell = row.createCell(4);
+//            cell.setCellValue(rowData.getTotal());
+//            cell = row.createCell(5);
+//            cell.setCellValue(rowData.getGender());
+//        }
         sheet.setAutoFilter(CellRangeAddress.valueOf("A1:F1"));
         System.out.println("Individual All Scores data populated in " + (System.currentTimeMillis() - trueStart) + "ms");
     }
