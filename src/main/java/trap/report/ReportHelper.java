@@ -419,7 +419,7 @@ public class ReportHelper {
             var individualHandicapData = justValues.stream().filter(f -> f.getGender().equals(gender) && f.getClassification().equals(classification) && f.getType().equals("handicap")).toList();
             System.out.println("Ran query for handicap by " + gender + " and " + classification + " " + (System.currentTimeMillis() - start) + "ms");
             for (IndividualTotal handicapRowData : individualHandicapData) {
-                row = sheet.createRow(++updateRow);
+                row = sheet.getRow(++updateRow);
                 addPlayerData(row, column, handicapRowData.getAthlete(), handicapRowData.getTotal(), handicapRowData.getTeam(), mainTextStyle);
             }
             maxRow = Math.max(maxRow, updateRow);
@@ -431,7 +431,7 @@ public class ReportHelper {
             var individualDoublesData = justValues.stream().filter(f -> f.getGender().equals(gender) && f.getClassification().equals(classification) && f.getType().equals("doubles")).toList();
             System.out.println("Ran query for handicap by " + gender + " and " + classification + " " + (System.currentTimeMillis() - start) + "ms");
             for (IndividualTotal doublesRowData : individualDoublesData) {
-                row = sheet.createRow(++updateRow);
+                row = sheet.getRow(++updateRow);
                 addPlayerData(row, column, doublesRowData.getAthlete(), doublesRowData.getTotal(), doublesRowData.getTeam(), mainTextStyle);
             }
             maxRow = Math.max(maxRow, updateRow);
@@ -443,7 +443,7 @@ public class ReportHelper {
             var individualSkeetData = justValues.stream().filter(f -> f.getGender().equals(gender) && f.getClassification().equals(classification) && f.getType().equals("skeet")).toList();
             System.out.println("Ran query for skeet by " + gender + " and " + classification + " " + (System.currentTimeMillis() - start) + "ms");
             for (IndividualTotal skeetRowData : individualSkeetData) {
-                row = sheet.createRow(++updateRow);
+                row = sheet.getRow(++updateRow);
                 addPlayerData(row, column, skeetRowData.getAthlete(), skeetRowData.getTotal(), skeetRowData.getTeam(), mainTextStyle);
             }
             maxRow = Math.max(maxRow, updateRow);
@@ -455,7 +455,7 @@ public class ReportHelper {
             var individualClaysData = justValues.stream().filter(f -> f.getGender().equals(gender) && f.getClassification().equals(classification) && f.getType().equals("clays")).toList();
             System.out.println("Ran query for clays by " + gender + " and " + classification + " " + (System.currentTimeMillis() - start) + "ms");
             for (IndividualTotal claysRowData : individualClaysData) {
-                row = sheet.createRow(++updateRow);
+                row = sheet.getRow(++updateRow);
                 addPlayerData(row, column, claysRowData.getAthlete(), claysRowData.getTotal(), claysRowData.getTeam(), mainTextStyle);
             }
             maxRow = Math.max(maxRow, updateRow);
@@ -467,7 +467,7 @@ public class ReportHelper {
             var individualFivestandData = justValues.stream().filter(f -> f.getGender().equals(gender) && f.getClassification().equals(classification) && f.getType().equals("fivestand")).toList();
             System.out.println("Ran query for fivestand by " + gender + " and " + classification + " " + (System.currentTimeMillis() - start) + "ms");
             for (IndividualTotal fivestandRowData : individualFivestandData) {
-                row = sheet.createRow(++updateRow);
+                row = sheet.getRow(++updateRow);
                 addPlayerData(row, column, fivestandRowData.getAthlete(), fivestandRowData.getTotal(), fivestandRowData.getTeam(), mainTextStyle);
             }
             maxRow = Math.max(maxRow, updateRow);
@@ -479,11 +479,10 @@ public class ReportHelper {
             var individualDoubleSkeetData = justValues.stream().filter(f -> f.getGender().equals(gender) && f.getClassification().equals(classification) && f.getType().equals("doubleSkeet")).toList();
             System.out.println("Ran query for doubleSkeet by " + gender + " and " + classification + " " + (System.currentTimeMillis() - start) + "ms");
             for (IndividualTotal doubleSkeetRowData : individualDoubleSkeetData) {
-                row = sheet.createRow(++updateRow);
+                row = sheet.getRow(++updateRow);
                 addPlayerData(row, column, doubleSkeetRowData.getAthlete(), doubleSkeetRowData.getTotal(), doubleSkeetRowData.getTeam(), mainTextStyle);
             }
             maxRow = Math.max(maxRow, updateRow);
-            column += 4;
 
             sheet.setAutoFilter(CellRangeAddress.valueOf("A13:AB13"));
         }
