@@ -14,6 +14,7 @@ import org.apache.poi.ss.util.CellRangeAddress;
 import org.springframework.stereotype.Service;
 import trap.model.IndividualTotal;
 import trap.model.RoundScore;
+import trap.model.RoundTotal;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -26,12 +27,16 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.sql.Array;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -403,90 +408,94 @@ public class ReportHelper {
 
             start = System.currentTimeMillis();
 
-            var x = "y";
-//            List<RoundScore> typeRoundScores = allRoundScores.stream().filter(t -> t.getGender().equals(gender) && t.getClassification().equals(classification)).toList();
+//            var individualSinglesData = allRoundScores.entrySet().stream().filter(a -> a.getValue().getGender().equals(gender) && a.getValue().getClassification().equals(classification) && a.getValue().getType().equals("singles")).toList();
+            List<IndividualTotal> justValues = new ArrayList<>();
+            for (IndividualTotal value: allRoundScores.values()) {
+                justValues.add(value);
+            }
+            justValues.sort(Comparator.comparingInt(IndividualTotal::getTotal).reversed());
 
-//            List<SinglesAggregate> individualSinglesData = singlesRepository.getAllByGenderAndClassification(gender, classification);
+            var individualSinglesData = justValues.stream().filter(f -> f.getGender().equals(gender) && f.getClassification().equals(classification) && f.getType().equals("singles")).toList();
             System.out.println("Ran query for singles by " + gender + " and " + classification + " " + (System.currentTimeMillis() - start) + "ms");
 
-//            for (SinglesAggregate singlesRowData : individualSinglesData) {
-//                row = sheet.createRow(++updateRow);
-//                addPlayerData(row, column, singlesRowData.getAthlete(), singlesRowData.getTotal(), singlesRowData.getTeam(), mainTextStyle);
-//            }
-//            column += 4;
-//            maxRow = Math.max(maxRow, updateRow);
-//
-//            updateRow = classificationStartRow;
-//            updateRow++;
-//            start = System.currentTimeMillis();
-//            List<HandicapAggregate> individualHandicapData = handicapDataRepository.getAllByGenderAndClassification(gender, classification);
-//            System.out.println("Ran query for handicap by " + gender + " and " + classification + " " + (System.currentTimeMillis() - start) + "ms");
-//            for (HandicapAggregate handicapRowData : individualHandicapData) {
-//                row = sheet.getRow(++updateRow);
-//                addPlayerData(row, column, handicapRowData.getAthlete(), handicapRowData.getTotal(), handicapRowData.getTeam(), mainTextStyle);
-//            }
-//            column += 4;
-//
-//            updateRow = classificationStartRow;
-//            updateRow++;
-//            start = System.currentTimeMillis();
+            for (IndividualTotal singlesRowData : individualSinglesData) {
+                row = sheet.createRow(++updateRow);
+                addPlayerData(row, column, singlesRowData.getAthlete(), singlesRowData.getTotal(), singlesRowData.getTeam(), mainTextStyle);
+            }
+            column += 4;
+            maxRow = Math.max(maxRow, updateRow);
+
+            updateRow = classificationStartRow;
+            updateRow++;
+            start = System.currentTimeMillis();
+            var individualHandicapData = justValues.stream().filter(f -> f.getGender().equals(gender) && f.getClassification().equals(classification) && f.getType().equals("handicap")).toList();
+            System.out.println("Ran query for handicap by " + gender + " and " + classification + " " + (System.currentTimeMillis() - start) + "ms");
+
+            for (IndividualTotal handicapRowData : individualHandicapData) {
+                row = sheet.createRow(++updateRow);
+                addPlayerData(row, column, handicapRowData.getAthlete(), handicapRowData.getTotal(), handicapRowData.getTeam(), mainTextStyle);
+            }
+            column += 4;
+
+            updateRow = classificationStartRow;
+            updateRow++;
+            start = System.currentTimeMillis();
 //            List<DoublesAggregate> doublesIndividualData = doublesDataRepository.getAllByGenderAndClassification(gender, classification);
-//            System.out.println("Ran query for doubles by " + gender + " and " + classification + " " + (System.currentTimeMillis() - start) + "ms");
+            System.out.println("Ran query for doubles by " + gender + " and " + classification + " " + (System.currentTimeMillis() - start) + "ms");
 //            for (DoublesAggregate doublesRowData : doublesIndividualData) {
 //                row = sheet.getRow(++updateRow);
 //                addPlayerData(row, column, doublesRowData.getAthlete(), doublesRowData.getTotal(), doublesRowData.getTeam(), mainTextStyle);
 //            }
-//            column += 4;
-//
-//            updateRow = classificationStartRow;
-//            updateRow++;
-//            start = System.currentTimeMillis();
+            column += 4;
+
+            updateRow = classificationStartRow;
+            updateRow++;
+            start = System.currentTimeMillis();
 //            List<SkeetAggregate> skeetIndividualData = skeetDataRepository.getAllByGenderAndClassification(gender, classification);
-//            System.out.println("Ran query for skeet by " + gender + " and " + classification + " " + (System.currentTimeMillis() - start) + "ms");
+            System.out.println("Ran query for skeet by " + gender + " and " + classification + " " + (System.currentTimeMillis() - start) + "ms");
 //            for (SkeetAggregate skeetRowData : skeetIndividualData) {
 //                row = sheet.getRow(++updateRow);
 //                addPlayerData(row, column, skeetRowData.getAthlete(), skeetRowData.getTotal(), skeetRowData.getTeam(), mainTextStyle);
 //            }
-//            column += 4;
-//
-//            updateRow = classificationStartRow;
-//            updateRow++;
-//            start = System.currentTimeMillis();
+            column += 4;
+
+            updateRow = classificationStartRow;
+            updateRow++;
+            start = System.currentTimeMillis();
 //            List<ClaysAggregate> claysIndividualData = claysDataRepository.getAllByGenderAndClassification(gender, classification);
-//            System.out.println("Ran query for clays by " + gender + " and " + classification + " " + (System.currentTimeMillis() - start) + "ms");
+            System.out.println("Ran query for clays by " + gender + " and " + classification + " " + (System.currentTimeMillis() - start) + "ms");
 //            for (ClaysAggregate claysRowData : claysIndividualData) {
 //                row = sheet.getRow(++updateRow);
 //                addPlayerData(row, column, claysRowData.getAthlete(), claysRowData.getTotal(), claysRowData.getTeam(), mainTextStyle);
 //            }
-//            maxRow = Math.max(maxRow, updateRow);
-//            column += 4;
-//
-//            updateRow = classificationStartRow;
-//            updateRow++;
-//            start = System.currentTimeMillis();
+            maxRow = Math.max(maxRow, updateRow);
+            column += 4;
+
+            updateRow = classificationStartRow;
+            updateRow++;
+            start = System.currentTimeMillis();
 //            List<FiveStandAggregate> fiveStandIndividualData = fiveStandDataRepository.getAllByGenderAndClassification(gender, classification);
-//            System.out.println("Ran query for fivestand by " + gender + " and " + classification + " " + (System.currentTimeMillis() - start) + "ms");
+            System.out.println("Ran query for fivestand by " + gender + " and " + classification + " " + (System.currentTimeMillis() - start) + "ms");
 //            for (FiveStandAggregate fiveStandRowData : fiveStandIndividualData) {
 //                row = sheet.getRow(++updateRow);
 //                addPlayerData(row, column, fiveStandRowData.getAthlete(), fiveStandRowData.getTotal(), fiveStandRowData.getTeam(), mainTextStyle);
 //            }
-//            maxRow = Math.max(maxRow, updateRow);
-//            column += 4;
-//
-//            updateRow = classificationStartRow;
-//            updateRow++;
-//            start = System.currentTimeMillis();
+            maxRow = Math.max(maxRow, updateRow);
+            column += 4;
+
+            updateRow = classificationStartRow;
+            updateRow++;
+            start = System.currentTimeMillis();
 //            List<DoublesSkeetAggregate> doubleSkeetIndividualData = doublesSkeetDataRepository.getAllByGenderAndClassification(gender, classification);
-//            System.out.println("Ran query for doubleskeet by " + gender + " and " + classification + " " + (System.currentTimeMillis() - start) + "ms");
+            System.out.println("Ran query for doubleskeet by " + gender + " and " + classification + " " + (System.currentTimeMillis() - start) + "ms");
 //            for (DoublesSkeetAggregate doublesSkeetRowData : doubleSkeetIndividualData) {
 //                row = sheet.getRow(++updateRow);
 //                addPlayerData(row, column, doublesSkeetRowData.getAthlete(), doublesSkeetRowData.getTotal(), doublesSkeetRowData.getTeam(), mainTextStyle);
 //            }
-//            maxRow = Math.max(maxRow, updateRow);
+            maxRow = Math.max(maxRow, updateRow);
 
             sheet.setAutoFilter(CellRangeAddress.valueOf("A13:AB13"));
-        }
-        System.out.println(sheetName + " data populated in " + (System.currentTimeMillis() - initialStart) + "ms");
+        } System.out.println(sheetName + " data populated in " + (System.currentTimeMillis() - initialStart) + "ms");
     }
 
     private void setCurrentDateHeader(Sheet sheet) {
