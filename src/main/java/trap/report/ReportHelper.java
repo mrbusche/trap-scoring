@@ -50,8 +50,6 @@ public class ReportHelper {
 
     public void doItAll() throws Exception {
 //        downloadFiles();
-//        addFilesToDatabase();
-//        fixTeamNames();
 
         Workbook workbook = getWorkbook("main");
 
@@ -76,17 +74,19 @@ public class ReportHelper {
         var playerRoundTotals = trapHelper.calculatePlayerRoundTotals(allRoundScores);
         var playerIndividualTotal = trapHelper.calculatePlayerIndividualTotal(allRoundScores, playerRoundTotals);
         var playerFinalTotal = trapHelper.calculatePlayerFinalTotal(playerIndividualTotal);
+        var teamScoresByTotal = getTeamScoresByTotal(playerFinalTotal);
+        var teamScoresThatCount = calculateTeamScores(teamScoresByTotal);
 
         for (Map.Entry<String, String> entry : types.entrySet()) {
             start = System.currentTimeMillis();
-//            populateTeamData(workbook.getSheet(entry.getKey()), entry.getValue(), mainTextStyle, playerFinalTotal);
+            populateTeamData(workbook.getSheet(entry.getKey()), entry.getValue(), mainTextStyle, teamScoresThatCount);
             System.out.println(entry.getKey() + " data populated in " + (System.currentTimeMillis() - start) + "ms");
         }
 
         populateIndividualData(workbook, "Individual-Men", "M", style, mainTextStyle, playerFinalTotal);
         populateIndividualData(workbook, "Individual-Ladies", "F", style, mainTextStyle, playerFinalTotal);
 
-        populateTeamIndividualData(workbook, "Team-Individual-Scores", playerFinalTotal);
+        populateTeamIndividualData(workbook, "Team-Individual-Scores", teamScoresByTotal);
         populateAllIndividualData(workbook, "Individual-All-Scores", playerFinalTotal);
 
         createFile(workbook, "league-data");
@@ -271,7 +271,7 @@ public class ReportHelper {
         }
     }
 
-    private void populateTeamData(Sheet sheet, String teamType, CellStyle mainTextStyle, HashMap<String, IndividualTotal> allRoundScores) {
+    private void populateTeamData(Sheet sheet, String teamType, CellStyle mainTextStyle, HashMap<String, ArrayList<IndividualTotal>> teamScoresByTotal) {
         setCurrentDateHeader(sheet);
         setCurrentSeasonHeader(sheet);
 
@@ -281,24 +281,24 @@ public class ReportHelper {
         int updateRow = rows;
         int startColumn = 1;
         long start = System.currentTimeMillis();
-        List<IndividualTotal> justValues = new ArrayList<>(allRoundScores.values());
-        justValues.sort(Comparator.comparingInt(IndividualTotal::getTotal).reversed());
-        HashMap<String, ArrayList<IndividualTotal>> teamScoresThatCount = new HashMap<>();
-        for (IndividualTotal total : justValues) {
-            teamScoresThatCount.put(total.getTeamForScores(), new ArrayList<>());
-        }
-        for (IndividualTotal total : justValues) {
-            var currentTeam = teamScoresThatCount.get(total.getTeamForScores());
-            if (currentTeam.size() < 5) {
-                currentTeam.add(total);
-                teamScoresThatCount.put(total.getTeamForScores(), currentTeam);
-            }
-        }
+        HashMap<String, Integer> teamScoresThatCount = new HashMap<>();
+        var individualSinglesData = teamScoresByTotal.entrySet().stream().filter(f -> f.getValue().get(0).getTeamClassification().equals(teamType) && f.getValue().get(0).getType().equals("singles")).toList();
+//        for (Map.Entry<IndividualTotal> total : individualSinglesData) {
+//            teamScoresThatCount.put(total.getTeamForScores(), 0);
+//        }
+
+//        for (IndividualTotal total : individualSinglesData) {
+//            var currentTotal = teamScoresThatCount.get(total.getTeamForScores());
+//            currentTotal+=total.getTotal();
+//            teamScoresThatCount.put(total.getTeamForScores(), currentTotal);
+//        }
+//
+//        List<Integer> teamScores = new ArrayList<>(teamScoresThatCount.values());
+//        teamScoresByTotal.sort(Comparator.comparingInt(IndividualTotal::getTotal).reversed());
 
         start = System.currentTimeMillis();
-//        List<SinglesTeamAggregate> singlesTeamData = singlesDataTeamRepository.getAllByClassificationOrderByTotalDesc(teamType);
         System.out.println("Ran query for singles by " + teamType + " " + (System.currentTimeMillis() - start) + "ms");
-//        for (IndividualTotal indTotal : teamScoresThatCount) {
+//        for (IndividualTotal indTotal : teamScores) {
 //            row = sheet.createRow(++updateRow);
 //            addTeamData(row, startColumn, indTotal.getTeam(), indTotal.getTotal(), mainTextStyle);
 //        }
@@ -537,17 +537,21 @@ public class ReportHelper {
         return teamScoresThatCount;
     }
 
-    private void populateTeamIndividualData(Workbook workbook, String sheetName, HashMap<String, IndividualTotal> allRoundScores) {
+    private List<IndividualTotal> getTeamScoresByTotal(HashMap<String, IndividualTotal> allRoundScores) {
+        List<IndividualTotal> teamScoresByTotal = new ArrayList<>(allRoundScores.values());
+        teamScoresByTotal.sort(Comparator.comparingInt(IndividualTotal::getTotal).reversed());
+        return teamScoresByTotal;
+    }
+
+    private void populateTeamIndividualData(Workbook workbook, String sheetName, List<IndividualTotal> teamScoresByTotal) {
         Sheet sheet = workbook.getSheet(sheetName);
         long startTime = System.currentTimeMillis();
         long start = System.currentTimeMillis();
-        List<IndividualTotal> justValues = new ArrayList<>(allRoundScores.values());
-        justValues.sort(Comparator.comparingInt(IndividualTotal::getTotal).reversed());
         System.out.println("Ran query for team scores " + (System.currentTimeMillis() - start) + "ms");
 
         int rows = sheet.getLastRowNum();
 
-        var teamScoresThatCount = calculateTeamScores(justValues);
+        var teamScoresThatCount = calculateTeamScores(teamScoresByTotal);
         for (List<IndividualTotal> individualTotalList : teamScoresThatCount.values()) {
             for (IndividualTotal rowData : individualTotalList) {
                 rows = getRows(sheet, rows, rowData);
