@@ -519,16 +519,7 @@ public class ReportHelper {
         sheet.getRow(8).getCell(1).setCellValue(currentSeason + " " + sheet.getRow(8).getCell(1).getStringCellValue());
     }
 
-    private void populateTeamIndividualData(Workbook workbook, String sheetName, HashMap<String, IndividualTotal> allRoundScores) {
-        Sheet sheet = workbook.getSheet(sheetName);
-        long startTime = System.currentTimeMillis();
-        long start = System.currentTimeMillis();
-        List<IndividualTotal> justValues = new ArrayList<>(allRoundScores.values());
-        justValues.sort(Comparator.comparingInt(IndividualTotal::getTotal).reversed());
-        System.out.println("Ran query for team scores " + (System.currentTimeMillis() - start) + "ms");
-
-        int rows = sheet.getLastRowNum();
-
+    private HashMap<String, ArrayList<IndividualTotal>> calculateTeamScores(List<IndividualTotal> justValues) {
         HashMap<String, ArrayList<IndividualTotal>> teamScoresThatCount = new HashMap<>();
         for (IndividualTotal total : justValues) {
             teamScoresThatCount.put(total.getTeamForScores(), new ArrayList<>());
@@ -543,6 +534,20 @@ public class ReportHelper {
             }
         }
 
+        return teamScoresThatCount;
+    }
+
+    private void populateTeamIndividualData(Workbook workbook, String sheetName, HashMap<String, IndividualTotal> allRoundScores) {
+        Sheet sheet = workbook.getSheet(sheetName);
+        long startTime = System.currentTimeMillis();
+        long start = System.currentTimeMillis();
+        List<IndividualTotal> justValues = new ArrayList<>(allRoundScores.values());
+        justValues.sort(Comparator.comparingInt(IndividualTotal::getTotal).reversed());
+        System.out.println("Ran query for team scores " + (System.currentTimeMillis() - start) + "ms");
+
+        int rows = sheet.getLastRowNum();
+
+        var teamScoresThatCount = calculateTeamScores(justValues);
         for (List<IndividualTotal> individualTotalList : teamScoresThatCount.values()) {
             for (IndividualTotal rowData : individualTotalList) {
                 rows = getRows(sheet, rows, rowData);
