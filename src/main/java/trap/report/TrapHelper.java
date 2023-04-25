@@ -68,7 +68,7 @@ public class TrapHelper {
                         break;
                     }
                     // if location isn't the same as the other 3
-                    if (locationIds.size() == 2) {
+                    if (locationIds.size() == 2 || locationIds.size() == 3) {
                         indTotal.add(new IndividualTotal(t.getLocationId(), t.getTeam(), t.getAthlete(), t.getClassification(), t.getGender(), t.getTotal(), t.getType()));
                         break;
                     }

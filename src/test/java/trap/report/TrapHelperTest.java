@@ -75,6 +75,23 @@ class TrapHelperTest {
         return roundScores;
     }
 
+    private List<RoundScore> getRoundScoresPlayer5() {
+        List<RoundScore> roundScores = new ArrayList();
+
+        roundScores.add(new RoundScore(16923,"NS Trap Fall Invitational",1132,"Clinton County Sportsman Club","2022-10-29","Wilton JV/IA","Wilton Trap Team","Gavin Wulf","Intermediate/Advanced","M",21,21,0,0,0,0,0,0,"singles"));
+        roundScores.add(new RoundScore(17166,"Camanche Trap",1132,"Clinton County Sportsman Club","2022-10-01","Wilton - Intermediates","Wilton Trap Team","Gavin Wulf","Intermediate/Advanced","M",22,22,0,0,0,0,0,0,"singles"));
+        roundScores.add(new RoundScore(17267,"Davenport Youth Trap Fall Invite 1st 50",1132,"Clinton County Sportsman Club","2022-10-15","Wilton Intermediates","Wilton Trap Team","Gavin Wulf","Intermediate/Advanced","M",22,24,0,0,0,0,0,0,"singles"));
+        roundScores.add(new RoundScore(17268,"Davenport Youth Trap Fall Invite 2nd 50",1132,"Clinton County Sportsman Club","2022-10-15","Wilton Intermediates","Wilton Trap Team","Gavin Wulf","Intermediate/Advanced","M",18,24,0,0,0,0,0,0,"singles"));
+        roundScores.add(new RoundScore(17277,"Wilton Invitational",48,"Muscatine Izaak Walton League","2022-10-08","Wilton / Danville - Intermediates","Wilton Trap Team","Gavin Wulf","Intermediate/Advanced","M",20,22,0,0,0,0,0,0,"singles"));
+        roundScores.add(new RoundScore(17321,"Wilton Invitational",48,"Muscatine Izaak Walton League","2022-10-22","Wilton IA","Wilton Trap Team","Gavin Wulf","Intermediate/Advanced","M",23,25,0,0,0,0,0,0,"singles"));
+        roundScores.add(new RoundScore(17813,"Maquoketa @ Dubuque- Open",22,"Dubuque Co Izaak Walton League","2023-04-01","Wilton Int Singles","Wilton Trap Team","Gavin Wulf","Intermediate/Advanced","M",18,12,0,0,0,0,0,0,"singles"));
+        roundScores.add(new RoundScore(17975,"Kennedy Trap Club Invitational",90,"Otter Creek Sportsmans Club","2023-04-15","Wilton Int 2","Wilton Trap Team","Gavin Wulf","Intermediate/Advanced","M",23,23,0,0,0,0,0,0,"singles"));
+        roundScores.add(new RoundScore(18128,"Wilton and North Scott",48,"Muscatine Izaak Walton League","2023-04-22","Wilton IA 1","Wilton Trap Team","Gavin Wulf","Intermediate/Advanced","M",21,22,0,0,0,0,0,0,"singles"));
+        roundScores.add(new RoundScore(18256,"Wilton and Solon",48,"Muscatine Izaak Walton League","2023-04-08","New London / Wilton","Wilton Trap Team","Gavin Wulf","Intermediate/Advanced","M",21,25,0,0,0,0,0,0,"singles"));
+        roundScores.add(new RoundScore(18499,"Wilton vs. Highland",48,"Muscatine Izaak Walton League","2023-04-23","Wilton IA","Wilton Trap Team","Gavin Wulf","Intermediate/Advanced","M",24,22,0,0,0,0,0,0,"singles"));
+        return roundScores;
+    }
+
     @Test
     void testPlayerRoundTotals() {
         var roundScoresPlayer1 = getRoundScoresPlayer1();
@@ -202,12 +219,21 @@ class TrapHelperTest {
         assertEquals("clays", playerFinalTotal.get(player1.getUniqueName()).getType());
     }
 
-//        986 - 48,48,0,0,0,0,0,0,"clays"));
-//        50 - 45,44,0,0,0,0,0,0,"clays"));
-//        50 - 44,40,0,0,0,0,0,0,"clays"));
-//        986 - 43,46,0,0,0,0,0,0,"clays"));
-//        1070 - 41,41,0,0,0,0,0,0,"clays"));
-//        42 - 42,45,0,0,0,0,0,0,"clays"));
-//        50 - 38,43,0,0,0,0,0,0,"clays"));
+    @Test
+    void testPlayerFinalTotal5() {
+        List<RoundScore> roundScores = getRoundScoresPlayer5();
+        var playerRoundTotals = trapHelper.calculatePlayerRoundTotals(roundScores);
+        var playerIndividualTotal = trapHelper.calculatePlayerIndividualTotal(roundScores, playerRoundTotals);
+        var playerFinalTotal = trapHelper.calculatePlayerFinalTotal(playerIndividualTotal);
+
+        var player1 = roundScores.get(0);
+        assertEquals(0, playerFinalTotal.get(player1.getUniqueName()).getLocationId());
+        assertEquals("Wilton Trap Team", playerFinalTotal.get(player1.getUniqueName()).getTeam());
+        assertEquals("Gavin Wulf", playerFinalTotal.get(player1.getUniqueName()).getAthlete());
+        assertEquals("Intermediate/Advanced", playerFinalTotal.get(player1.getUniqueName()).getClassification());
+        assertEquals("M", playerFinalTotal.get(player1.getUniqueName()).getGender());
+        assertEquals(186, playerFinalTotal.get(player1.getUniqueName()).getTotal());
+        assertEquals("singles", playerFinalTotal.get(player1.getUniqueName()).getType());
+    }
 
 }
