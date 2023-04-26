@@ -70,7 +70,7 @@ public class ReportHelper {
         CellStyle style = setFontForHeaders(workbook);
 
         List<RoundScore> allRoundScores = generateRoundScores();
-//        populateCleanData(workbook.getSheet("Clean Data"), allRoundScores);
+        populateCleanData(workbook.getSheet("Clean Data"), allRoundScores);
 
         var playerRoundTotals = trapHelper.calculatePlayerRoundTotals(allRoundScores);
         var playerIndividualTotal = trapHelper.calculatePlayerIndividualTotal(allRoundScores, playerRoundTotals);
@@ -272,6 +272,25 @@ public class ReportHelper {
         }
     }
 
+    private List<TeamScore> getTeamScores(List<Map.Entry<String, ArrayList<IndividualTotal>>> teamData) {
+        HashMap<String, TeamScore> teamScoresThatCount = new HashMap<>();
+        for (Map.Entry<String, ArrayList<IndividualTotal>> total : teamData) {
+            var details = new TeamScore(total.getValue().get(0).getTeam(), 0);
+            teamScoresThatCount.put(total.getValue().get(0).getTeam(), details);
+        }
+
+        for (Map.Entry<String, ArrayList<IndividualTotal>> total : teamData) {
+            TeamScore teamTotal = teamScoresThatCount.get(total.getValue().get(0).getTeam());
+            for (IndividualTotal indTotal : total.getValue()) {
+                int currentTotal = teamTotal.getTotal();
+                teamTotal.setTotal(currentTotal + indTotal.getTotal());
+                teamScoresThatCount.put(indTotal.getTeam(), teamTotal);
+            }
+        }
+
+        return teamScoresThatCount.values().stream().sorted(Comparator.comparingInt(TeamScore::getTotal).reversed()).toList();
+    }
+
     private void populateTeamData(Sheet sheet, String teamType, CellStyle mainTextStyle, HashMap<String, ArrayList<IndividualTotal>> teamScoresByTotal) {
         setCurrentDateHeader(sheet);
         setCurrentSeasonHeader(sheet);
@@ -283,23 +302,8 @@ public class ReportHelper {
         int startColumn = 1;
         long start = System.currentTimeMillis();
 
-        HashMap<String, TeamScore> teamScoresThatCount = new HashMap<>();
-        List<Map.Entry<String, ArrayList<IndividualTotal>>> individualSinglesData = teamScoresByTotal.entrySet().stream().filter(f -> f.getValue().get(0).getTeamClassification().equals(teamType) && f.getValue().get(0).getType().equals("singles")).toList();
-        for (Map.Entry<String, ArrayList<IndividualTotal>> total : individualSinglesData) {
-            var details = new TeamScore(total.getValue().get(0).getTeam(), 0);
-            teamScoresThatCount.put(total.getValue().get(0).getTeam(), details);
-        }
-
-        for (Map.Entry<String, ArrayList<IndividualTotal>> total : individualSinglesData) {
-            TeamScore teamTotal = teamScoresThatCount.get(total.getValue().get(0).getTeam());
-            for (IndividualTotal indTotal : total.getValue()) {
-                int currentTotal = teamTotal.getTotal();
-                teamTotal.setTotal(currentTotal + indTotal.getTotal());
-                teamScoresThatCount.put(indTotal.getTeam(), teamTotal);
-            }
-        }
-
-        var teamScores = teamScoresThatCount.values().stream().sorted(Comparator.comparingInt(TeamScore::getTotal).reversed()).toList();
+        List<Map.Entry<String, ArrayList<IndividualTotal>>> teamData = teamScoresByTotal.entrySet().stream().filter(f -> f.getValue().get(0).getTeamClassification().equals(teamType) && f.getValue().get(0).getType().equals("singles")).toList();
+        List<TeamScore> teamScores = getTeamScores(teamData);
 
         start = System.currentTimeMillis();
         System.out.println("Ran query for singles by " + teamType + " " + (System.currentTimeMillis() - start) + "ms");
@@ -308,68 +312,74 @@ public class ReportHelper {
             addTeamData(row, startColumn, teamScore.getName(), teamScore.getTotal(), mainTextStyle);
         }
 
-//        if (!"Rookie".equals(teamType)) {
-//            startColumn += 3;
-//
-//            updateRow = rows;
-//            start = System.currentTimeMillis();
-//            List<HandicapTeamAggregate> handicapTeamData = handicapDataTeamRepository.getAllByClassificationOrderByTotalDesc(teamType);
-//            System.out.println("Ran query for handicap by " + teamType + " " + (System.currentTimeMillis() - start) + "ms");
-//            for (HandicapTeamAggregate handicapTeamRowData : handicapTeamData) {
-//                row = sheet.getRow(++updateRow);
-//                addTeamData(row, startColumn, handicapTeamRowData.getTeam(), handicapTeamRowData.getTotal(), mainTextStyle);
-//            }
-//            startColumn += 3;
-//
-//            updateRow = rows;
-//            start = System.currentTimeMillis();
-//            List<DoublesTeamAggregate> doublesTeamData = doublesDataTeamRepository.getAllByClassificationOrderByTotalDesc(teamType);
-//            System.out.println("Ran query for doubles by " + teamType + " " + (System.currentTimeMillis() - start) + "ms");
-//            for (DoublesTeamAggregate doublesTeamRowData : doublesTeamData) {
-//                row = sheet.getRow(++updateRow);
-//                addTeamData(row, startColumn, doublesTeamRowData.getTeam(), doublesTeamRowData.getTotal(), mainTextStyle);
-//            }
-//            startColumn += 3;
-//
-//            updateRow = rows;
-//            start = System.currentTimeMillis();
-//            List<SkeetTeamAggregate> skeetTeamData = skeetDataTeamRepository.getAllByClassificationOrderByTotalDesc(teamType);
-//            System.out.println("Ran query for skeet by " + teamType + " " + (System.currentTimeMillis() - start) + "ms");
-//            for (SkeetTeamAggregate skeetTeamRowData : skeetTeamData) {
-//                row = sheet.getRow(++updateRow);
-//                addTeamData(row, startColumn, skeetTeamRowData.getTeam(), skeetTeamRowData.getTotal(), mainTextStyle);
-//            }
-//            startColumn += 3;
-//
-//            updateRow = rows;
-//            start = System.currentTimeMillis();
-//            List<ClaysTeamAggregate> claysTeamData = claysDataTeamRepository.getAllByClassificationOrderByTotalDesc(teamType);
-//            System.out.println("Ran query for clays by " + teamType + " " + (System.currentTimeMillis() - start) + "ms");
-//            for (ClaysTeamAggregate claysTeamRowData : claysTeamData) {
-//                row = sheet.getRow(++updateRow);
-//                addTeamData(row, startColumn, claysTeamRowData.getTeam(), claysTeamRowData.getTotal(), mainTextStyle);
-//            }
-//            startColumn += 3;
-//
-//            updateRow = rows;
-//            start = System.currentTimeMillis();
-//            List<FiveStandTeamAggregate> fivestandTeamData = fiveStandDataTeamRepository.getAllByClassificationOrderByTotalDesc(teamType);
-//            System.out.println("Ran query for fivestand by " + teamType + " " + (System.currentTimeMillis() - start) + "ms");
-//            for (FiveStandTeamAggregate fiveStandTeamRowData : fivestandTeamData) {
-//                row = sheet.getRow(++updateRow);
-//                addTeamData(row, startColumn, fiveStandTeamRowData.getTeam(), fiveStandTeamRowData.getTotal(), mainTextStyle);
-//            }
-//            startColumn += 3;
-//
-//            updateRow = rows;
-//            start = System.currentTimeMillis();
-//            List<DoublesSkeetTeamAggregate> doublesSkeetTeamData = doublesSkeetDataTeamRepository.getAllByClassificationOrderByTotalDesc(teamType);
-//            System.out.println("Ran query for doublesskeet by " + teamType + " " + (System.currentTimeMillis() - start) + "ms");
-//            for (DoublesSkeetTeamAggregate doublesSkeetTeamRowData : doublesSkeetTeamData) {
-//                row = sheet.getRow(++updateRow);
-//                addTeamData(row, startColumn, doublesSkeetTeamRowData.getTeam(), doublesSkeetTeamRowData.getTotal(), mainTextStyle);
-//            }
-//        }
+        if (!"Rookie".equals(teamType)) {
+            startColumn += 3;
+
+            updateRow = rows;
+            start = System.currentTimeMillis();
+            teamData = teamScoresByTotal.entrySet().stream().filter(f -> f.getValue().get(0).getTeamClassification().equals(teamType) && f.getValue().get(0).getType().equals("handicap")).toList();
+            teamScores = getTeamScores(teamData);
+            System.out.println("Ran query for handicap by " + teamType + " " + (System.currentTimeMillis() - start) + "ms");
+            for (TeamScore teamScore : teamScores) {
+                row = sheet.getRow(++updateRow);
+                addTeamData(row, startColumn, teamScore.getName(), teamScore.getTotal(), mainTextStyle);
+            }
+            startColumn += 3;
+
+            updateRow = rows;
+            start = System.currentTimeMillis();
+            teamData = teamScoresByTotal.entrySet().stream().filter(f -> f.getValue().get(0).getTeamClassification().equals(teamType) && f.getValue().get(0).getType().equals("doubles")).toList();
+            teamScores = getTeamScores(teamData);
+            System.out.println("Ran query for doubles by " + teamType + " " + (System.currentTimeMillis() - start) + "ms");
+            for (TeamScore teamScore : teamScores) {
+                row = sheet.getRow(++updateRow);
+                addTeamData(row, startColumn, teamScore.getName(), teamScore.getTotal(), mainTextStyle);
+            }
+            startColumn += 3;
+
+            updateRow = rows;
+            start = System.currentTimeMillis();
+            teamData = teamScoresByTotal.entrySet().stream().filter(f -> f.getValue().get(0).getTeamClassification().equals(teamType) && f.getValue().get(0).getType().equals("skeet")).toList();
+            teamScores = getTeamScores(teamData);
+            System.out.println("Ran query for skeet by " + teamType + " " + (System.currentTimeMillis() - start) + "ms");
+            for (TeamScore teamScore : teamScores) {
+                row = sheet.getRow(++updateRow);
+                addTeamData(row, startColumn, teamScore.getName(), teamScore.getTotal(), mainTextStyle);
+            }
+            startColumn += 3;
+
+            updateRow = rows;
+            start = System.currentTimeMillis();
+            teamData = teamScoresByTotal.entrySet().stream().filter(f -> f.getValue().get(0).getTeamClassification().equals(teamType) && f.getValue().get(0).getType().equals("clays")).toList();
+            teamScores = getTeamScores(teamData);
+            System.out.println("Ran query for clays by " + teamType + " " + (System.currentTimeMillis() - start) + "ms");
+            for (TeamScore teamScore : teamScores) {
+                row = sheet.getRow(++updateRow);
+                addTeamData(row, startColumn, teamScore.getName(), teamScore.getTotal(), mainTextStyle);
+            }
+            startColumn += 3;
+
+            updateRow = rows;
+            start = System.currentTimeMillis();
+            teamData = teamScoresByTotal.entrySet().stream().filter(f -> f.getValue().get(0).getTeamClassification().equals(teamType) && f.getValue().get(0).getType().equals("fivestand")).toList();
+            teamScores = getTeamScores(teamData);
+            System.out.println("Ran query for fivestand by " + teamType + " " + (System.currentTimeMillis() - start) + "ms");
+            for (TeamScore teamScore : teamScores) {
+                row = sheet.getRow(++updateRow);
+                addTeamData(row, startColumn, teamScore.getName(), teamScore.getTotal(), mainTextStyle);
+            }
+            startColumn += 3;
+
+            updateRow = rows;
+            start = System.currentTimeMillis();
+            teamData = teamScoresByTotal.entrySet().stream().filter(f -> f.getValue().get(0).getTeamClassification().equals(teamType) && f.getValue().get(0).getType().equals("doublesskeet")).toList();
+            teamScores = getTeamScores(teamData);
+            System.out.println("Ran query for doublesskeet by " + teamType + " " + (System.currentTimeMillis() - start) + "ms");
+            for (TeamScore teamScore : teamScores) {
+                row = sheet.getRow(++updateRow);
+                addTeamData(row, startColumn, teamScore.getName(), teamScore.getTotal(), mainTextStyle);
+            }
+        }
     }
 
     private void populateIndividualData(Workbook workbook, String sheetName, String gender, CellStyle style, CellStyle mainTextStyle, HashMap<String, IndividualTotal> allRoundScores) {
@@ -532,7 +542,8 @@ public class ReportHelper {
 
         for (IndividualTotal total : justValues) {
             var currentTeam = teamScoresThatCount.get(total.getTeamForScores());
-            if (currentTeam.size() < 5) {
+            var scoresToCount = total.getType().equals("singles") || total.getType().equals("handicap") || total.getType().equals("doubles") ? 5 : 3;
+            if (currentTeam.size() < scoresToCount) {
                 total.setClassification(total.getTeamClassification());
                 currentTeam.add(total);
                 teamScoresThatCount.put(total.getTeamForScores(), currentTeam);
