@@ -5,7 +5,6 @@ import com.opencsv.exceptions.CsvException;
 import lombok.RequiredArgsConstructor;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
-import org.apache.poi.ss.usermodel.Font;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -16,29 +15,18 @@ import trap.model.IndividualTotal;
 import trap.model.RoundScore;
 import trap.model.TeamScore;
 
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Comparator;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-
-import static org.apache.commons.io.FileUtils.copyURLToFile;
 
 @RequiredArgsConstructor
 @Service
@@ -48,9 +36,11 @@ public class ReportHelper {
     private final String[] trapTypes = new String[]{"singles", "doubles", "handicap", "skeet", "clays", "fivestand", "doublesskeet"};
 
     TrapHelper trapHelper = new TrapHelper();
+    DownloadHelper downloadHelper = new DownloadHelper();
+    ExcelHelper excelHelper = new ExcelHelper();
 
     public void doItAll() throws Exception {
-        downloadFiles();
+        downloadHelper.downloadFiles(trapTypes);
 
         Workbook workbook = getWorkbook("main");
 
@@ -66,8 +56,8 @@ public class ReportHelper {
         types.put("Team-Intermediate", "Intermediate Entry");
         types.put("Team-Rookie", "Rookie");
 
-        CellStyle mainTextStyle = getCellStyle(workbook);
-        CellStyle style = setFontForHeaders(workbook);
+        CellStyle mainTextStyle = excelHelper.getCellStyle(workbook);
+        CellStyle style = excelHelper.setFontForHeaders(workbook);
 
         List<RoundScore> allRoundScores = generateRoundScores();
         populateCleanData(workbook.getSheet("Clean Data"), allRoundScores);
@@ -90,39 +80,10 @@ public class ReportHelper {
         populateTeamIndividualData(workbook, "Team-Individual-Scores", teamScoresByTotal);
         populateAllIndividualData(workbook, "Individual-All-Scores", playerFinalTotal);
 
-        createFile(workbook, "league-data");
+        excelHelper.createFile(workbook, "league-data");
 
         System.out.println("Finished creating file in " + (System.currentTimeMillis() - trueStart) + "ms");
         workbook.close();
-    }
-
-    private void downloadFiles() throws IOException {
-        long start = System.currentTimeMillis();
-        System.out.println("Started downloading files");
-
-        Map<String, String> fileUrls = new HashMap<>();
-        fileUrls.put("singles", "https://metabase.sssfonline.com/public/question/8648faf9-42e8-4a9c-b55d-2f251349de7f.csv");
-        fileUrls.put("doubles", "https://metabase.sssfonline.com/public/question/5d5a78a5-2356-477f-b1b8-fe6ee11d25b1.csv");
-        fileUrls.put("handicap", "https://metabase.sssfonline.com/public/question/69ca55d9-3e18-45bc-b57f-73aeb205ece8.csv");
-        fileUrls.put("skeet", "https://metabase.sssfonline.com/public/question/c697d744-0e06-4c3f-a640-fea02f9c9ecd.csv");
-        fileUrls.put("clays", "https://metabase.sssfonline.com/public/question/2c6edb1a-a7ee-43c2-8180-ad199a57be55.csv");
-        fileUrls.put("fivestand", "https://metabase.sssfonline.com/public/question/3c5aecf2-a9f2-49b2-a11f-36965cb1a964.csv");
-        fileUrls.put("doublesskeet", "https://metabase.sssfonline.com/public/question/bdd61066-6e29-4242-b6e9-adf286c2c4ae.csv");
-
-        Charset charset = StandardCharsets.UTF_8;
-        for (String type : trapTypes) {
-            System.out.println("Downloading " + type + " file");
-            copyURLToFile(new URL(fileUrls.get(type)), new File(type + ".csv"), 60000, 60000);
-            System.out.println("Finished downloading " + type + " file");
-
-            System.out.println("Replacing double spaces for " + type + " file");
-            Path path = Paths.get(type + ".csv");
-            String content = Files.readString(path, charset);
-            content = content.replaceAll(" {2}", " ");
-            Files.writeString(path, content, charset);
-            System.out.println("Finished replacing double spaces for " + type + " file");
-        }
-        System.out.println("Files downloaded in " + (System.currentTimeMillis() - start) + " ms");
     }
 
     private List<RoundScore> generateRoundScores() {
@@ -229,26 +190,6 @@ public class ReportHelper {
         }
     }
 
-    private CellStyle setFontForHeaders(Workbook workbook) {
-        Font font = workbook.createFont();
-        font.setFontName("Calibri");
-        font.setItalic(true);
-        font.setBold(true);
-        font.setFontHeightInPoints((short) 14);
-        CellStyle style = workbook.createCellStyle();
-        style.setFont(font);
-        return style;
-    }
-
-    private CellStyle getCellStyle(Workbook workbook) {
-        Font mainText = workbook.createFont();
-        mainText.setFontName("Calibri");
-        mainText.setFontHeightInPoints((short) 12);
-        CellStyle mainTextStyle = workbook.createCellStyle();
-        mainTextStyle.setFont(mainText);
-        return mainTextStyle;
-    }
-
     private static void addTeamData(Row row, int startColumn, String team, Integer total, CellStyle mainTextStyle) {
         Cell cell = row.createCell(startColumn);
         cell.setCellValue(team);
@@ -292,8 +233,8 @@ public class ReportHelper {
     }
 
     private void populateTeamData(Sheet sheet, String teamType, CellStyle mainTextStyle, HashMap<String, ArrayList<IndividualTotal>> teamScoresByTotal) {
-        setCurrentDateHeader(sheet);
-        setCurrentSeasonHeader(sheet);
+        excelHelper.setCurrentDateHeader(sheet, currentDate);
+        excelHelper.setCurrentSeasonHeader(sheet);
 
         int rows = sheet.getLastRowNum();
         Row row;
@@ -385,8 +326,8 @@ public class ReportHelper {
     private void populateIndividualData(Workbook workbook, String sheetName, String gender, CellStyle style, CellStyle mainTextStyle, HashMap<String, IndividualTotal> allRoundScores) {
         long initialStart = System.currentTimeMillis();
         Sheet sheet = workbook.getSheet(sheetName);
-        setCurrentDateHeader(sheet);
-        setCurrentSeasonHeader(sheet);
+        excelHelper.setCurrentDateHeader(sheet, currentDate);
+        excelHelper.setCurrentSeasonHeader(sheet);
 
         int rows = sheet.getLastRowNum();
         Cell cell;
@@ -520,20 +461,6 @@ public class ReportHelper {
         System.out.println(sheetName + " data populated in " + (System.currentTimeMillis() - initialStart) + "ms");
     }
 
-    private void setCurrentDateHeader(Sheet sheet) {
-        sheet.getRow(9).getCell(1).setCellValue(sheet.getRow(9).getCell(1).getStringCellValue() + currentDate);
-    }
-
-    private void setCurrentSeasonHeader(Sheet sheet) {
-        java.util.Date date = new Date();
-        Calendar cal = Calendar.getInstance();
-        cal.setTime(date);
-        int month = cal.get(Calendar.MONTH);
-        int year = cal.get(Calendar.YEAR);
-        int currentSeason = month > 8 ? year + 1 : year;
-        sheet.getRow(8).getCell(1).setCellValue(currentSeason + " " + sheet.getRow(8).getCell(1).getStringCellValue());
-    }
-
     private HashMap<String, ArrayList<IndividualTotal>> calculateTeamScores(List<IndividualTotal> justValues) {
         HashMap<String, ArrayList<IndividualTotal>> teamScoresThatCount = new HashMap<>();
         for (IndividualTotal total : justValues) {
@@ -625,17 +552,4 @@ public class ReportHelper {
         System.out.println("Individual All Scores data populated in " + (System.currentTimeMillis() - trueStart) + "ms");
     }
 
-    private void createFile(Workbook workbook, String teamType) throws IOException {
-        long start;
-        start = System.currentTimeMillis();
-        Date date = new Date();
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmss");
-        String currentDate = formatter.format(date);
-        String newFilename = teamType + "-" + currentDate + ".xlsx";
-        FileOutputStream fileOutputStream = new FileOutputStream(newFilename);
-        workbook.write(fileOutputStream);
-        fileOutputStream.close();
-        System.out.println("Created file " + newFilename);
-        System.out.println("Wrote the contents to a file in " + (System.currentTimeMillis() - start) + "ms");
-    }
 }
