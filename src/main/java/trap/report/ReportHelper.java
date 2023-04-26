@@ -50,7 +50,7 @@ public class ReportHelper {
     TrapHelper trapHelper = new TrapHelper();
 
     public void doItAll() throws Exception {
-//        downloadFiles();
+        downloadFiles();
 
         Workbook workbook = getWorkbook("main");
 
