@@ -14,6 +14,7 @@ import org.apache.poi.ss.util.CellRangeAddress;
 import org.springframework.stereotype.Service;
 import trap.model.IndividualTotal;
 import trap.model.RoundScore;
+import trap.model.TeamScore;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -281,27 +282,31 @@ public class ReportHelper {
         int updateRow = rows;
         int startColumn = 1;
         long start = System.currentTimeMillis();
-        HashMap<String, Integer> teamScoresThatCount = new HashMap<>();
-        var individualSinglesData = teamScoresByTotal.entrySet().stream().filter(f -> f.getValue().get(0).getTeamClassification().equals(teamType) && f.getValue().get(0).getType().equals("singles")).toList();
-//        for (Map.Entry<IndividualTotal> total : individualSinglesData) {
-//            teamScoresThatCount.put(total.getTeamForScores(), 0);
-//        }
 
-//        for (IndividualTotal total : individualSinglesData) {
-//            var currentTotal = teamScoresThatCount.get(total.getTeamForScores());
-//            currentTotal+=total.getTotal();
-//            teamScoresThatCount.put(total.getTeamForScores(), currentTotal);
-//        }
-//
-//        List<Integer> teamScores = new ArrayList<>(teamScoresThatCount.values());
-//        teamScoresByTotal.sort(Comparator.comparingInt(IndividualTotal::getTotal).reversed());
+        HashMap<String, TeamScore> teamScoresThatCount = new HashMap<>();
+        List<Map.Entry<String, ArrayList<IndividualTotal>>> individualSinglesData = teamScoresByTotal.entrySet().stream().filter(f -> f.getValue().get(0).getTeamClassification().equals(teamType) && f.getValue().get(0).getType().equals("singles")).toList();
+        for (Map.Entry<String, ArrayList<IndividualTotal>> total : individualSinglesData) {
+            var details = new TeamScore(total.getValue().get(0).getTeam(), 0);
+            teamScoresThatCount.put(total.getValue().get(0).getTeam(), details);
+        }
+
+        for (Map.Entry<String, ArrayList<IndividualTotal>> total : individualSinglesData) {
+            TeamScore teamTotal = teamScoresThatCount.get(total.getValue().get(0).getTeam());
+            for (IndividualTotal indTotal : total.getValue()) {
+                int currentTotal = teamTotal.getTotal();
+                teamTotal.setTotal(currentTotal + indTotal.getTotal());
+                teamScoresThatCount.put(indTotal.getTeam(), teamTotal);
+            }
+        }
+
+        var teamScores = teamScoresThatCount.values().stream().sorted(Comparator.comparingInt(TeamScore::getTotal).reversed()).toList();
 
         start = System.currentTimeMillis();
         System.out.println("Ran query for singles by " + teamType + " " + (System.currentTimeMillis() - start) + "ms");
-//        for (IndividualTotal indTotal : teamScores) {
-//            row = sheet.createRow(++updateRow);
-//            addTeamData(row, startColumn, indTotal.getTeam(), indTotal.getTotal(), mainTextStyle);
-//        }
+        for (TeamScore teamScore : teamScores) {
+            row = sheet.createRow(++updateRow);
+            addTeamData(row, startColumn, teamScore.getName(), teamScore.getTotal(), mainTextStyle);
+        }
 
 //        if (!"Rookie".equals(teamType)) {
 //            startColumn += 3;
