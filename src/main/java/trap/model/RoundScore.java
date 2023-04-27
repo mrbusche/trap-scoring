@@ -29,4 +29,8 @@ public class RoundScore {
     public String getUniqueName() {
         return this.getAthlete() + " " + this.getTeam() + " " + this.getClassification() + " " + this.getType();
     }
+
+    public String getTeamClassification() {
+        return this.classification.replace("Senior/Varsity", "Varsity").replace("Senior/Jr. Varsity", "Junior Varsity").replace("Intermediate/Advanced", "Intermediate Advanced").replace("Intermediate/Entry Level", "Intermediate Entry");
+    }
 }
