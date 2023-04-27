@@ -37,6 +37,9 @@ public class ReportHelper {
     private static final String CLAYS = "clays";
     private static final String FIVESTAND = "fivestand";
     private static final String DOUBLESKEET = "doublesskeet";
+    private static final String VARSITY = "Varsity";
+    private static final String INTERMEDIATEENTRY = "Intermediate Entry";
+    private static final String ROOKIE = "Rookie";
     private final String currentDate = new SimpleDateFormat("MM/dd/yyyy").format(Calendar.getInstance().getTime());
     private final String[] trapTypes = new String[]{SINGLES, DOUBLES, HANDICAP, SKEET, CLAYS, FIVESTAND, DOUBLESKEET};
 
@@ -57,9 +60,9 @@ public class ReportHelper {
         long trueStart = System.currentTimeMillis();
 
         Map<String, String> types = new HashMap<>();
-        types.put("Team-Senior", "Varsity");
-        types.put("Team-Intermediate", "Intermediate Entry");
-        types.put("Team-Rookie", "Rookie");
+        types.put("Team-Senior", VARSITY);
+        types.put("Team-Intermediate", INTERMEDIATEENTRY);
+        types.put("Team-Rookie", ROOKIE);
 
         CellStyle mainTextStyle = excelHelper.getCellStyle(workbook);
         CellStyle style = excelHelper.setFontForHeaders(workbook);
@@ -125,7 +128,8 @@ public class ReportHelper {
         List<String[]> roundScores = reader.readAll();
         roundScores.remove(0);
         List<RoundScore> roundScoresList = new ArrayList<>();
-        roundScores.forEach((s) -> roundScoresList.add(new RoundScore(Integer.parseInt(s[1]), s[2], Integer.parseInt(s[3]), s[4], s[5], s[6], s[7].replace("Club", "Team"), s[8], s[10].replace("Senior/Varsity", "Varsity").replace("Senior/Jr. Varsity", "Junior Varsity").replace("Intermediate/Advanced", "Intermediate Advanced").replace("Intermediate/Entry Level", "Intermediate Entry"), s[11], "".equals(s[12]) ? 0 : Integer.parseInt(s[12]), "".equals(s[13]) ? 0 : Integer.parseInt(s[13]), "".equals(s[14]) ? 0 : Integer.parseInt(s[14]), "".equals(s[15]) ? 0 : Integer.parseInt(s[15]), "".equals(s[16]) ? 0 : Integer.parseInt(s[16]), "".equals(s[17]) ? 0 : Integer.parseInt(s[17]), "".equals(s[18]) ? 0 : Integer.parseInt(s[18]), "".equals(s[19]) ? 0 : Integer.parseInt(s[19]), type)));
+        roundScores.forEach((s) -> roundScoresList.add(new RoundScore(Integer.parseInt(s[1]), s[2], Integer.parseInt(s[3]), s[4], s[5], s[6], s[7].replace("Club", "Team"), s[8], s[10].replace("Senior/Varsity", VARSITY).replace("Senior/Jr. Varsity", "Junior Varsity").replace("Intermediate/Advanced", "Intermediate Advanced").replace("Intermediate/Entry Level", INTERMEDIATEENTRY), s[11], "".equals(s[12]) ? 0 : Integer.parseInt(s[12]), "".equals(s[13]) ? 0 : Integer.parseInt(s[13]),
+                "".equals(s[14]) ? 0 : Integer.parseInt(s[14]), "".equals(s[15]) ? 0 : Integer.parseInt(s[15]), "".equals(s[16]) ? 0 : Integer.parseInt(s[16]), "".equals(s[17]) ? 0 : Integer.parseInt(s[17]), "".equals(s[18]) ? 0 : Integer.parseInt(s[18]), "".equals(s[19]) ? 0 : Integer.parseInt(s[19]), type)));
         return roundScoresList;
     }
 
@@ -258,7 +262,7 @@ public class ReportHelper {
             addTeamData(row, startColumn, teamScore.getName(), teamScore.getTotal(), mainTextStyle);
         }
 
-        if (!"Rookie".equals(teamType)) {
+        if (!ROOKIE.equals(teamType)) {
             startColumn += 3;
 
             updateRow = rows;
@@ -342,7 +346,7 @@ public class ReportHelper {
         int maxRow = rows;
         int classificationStartRow;
         boolean addBlankRowForHeader = false;
-        List<String> classificationList = Arrays.asList("Varsity", "Junior Varsity", "Intermediate Advanced", "Intermediate Entry", "Rookie");
+        List<String> classificationList = Arrays.asList(VARSITY, "Junior Varsity", "Intermediate Advanced", INTERMEDIATEENTRY, ROOKIE);
         long start;
         for (String classification : classificationList) {
             int column = 1;
