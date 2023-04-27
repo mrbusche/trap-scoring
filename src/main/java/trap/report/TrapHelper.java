@@ -95,7 +95,7 @@ public class TrapHelper {
                 }
             }
         } catch (Exception e) {
-            System.out.println(e);
+            throw e;
         }
         return playerFinalTotal;
     }
