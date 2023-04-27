@@ -2,7 +2,6 @@ package trap.report;
 
 import com.opencsv.CSVReader;
 import com.opencsv.exceptions.CsvException;
-import lombok.RequiredArgsConstructor;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.Row;
@@ -28,12 +27,18 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-@RequiredArgsConstructor
 @Service
 public class ReportHelper {
     private static final String COMMA_DELIMITER = ",";
+    private static final String SINGLES = "singles";
+    private static final String DOUBLES = "doubles";
+    private static final String HANDICAP = "handicap";
+    private static final String SKEET = "skeet";
+    private static final String CLAYS = "clays";
+    private static final String FIVESTAND = "fivestand";
+    private static final String DOUBLESKEET = "doublesskeet";
     private final String currentDate = new SimpleDateFormat("MM/dd/yyyy").format(Calendar.getInstance().getTime());
-    private final String[] trapTypes = new String[]{"singles", "doubles", "handicap", "skeet", "clays", "fivestand", "doublesskeet"};
+    private final String[] trapTypes = new String[]{SINGLES, DOUBLES, HANDICAP, SKEET, CLAYS, FIVESTAND, DOUBLESKEET};
 
     TrapHelper trapHelper = new TrapHelper();
     DownloadHelper downloadHelper = new DownloadHelper();
@@ -89,13 +94,13 @@ public class ReportHelper {
     private List<RoundScore> generateRoundScores() {
         List<RoundScore> allRoundScores;
         try {
-            List<RoundScore> singles = generateRoundScores("singles");
-            List<RoundScore> doubles = generateRoundScores("doubles");
-            List<RoundScore> handicap = generateRoundScores("handicap");
-            List<RoundScore> skeet = generateRoundScores("skeet");
-            List<RoundScore> clays = generateRoundScores("clays");
-            List<RoundScore> fivestand = generateRoundScores("fivestand");
-            List<RoundScore> doublesskeet = generateRoundScores("doublesskeet");
+            List<RoundScore> singles = generateRoundScores(SINGLES);
+            List<RoundScore> doubles = generateRoundScores(DOUBLES);
+            List<RoundScore> handicap = generateRoundScores(HANDICAP);
+            List<RoundScore> skeet = generateRoundScores(SKEET);
+            List<RoundScore> clays = generateRoundScores(CLAYS);
+            List<RoundScore> fivestand = generateRoundScores(FIVESTAND);
+            List<RoundScore> doublesskeet = generateRoundScores(DOUBLESKEET);
 
             allRoundScores = new ArrayList<>(singles);
             allRoundScores.addAll(doubles);
@@ -186,7 +191,7 @@ public class ReportHelper {
             cell = row.createCell(18);
             cell.setCellValue(rowData.getType());
         } catch (Exception e) {
-            System.out.println(row.toString());
+            throw e;
         }
     }
 
@@ -243,7 +248,7 @@ public class ReportHelper {
         int startColumn = 1;
         long start = System.currentTimeMillis();
 
-        List<Map.Entry<String, ArrayList<IndividualTotal>>> teamData = teamScoresByTotal.entrySet().stream().filter(f -> f.getValue().get(0).getTeamClassification().equals(teamType) && f.getValue().get(0).getType().equals("singles")).toList();
+        List<Map.Entry<String, ArrayList<IndividualTotal>>> teamData = teamScoresByTotal.entrySet().stream().filter(f -> f.getValue().get(0).getTeamClassification().equals(teamType) && f.getValue().get(0).getType().equals(SINGLES)).toList();
         List<TeamScore> teamScores = getTeamScores(teamData);
 
         start = System.currentTimeMillis();
@@ -258,7 +263,7 @@ public class ReportHelper {
 
             updateRow = rows;
             start = System.currentTimeMillis();
-            teamData = teamScoresByTotal.entrySet().stream().filter(f -> f.getValue().get(0).getTeamClassification().equals(teamType) && f.getValue().get(0).getType().equals("handicap")).toList();
+            teamData = teamScoresByTotal.entrySet().stream().filter(f -> f.getValue().get(0).getTeamClassification().equals(teamType) && f.getValue().get(0).getType().equals(HANDICAP)).toList();
             teamScores = getTeamScores(teamData);
             System.out.println("Ran query for handicap by " + teamType + " " + (System.currentTimeMillis() - start) + "ms");
             for (TeamScore teamScore : teamScores) {
@@ -269,7 +274,7 @@ public class ReportHelper {
 
             updateRow = rows;
             start = System.currentTimeMillis();
-            teamData = teamScoresByTotal.entrySet().stream().filter(f -> f.getValue().get(0).getTeamClassification().equals(teamType) && f.getValue().get(0).getType().equals("doubles")).toList();
+            teamData = teamScoresByTotal.entrySet().stream().filter(f -> f.getValue().get(0).getTeamClassification().equals(teamType) && f.getValue().get(0).getType().equals(DOUBLES)).toList();
             teamScores = getTeamScores(teamData);
             System.out.println("Ran query for doubles by " + teamType + " " + (System.currentTimeMillis() - start) + "ms");
             for (TeamScore teamScore : teamScores) {
@@ -280,7 +285,7 @@ public class ReportHelper {
 
             updateRow = rows;
             start = System.currentTimeMillis();
-            teamData = teamScoresByTotal.entrySet().stream().filter(f -> f.getValue().get(0).getTeamClassification().equals(teamType) && f.getValue().get(0).getType().equals("skeet")).toList();
+            teamData = teamScoresByTotal.entrySet().stream().filter(f -> f.getValue().get(0).getTeamClassification().equals(teamType) && f.getValue().get(0).getType().equals(SKEET)).toList();
             teamScores = getTeamScores(teamData);
             System.out.println("Ran query for skeet by " + teamType + " " + (System.currentTimeMillis() - start) + "ms");
             for (TeamScore teamScore : teamScores) {
@@ -291,7 +296,7 @@ public class ReportHelper {
 
             updateRow = rows;
             start = System.currentTimeMillis();
-            teamData = teamScoresByTotal.entrySet().stream().filter(f -> f.getValue().get(0).getTeamClassification().equals(teamType) && f.getValue().get(0).getType().equals("clays")).toList();
+            teamData = teamScoresByTotal.entrySet().stream().filter(f -> f.getValue().get(0).getTeamClassification().equals(teamType) && f.getValue().get(0).getType().equals(CLAYS)).toList();
             teamScores = getTeamScores(teamData);
             System.out.println("Ran query for clays by " + teamType + " " + (System.currentTimeMillis() - start) + "ms");
             for (TeamScore teamScore : teamScores) {
@@ -302,7 +307,7 @@ public class ReportHelper {
 
             updateRow = rows;
             start = System.currentTimeMillis();
-            teamData = teamScoresByTotal.entrySet().stream().filter(f -> f.getValue().get(0).getTeamClassification().equals(teamType) && f.getValue().get(0).getType().equals("fivestand")).toList();
+            teamData = teamScoresByTotal.entrySet().stream().filter(f -> f.getValue().get(0).getTeamClassification().equals(teamType) && f.getValue().get(0).getType().equals(FIVESTAND)).toList();
             teamScores = getTeamScores(teamData);
             System.out.println("Ran query for fivestand by " + teamType + " " + (System.currentTimeMillis() - start) + "ms");
             for (TeamScore teamScore : teamScores) {
@@ -313,7 +318,7 @@ public class ReportHelper {
 
             updateRow = rows;
             start = System.currentTimeMillis();
-            teamData = teamScoresByTotal.entrySet().stream().filter(f -> f.getValue().get(0).getTeamClassification().equals(teamType) && f.getValue().get(0).getType().equals("doublesskeet")).toList();
+            teamData = teamScoresByTotal.entrySet().stream().filter(f -> f.getValue().get(0).getTeamClassification().equals(teamType) && f.getValue().get(0).getType().equals(DOUBLESKEET)).toList();
             teamScores = getTeamScores(teamData);
             System.out.println("Ran query for doublesskeet by " + teamType + " " + (System.currentTimeMillis() - start) + "ms");
             for (TeamScore teamScore : teamScores) {
@@ -370,12 +375,12 @@ public class ReportHelper {
 
             start = System.currentTimeMillis();
 
-//            var individualSinglesData = allRoundScores.entrySet().stream().filter(a -> a.getValue().getGender().equals(gender) && a.getValue().getClassification().equals(classification) && a.getValue().getType().equals("singles")).toList();
+//            var individualSinglesData = allRoundScores.entrySet().stream().filter(a -> a.getValue().getGender().equals(gender) && a.getValue().getClassification().equals(classification) && a.getValue().getType().equals(SINGLES)).toList();
             List<IndividualTotal> justValues = new ArrayList<>(allRoundScores.values());
             justValues.sort(Comparator.comparingInt(IndividualTotal::getTotal).reversed());
 
             start = System.currentTimeMillis();
-            var individualSinglesData = justValues.stream().filter(f -> f.getGender().equals(gender) && f.getClassification().equals(classification) && f.getType().equals("singles")).toList();
+            var individualSinglesData = justValues.stream().filter(f -> f.getGender().equals(gender) && f.getClassification().equals(classification) && f.getType().equals(SINGLES)).toList();
             System.out.println("Ran query for singles by " + gender + " and " + classification + " " + (System.currentTimeMillis() - start) + "ms");
 
             for (IndividualTotal singlesRowData : individualSinglesData) {
@@ -388,7 +393,7 @@ public class ReportHelper {
             updateRow = classificationStartRow;
             updateRow++;
             start = System.currentTimeMillis();
-            var individualHandicapData = justValues.stream().filter(f -> f.getGender().equals(gender) && f.getClassification().equals(classification) && f.getType().equals("handicap")).toList();
+            var individualHandicapData = justValues.stream().filter(f -> f.getGender().equals(gender) && f.getClassification().equals(classification) && f.getType().equals(HANDICAP)).toList();
             System.out.println("Ran query for handicap by " + gender + " and " + classification + " " + (System.currentTimeMillis() - start) + "ms");
             for (IndividualTotal handicapRowData : individualHandicapData) {
                 row = sheet.getRow(++updateRow);
@@ -400,7 +405,7 @@ public class ReportHelper {
             updateRow = classificationStartRow;
             updateRow++;
             start = System.currentTimeMillis();
-            var individualDoublesData = justValues.stream().filter(f -> f.getGender().equals(gender) && f.getClassification().equals(classification) && f.getType().equals("doubles")).toList();
+            var individualDoublesData = justValues.stream().filter(f -> f.getGender().equals(gender) && f.getClassification().equals(classification) && f.getType().equals(DOUBLES)).toList();
             System.out.println("Ran query for handicap by " + gender + " and " + classification + " " + (System.currentTimeMillis() - start) + "ms");
             for (IndividualTotal doublesRowData : individualDoublesData) {
                 row = sheet.getRow(++updateRow);
@@ -412,7 +417,7 @@ public class ReportHelper {
             updateRow = classificationStartRow;
             updateRow++;
             start = System.currentTimeMillis();
-            var individualSkeetData = justValues.stream().filter(f -> f.getGender().equals(gender) && f.getClassification().equals(classification) && f.getType().equals("skeet")).toList();
+            var individualSkeetData = justValues.stream().filter(f -> f.getGender().equals(gender) && f.getClassification().equals(classification) && f.getType().equals(SKEET)).toList();
             System.out.println("Ran query for skeet by " + gender + " and " + classification + " " + (System.currentTimeMillis() - start) + "ms");
             for (IndividualTotal skeetRowData : individualSkeetData) {
                 row = sheet.getRow(++updateRow);
@@ -424,7 +429,7 @@ public class ReportHelper {
             updateRow = classificationStartRow;
             updateRow++;
             start = System.currentTimeMillis();
-            var individualClaysData = justValues.stream().filter(f -> f.getGender().equals(gender) && f.getClassification().equals(classification) && f.getType().equals("clays")).toList();
+            var individualClaysData = justValues.stream().filter(f -> f.getGender().equals(gender) && f.getClassification().equals(classification) && f.getType().equals(CLAYS)).toList();
             System.out.println("Ran query for clays by " + gender + " and " + classification + " " + (System.currentTimeMillis() - start) + "ms");
             for (IndividualTotal claysRowData : individualClaysData) {
                 row = sheet.getRow(++updateRow);
@@ -436,7 +441,7 @@ public class ReportHelper {
             updateRow = classificationStartRow;
             updateRow++;
             start = System.currentTimeMillis();
-            var individualFivestandData = justValues.stream().filter(f -> f.getGender().equals(gender) && f.getClassification().equals(classification) && f.getType().equals("fivestand")).toList();
+            var individualFivestandData = justValues.stream().filter(f -> f.getGender().equals(gender) && f.getClassification().equals(classification) && f.getType().equals(FIVESTAND)).toList();
             System.out.println("Ran query for fivestand by " + gender + " and " + classification + " " + (System.currentTimeMillis() - start) + "ms");
             for (IndividualTotal fivestandRowData : individualFivestandData) {
                 row = sheet.getRow(++updateRow);
@@ -448,7 +453,7 @@ public class ReportHelper {
             updateRow = classificationStartRow;
             updateRow++;
             start = System.currentTimeMillis();
-            var individualDoubleSkeetData = justValues.stream().filter(f -> f.getGender().equals(gender) && f.getClassification().equals(classification) && f.getType().equals("doublesskeet")).toList();
+            var individualDoubleSkeetData = justValues.stream().filter(f -> f.getGender().equals(gender) && f.getClassification().equals(classification) && f.getType().equals(DOUBLESKEET)).toList();
             System.out.println("Ran query for doublesskeet by " + gender + " and " + classification + " " + (System.currentTimeMillis() - start) + "ms");
             for (IndividualTotal doublesskeetRowData : individualDoubleSkeetData) {
                 row = sheet.getRow(++updateRow);
@@ -469,7 +474,7 @@ public class ReportHelper {
 
         for (IndividualTotal total : justValues) {
             var currentTeam = teamScoresThatCount.get(total.getTeamForScores());
-            var scoresToCount = total.getType().equals("singles") || total.getType().equals("handicap") || total.getType().equals("doubles") ? 5 : 3;
+            var scoresToCount = total.getType().equals(SINGLES) || total.getType().equals(HANDICAP) || total.getType().equals(DOUBLES) ? 5 : 3;
             if (currentTeam.size() < scoresToCount) {
                 total.setClassification(total.getTeamClassification());
                 currentTeam.add(total);
