@@ -45,7 +45,7 @@ public class ReportHelper {
     ExcelHelper excelHelper = new ExcelHelper();
 
     public void doItAll() throws Exception {
-//        downloadHelper.downloadFiles(trapTypes);
+        downloadHelper.downloadFiles(trapTypes);
 
         Workbook workbook = getWorkbook("main");
 
@@ -362,7 +362,6 @@ public class ReportHelper {
             var currentTeam = teamScoresThatCount.get(total.getTeamForScores());
             var scoresToCount = total.getType().equals(SINGLES) || total.getType().equals(HANDICAP) || total.getType().equals(DOUBLES) ? 5 : 3;
             if (currentTeam.size() < scoresToCount) {
-//                total.setClassification(total.getTeamClassificationForTotal());
                 currentTeam.add(total);
                 teamScoresThatCount.put(total.getTeamForScores(), currentTeam);
             }
