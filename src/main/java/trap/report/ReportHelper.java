@@ -242,12 +242,10 @@ public class ReportHelper {
 
         int updateRow = rows;
         int startColumn = 1;
-        long start;
+        long start = System.currentTimeMillis();
 
         List<Map.Entry<String, ArrayList<IndividualTotal>>> teamData = teamScoresByTotal.entrySet().stream().filter(f -> f.getValue().get(0).getTeamClassificationForTotal().equals(teamType) && f.getValue().get(0).getType().equals(SINGLES)).toList();
         List<TeamScore> teamScores = getTeamScores(teamData);
-
-        start = System.currentTimeMillis();
         System.out.println("Ran query for singles by " + teamType + " " + (System.currentTimeMillis() - start) + "ms");
         for (TeamScore teamScore : teamScores) {
             row = sheet.createRow(++updateRow);
@@ -257,70 +255,20 @@ public class ReportHelper {
         if (!"Rookie".equals(teamType)) {
             startColumn += 3;
 
-            updateRow = rows;
-            start = System.currentTimeMillis();
-            teamData = teamScoresByTotal.entrySet().stream().filter(f -> f.getValue().get(0).getTeamClassificationForTotal().equals(teamType) && f.getValue().get(0).getType().equals(HANDICAP)).toList();
-            teamScores = getTeamScores(teamData);
-            System.out.println("Ran query for handicap by " + teamType + " " + (System.currentTimeMillis() - start) + "ms");
-            for (TeamScore teamScore : teamScores) {
-                row = sheet.getRow(++updateRow);
-                addTeamData(row, startColumn, teamScore.getName(), teamScore.getTotal(), mainTextStyle);
+            String[] types = new String[]{HANDICAP, DOUBLES, SKEET, CLAYS, FIVESTAND, DOUBLESKEET};
+            for (String type : types) {
+                updateRow = rows;
+                start = System.currentTimeMillis();
+                teamData = teamScoresByTotal.entrySet().stream().filter(f -> f.getValue().get(0).getTeamClassificationForTotal().equals(teamType) && f.getValue().get(0).getType().equals(type)).toList();
+                teamScores = getTeamScores(teamData);
+                System.out.println("Ran query for " + type + " by " + teamType + " " + (System.currentTimeMillis() - start) + "ms");
+                for (TeamScore teamScore : teamScores) {
+                    row = sheet.getRow(++updateRow);
+                    addTeamData(row, startColumn, teamScore.getName(), teamScore.getTotal(), mainTextStyle);
+                }
+                startColumn += 3;
             }
-            startColumn += 3;
 
-            updateRow = rows;
-            start = System.currentTimeMillis();
-            teamData = teamScoresByTotal.entrySet().stream().filter(f -> f.getValue().get(0).getTeamClassificationForTotal().equals(teamType) && f.getValue().get(0).getType().equals(DOUBLES)).toList();
-            teamScores = getTeamScores(teamData);
-            System.out.println("Ran query for doubles by " + teamType + " " + (System.currentTimeMillis() - start) + "ms");
-            for (TeamScore teamScore : teamScores) {
-                row = sheet.getRow(++updateRow);
-                addTeamData(row, startColumn, teamScore.getName(), teamScore.getTotal(), mainTextStyle);
-            }
-            startColumn += 3;
-
-            updateRow = rows;
-            start = System.currentTimeMillis();
-            teamData = teamScoresByTotal.entrySet().stream().filter(f -> f.getValue().get(0).getTeamClassificationForTotal().equals(teamType) && f.getValue().get(0).getType().equals(SKEET)).toList();
-            teamScores = getTeamScores(teamData);
-            System.out.println("Ran query for skeet by " + teamType + " " + (System.currentTimeMillis() - start) + "ms");
-            for (TeamScore teamScore : teamScores) {
-                row = sheet.getRow(++updateRow);
-                addTeamData(row, startColumn, teamScore.getName(), teamScore.getTotal(), mainTextStyle);
-            }
-            startColumn += 3;
-
-            updateRow = rows;
-            start = System.currentTimeMillis();
-            teamData = teamScoresByTotal.entrySet().stream().filter(f -> f.getValue().get(0).getTeamClassificationForTotal().equals(teamType) && f.getValue().get(0).getType().equals(CLAYS)).toList();
-            teamScores = getTeamScores(teamData);
-            System.out.println("Ran query for clays by " + teamType + " " + (System.currentTimeMillis() - start) + "ms");
-            for (TeamScore teamScore : teamScores) {
-                row = sheet.getRow(++updateRow);
-                addTeamData(row, startColumn, teamScore.getName(), teamScore.getTotal(), mainTextStyle);
-            }
-            startColumn += 3;
-
-            updateRow = rows;
-            start = System.currentTimeMillis();
-            teamData = teamScoresByTotal.entrySet().stream().filter(f -> f.getValue().get(0).getTeamClassificationForTotal().equals(teamType) && f.getValue().get(0).getType().equals(FIVESTAND)).toList();
-            teamScores = getTeamScores(teamData);
-            System.out.println("Ran query for fivestand by " + teamType + " " + (System.currentTimeMillis() - start) + "ms");
-            for (TeamScore teamScore : teamScores) {
-                row = sheet.getRow(++updateRow);
-                addTeamData(row, startColumn, teamScore.getName(), teamScore.getTotal(), mainTextStyle);
-            }
-            startColumn += 3;
-
-            updateRow = rows;
-            start = System.currentTimeMillis();
-            teamData = teamScoresByTotal.entrySet().stream().filter(f -> f.getValue().get(0).getTeamClassificationForTotal().equals(teamType) && f.getValue().get(0).getType().equals(DOUBLESKEET)).toList();
-            teamScores = getTeamScores(teamData);
-            System.out.println("Ran query for doublesskeet by " + teamType + " " + (System.currentTimeMillis() - start) + "ms");
-            for (TeamScore teamScore : teamScores) {
-                row = sheet.getRow(++updateRow);
-                addTeamData(row, startColumn, teamScore.getName(), teamScore.getTotal(), mainTextStyle);
-            }
         }
     }
 
@@ -374,7 +322,6 @@ public class ReportHelper {
             List<IndividualTotal> justValues = new ArrayList<>(allRoundScores.values());
             justValues.sort(Comparator.comparingInt(IndividualTotal::getTotal).reversed());
 
-            start = System.currentTimeMillis();
             var individualSinglesData = justValues.stream().filter(f -> f.getGender().equals(gender) && f.getTeamClassification().equals(classification) && f.getType().equals(SINGLES)).toList();
             System.out.println("Ran query for singles by " + gender + " and " + classification + " " + (System.currentTimeMillis() - start) + "ms");
 
@@ -385,76 +332,20 @@ public class ReportHelper {
             column += 4;
             maxRow = Math.max(maxRow, updateRow);
 
-            updateRow = classificationStartRow;
-            updateRow++;
-            start = System.currentTimeMillis();
-            var individualHandicapData = justValues.stream().filter(f -> f.getGender().equals(gender) && f.getTeamClassification().equals(classification) && f.getType().equals(HANDICAP)).toList();
-            System.out.println("Ran query for handicap by " + gender + " and " + classification + " " + (System.currentTimeMillis() - start) + "ms");
-            for (IndividualTotal handicapRowData : individualHandicapData) {
-                row = sheet.getRow(++updateRow);
-                addPlayerData(row, column, handicapRowData.getAthlete(), handicapRowData.getTotal(), handicapRowData.getTeam(), mainTextStyle);
+            String[] types = new String[]{HANDICAP, DOUBLES, SKEET, CLAYS, FIVESTAND, DOUBLESKEET};
+            for (String type : types) {
+                updateRow = classificationStartRow;
+                updateRow++;
+                start = System.currentTimeMillis();
+                var individualData = justValues.stream().filter(f -> f.getGender().equals(gender) && f.getTeamClassification().equals(classification) && f.getType().equals(type)).toList();
+                System.out.println("Ran query for " + type + " by " + gender + " and " + classification + " " + (System.currentTimeMillis() - start) + "ms");
+                for (IndividualTotal data : individualData) {
+                    row = sheet.getRow(++updateRow);
+                    addPlayerData(row, column, data.getAthlete(), data.getTotal(), data.getTeam(), mainTextStyle);
+                }
+                maxRow = Math.max(maxRow, updateRow);
+                column += 4;
             }
-            maxRow = Math.max(maxRow, updateRow);
-            column += 4;
-//
-            updateRow = classificationStartRow;
-            updateRow++;
-            start = System.currentTimeMillis();
-            var individualDoublesData = justValues.stream().filter(f -> f.getGender().equals(gender) && f.getTeamClassification().equals(classification) && f.getType().equals(DOUBLES)).toList();
-            System.out.println("Ran query for handicap by " + gender + " and " + classification + " " + (System.currentTimeMillis() - start) + "ms");
-            for (IndividualTotal doublesRowData : individualDoublesData) {
-                row = sheet.getRow(++updateRow);
-                addPlayerData(row, column, doublesRowData.getAthlete(), doublesRowData.getTotal(), doublesRowData.getTeam(), mainTextStyle);
-            }
-            maxRow = Math.max(maxRow, updateRow);
-            column += 4;
-
-            updateRow = classificationStartRow;
-            updateRow++;
-            start = System.currentTimeMillis();
-            var individualSkeetData = justValues.stream().filter(f -> f.getGender().equals(gender) && f.getTeamClassification().equals(classification) && f.getType().equals(SKEET)).toList();
-            System.out.println("Ran query for skeet by " + gender + " and " + classification + " " + (System.currentTimeMillis() - start) + "ms");
-            for (IndividualTotal skeetRowData : individualSkeetData) {
-                row = sheet.getRow(++updateRow);
-                addPlayerData(row, column, skeetRowData.getAthlete(), skeetRowData.getTotal(), skeetRowData.getTeam(), mainTextStyle);
-            }
-            maxRow = Math.max(maxRow, updateRow);
-            column += 4;
-
-            updateRow = classificationStartRow;
-            updateRow++;
-            start = System.currentTimeMillis();
-            var individualClaysData = justValues.stream().filter(f -> f.getGender().equals(gender) && f.getTeamClassification().equals(classification) && f.getType().equals(CLAYS)).toList();
-            System.out.println("Ran query for clays by " + gender + " and " + classification + " " + (System.currentTimeMillis() - start) + "ms");
-            for (IndividualTotal claysRowData : individualClaysData) {
-                row = sheet.getRow(++updateRow);
-                addPlayerData(row, column, claysRowData.getAthlete(), claysRowData.getTotal(), claysRowData.getTeam(), mainTextStyle);
-            }
-            maxRow = Math.max(maxRow, updateRow);
-            column += 4;
-
-            updateRow = classificationStartRow;
-            updateRow++;
-            start = System.currentTimeMillis();
-            var individualFivestandData = justValues.stream().filter(f -> f.getGender().equals(gender) && f.getTeamClassification().equals(classification) && f.getType().equals(FIVESTAND)).toList();
-            System.out.println("Ran query for fivestand by " + gender + " and " + classification + " " + (System.currentTimeMillis() - start) + "ms");
-            for (IndividualTotal fivestandRowData : individualFivestandData) {
-                row = sheet.getRow(++updateRow);
-                addPlayerData(row, column, fivestandRowData.getAthlete(), fivestandRowData.getTotal(), fivestandRowData.getTeam(), mainTextStyle);
-            }
-            maxRow = Math.max(maxRow, updateRow);
-            column += 4;
-
-            updateRow = classificationStartRow;
-            updateRow++;
-            start = System.currentTimeMillis();
-            var individualDoubleSkeetData = justValues.stream().filter(f -> f.getGender().equals(gender) && f.getTeamClassification().equals(classification) && f.getType().equals(DOUBLESKEET)).toList();
-            System.out.println("Ran query for doublesskeet by " + gender + " and " + classification + " " + (System.currentTimeMillis() - start) + "ms");
-            for (IndividualTotal doublesskeetRowData : individualDoubleSkeetData) {
-                row = sheet.getRow(++updateRow);
-                addPlayerData(row, column, doublesskeetRowData.getAthlete(), doublesskeetRowData.getTotal(), doublesskeetRowData.getTeam(), mainTextStyle);
-            }
-            maxRow = Math.max(maxRow, updateRow);
 
             sheet.setAutoFilter(CellRangeAddress.valueOf("A13:AB13"));
         }
