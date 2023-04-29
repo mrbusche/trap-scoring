@@ -14,9 +14,8 @@ import java.util.Set;
 
 public class TrapHelper {
 
-    public HashMap<String, ArrayList<RoundTotal>> calculatePlayerRoundTotals(List<RoundScore> roundScores) {
-        HashMap<String, ArrayList<RoundTotal>> playerRoundTotals = new HashMap<>();
-        ArrayList<RoundTotal> playerRoundTotalList = new ArrayList<>();
+    public Map<String, ArrayList<RoundTotal>> calculatePlayerRoundTotals(List<RoundScore> roundScores) {
+        Map<String, ArrayList<RoundTotal>> playerRoundTotals = new HashMap<>();
         for (RoundScore r : roundScores) {
             playerRoundTotals.put(r.getUniqueName(), new ArrayList<>());
         }
@@ -42,15 +41,15 @@ public class TrapHelper {
             }
             playerRoundTotals.put(r.getUniqueName(), currentPlayerRoundTotal);
         }
+
         return playerRoundTotals;
     }
 
-    public HashMap<String, ArrayList<IndividualTotal>> calculatePlayerIndividualTotal(List<RoundScore> roundScores, HashMap<String, ArrayList<RoundTotal>> playerRoundTotals) {
-        HashMap<String, ArrayList<IndividualTotal>> playerIndividualTotal = new HashMap<>();
+    public Map<String, ArrayList<IndividualTotal>> calculatePlayerIndividualTotal(List<RoundScore> roundScores, Map<String, ArrayList<RoundTotal>> playerRoundTotals) {
+        Map<String, ArrayList<IndividualTotal>> playerIndividualTotal = new HashMap<>();
         for (RoundScore r : roundScores) {
             playerIndividualTotal.put(r.getUniqueName(), new ArrayList<>());
         }
-        ArrayList<IndividualTotal> allIndTotals = new ArrayList<>();
         for (ArrayList<RoundTotal> playerRoundTotal : playerRoundTotals.values()) {
             // clays, skeet, and fivestand are top 3 scores only, minimum 2 locations
             var subtractScores = playerRoundTotal.get(0).getType().equals("clays") || playerRoundTotal.get(0).getType().equals("skeet") || playerRoundTotal.get(0).getType().equals("fivestand") ? 1 : 0;
@@ -77,26 +76,24 @@ public class TrapHelper {
             }
             playerIndividualTotal.put(playerRoundTotal.get(0).getUniqueName(), indTotal);
         }
+
         return playerIndividualTotal;
     }
 
-    public HashMap<String, IndividualTotal> calculatePlayerFinalTotal(HashMap<String, ArrayList<IndividualTotal>> playerIndividualTotal) {
-        HashMap<String, IndividualTotal> playerFinalTotal = new HashMap<>();
-        try {
-            for (Map.Entry<String, ArrayList<IndividualTotal>> entry : playerIndividualTotal.entrySet()) {
-                String key = entry.getKey();
-                ArrayList<IndividualTotal> value = entry.getValue();
-                if (value.size() != 0) {
-                    int total = 0;
-                    for (IndividualTotal t : value) {
-                        total += t.getTotal();
-                    }
-                    playerFinalTotal.put(key, new IndividualTotal(0, value.get(0).getTeam(), value.get(0).getAthlete(), value.get(0).getClassification(), value.get(0).getGender(), total, value.get(0).getType()));
+    public Map<String, IndividualTotal> calculatePlayerFinalTotal(Map<String, ArrayList<IndividualTotal>> playerIndividualTotal) {
+        Map<String, IndividualTotal> playerFinalTotal = new HashMap<>();
+        for (Map.Entry<String, ArrayList<IndividualTotal>> entry : playerIndividualTotal.entrySet()) {
+            String key = entry.getKey();
+            ArrayList<IndividualTotal> value = entry.getValue();
+            if (!value.isEmpty()) {
+                int total = 0;
+                for (IndividualTotal t : value) {
+                    total += t.getTotal();
                 }
+                playerFinalTotal.put(key, new IndividualTotal(0, value.get(0).getTeam(), value.get(0).getAthlete(), value.get(0).getClassification(), value.get(0).getGender(), total, value.get(0).getType()));
             }
-        } catch (Exception e) {
-            throw e;
         }
+
         return playerFinalTotal;
     }
 }
