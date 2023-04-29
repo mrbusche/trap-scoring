@@ -37,6 +37,11 @@ public class ReportHelper {
     private static final String CLAYS = "clays";
     private static final String FIVESTAND = "fivestand";
     private static final String DOUBLESKEET = "doublesskeet";
+    private static final String ROOKIE = "Rookie";
+    private static final String VARSITY = "Varsity";
+    private static final String INTERMEDIATE_ENTRY = "Intermediate Entry";
+    private static final String JUNIOR_VARSITY = "Junior Varsity";
+    private static final String INTERMEDIATE_ADVANCED = "Intermediate Advanced";
     private final String currentDate = new SimpleDateFormat("MM/dd/yyyy").format(Calendar.getInstance().getTime());
     private final String[] trapTypes = new String[]{SINGLES, DOUBLES, HANDICAP, SKEET, CLAYS, FIVESTAND, DOUBLESKEET};
 
@@ -57,9 +62,9 @@ public class ReportHelper {
         long trueStart = System.currentTimeMillis();
 
         Map<String, String> types = new HashMap<>();
-        types.put("Team-Senior", "Varsity");
-        types.put("Team-Intermediate", "Intermediate Entry");
-        types.put("Team-Rookie", "Rookie");
+        types.put("Team-Senior", VARSITY);
+        types.put("Team-Intermediate", INTERMEDIATE_ENTRY);
+        types.put("Team-Rookie", ROOKIE);
 
         CellStyle mainTextStyle = excelHelper.getCellStyle(workbook);
         CellStyle style = excelHelper.setFontForHeaders(workbook);
@@ -131,7 +136,7 @@ public class ReportHelper {
             List<RoundScore> typeRoundScores = allRoundScores.stream().filter(t -> t.getType().equals(type)).toList();
             for (RoundScore record : typeRoundScores) {
                 row = sheet.createRow(++rows);
-                excelHelper.addCleanData(row, record, type);
+                excelHelper.addCleanData(row, record);
             }
         }
 
@@ -177,7 +182,7 @@ public class ReportHelper {
             ExcelHelper.addTeamData(row, startColumn, teamScore.getName(), teamScore.getTotal(), mainTextStyle);
         }
 
-        if (!"Rookie".equals(teamType)) {
+        if (!ROOKIE.equals(teamType)) {
             startColumn += 3;
 
             String[] types = new String[]{HANDICAP, DOUBLES, SKEET, CLAYS, FIVESTAND, DOUBLESKEET};
@@ -211,7 +216,7 @@ public class ReportHelper {
         int maxRow = rows;
         int classificationStartRow;
         boolean addBlankRowForHeader = false;
-        List<String> classificationList = Arrays.asList("Varsity", "Junior Varsity", "Intermediate Advanced", "Intermediate Entry", "Rookie");
+        List<String> classificationList = Arrays.asList(VARSITY, JUNIOR_VARSITY, INTERMEDIATE_ADVANCED, INTERMEDIATE_ENTRY, ROOKIE);
         long start;
         for (String classification : classificationList) {
             int column = 1;

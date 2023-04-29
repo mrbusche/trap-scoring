@@ -64,7 +64,7 @@ public class ExcelHelper {
         System.out.println("Wrote the contents to a file in " + (System.currentTimeMillis() - start) + "ms");
     }
 
-    public void addCleanData(Row row, RoundScore rowData, String type) {
+    public void addCleanData(Row row, RoundScore rowData) {
         Cell cell;
         cell = row.createCell(0);
         cell.setCellValue(rowData.getEventId());
