@@ -1,9 +1,13 @@
 package trap.report;
 
+import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.Font;
+import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
+import trap.model.IndividualTotal;
+import trap.model.RoundScore;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -58,5 +62,85 @@ public class ExcelHelper {
         fileOutputStream.close();
         System.out.println("Created file " + newFilename);
         System.out.println("Wrote the contents to a file in " + (System.currentTimeMillis() - start) + "ms");
+    }
+
+    public void addCleanData(Row row, RoundScore rowData, String type) {
+        Cell cell;
+        cell = row.createCell(0);
+        cell.setCellValue(rowData.getEventId());
+        cell = row.createCell(1);
+        cell.setCellValue(rowData.getEvent());
+        cell = row.createCell(2);
+        cell.setCellValue(rowData.getLocationId());
+        cell = row.createCell(3);
+        cell.setCellValue(rowData.getLocation());
+        cell = row.createCell(4);
+        cell.setCellValue(rowData.getEventDate());
+        cell = row.createCell(5);
+        cell.setCellValue(rowData.getSquadName());
+        cell = row.createCell(6);
+        cell.setCellValue(rowData.getTeam());
+        cell = row.createCell(7);
+        cell.setCellValue(rowData.getAthlete());
+        cell = row.createCell(8);
+        cell.setCellValue(rowData.getClassification());
+        cell = row.createCell(9);
+        cell.setCellValue(rowData.getGender());
+        cell = row.createCell(10);
+        cell.setCellValue(rowData.getRound1());
+        cell = row.createCell(11);
+        cell.setCellValue(rowData.getRound2());
+        cell = row.createCell(12);
+        cell.setCellValue(rowData.getRound3());
+        cell = row.createCell(13);
+        cell.setCellValue(rowData.getRound4());
+        cell = row.createCell(14);
+        cell.setCellValue(rowData.getRound5());
+        cell = row.createCell(15);
+        cell.setCellValue(rowData.getRound6());
+        cell = row.createCell(16);
+        cell.setCellValue(rowData.getRound7());
+        cell = row.createCell(17);
+        cell.setCellValue(rowData.getRound8());
+        cell = row.createCell(18);
+        cell.setCellValue(rowData.getType());
+    }
+
+    public static void addTeamData(Row row, int startColumn, String team, Integer total, CellStyle mainTextStyle) {
+        Cell cell = row.createCell(startColumn);
+        cell.setCellValue(team);
+        cell.setCellStyle(mainTextStyle);
+        cell = row.createCell(startColumn + 1);
+        cell.setCellValue(total);
+        cell.setCellStyle(mainTextStyle);
+    }
+
+    public static void addPlayerData(Row row, int column, String athlete, Integer total, String team, CellStyle mainTextStyle) {
+        if (row != null) {
+            Cell cell = row.createCell(column);
+            cell.setCellValue(athlete);
+            cell.setCellStyle(mainTextStyle);
+            cell = row.createCell(column + 1);
+            cell.setCellValue(total);
+            cell.setCellStyle(mainTextStyle);
+            cell = row.createCell(column + 2);
+            cell.setCellValue(team);
+            cell.setCellStyle(mainTextStyle);
+        }
+    }
+
+    public static int getRows(Sheet sheet, int rows, IndividualTotal rowData) {
+        Row row = sheet.createRow(++rows);
+        Cell cell = row.createCell(0);
+        cell.setCellValue(rowData.getType());
+        cell = row.createCell(1);
+        cell.setCellValue(rowData.getTeam());
+        cell = row.createCell(2);
+        cell.setCellValue(rowData.getClassification());
+        cell = row.createCell(3);
+        cell.setCellValue(rowData.getAthlete());
+        cell = row.createCell(4);
+        cell.setCellValue(rowData.getTotal());
+        return rows;
     }
 }
