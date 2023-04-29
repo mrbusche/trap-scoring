@@ -47,7 +47,6 @@ public class ReportHelper {
 
     TrapHelper trapHelper = new TrapHelper();
     DownloadHelper downloadHelper = new DownloadHelper();
-    ExcelHelper excelHelper = new ExcelHelper();
 
     public void doItAll() throws Exception {
         downloadHelper.downloadFiles(trapTypes);
@@ -66,8 +65,8 @@ public class ReportHelper {
         types.put("Team-Intermediate", INTERMEDIATE_ENTRY);
         types.put("Team-Rookie", ROOKIE);
 
-        CellStyle mainTextStyle = excelHelper.getCellStyle(workbook);
-        CellStyle style = excelHelper.setFontForHeaders(workbook);
+        CellStyle mainTextStyle = ExcelHelper.getCellStyle(workbook);
+        CellStyle style = ExcelHelper.setFontForHeaders(workbook);
 
         List<RoundScore> allRoundScores = generateRoundScores();
         populateCleanData(workbook.getSheet("Clean Data"), allRoundScores);
@@ -90,7 +89,7 @@ public class ReportHelper {
         populateTeamIndividualData(workbook, "Team-Individual-Scores", teamScoresByTotal);
         populateAllIndividualData(workbook, "Individual-All-Scores", playerFinalTotal);
 
-        excelHelper.createFile(workbook, "league-data");
+        ExcelHelper.createFile(workbook, "league-data");
 
         System.out.println("Finished creating file in " + (System.currentTimeMillis() - trueStart) + "ms");
         workbook.close();
@@ -134,9 +133,9 @@ public class ReportHelper {
 
         for (String type : trapTypes) {
             List<RoundScore> typeRoundScores = allRoundScores.stream().filter(t -> t.getType().equals(type)).toList();
-            for (RoundScore record : typeRoundScores) {
+            for (RoundScore score : typeRoundScores) {
                 row = sheet.createRow(++rows);
-                excelHelper.addCleanData(row, record);
+                ExcelHelper.addCleanData(row, score);
             }
         }
 
@@ -164,8 +163,8 @@ public class ReportHelper {
     }
 
     private void populateTeamData(Sheet sheet, String teamType, CellStyle mainTextStyle, HashMap<String, ArrayList<IndividualTotal>> teamScoresByTotal) {
-        excelHelper.setCurrentDateHeader(sheet, currentDate);
-        excelHelper.setCurrentSeasonHeader(sheet);
+        ExcelHelper.setCurrentDateHeader(sheet, currentDate);
+        ExcelHelper.setCurrentSeasonHeader(sheet);
 
         int rows = sheet.getLastRowNum();
         Row row;
@@ -205,8 +204,8 @@ public class ReportHelper {
     private void populateIndividualData(Workbook workbook, String sheetName, String gender, CellStyle style, CellStyle mainTextStyle, Map<String, IndividualTotal> allRoundScores) {
         long initialStart = System.currentTimeMillis();
         Sheet sheet = workbook.getSheet(sheetName);
-        excelHelper.setCurrentDateHeader(sheet, currentDate);
-        excelHelper.setCurrentSeasonHeader(sheet);
+        ExcelHelper.setCurrentDateHeader(sheet, currentDate);
+        ExcelHelper.setCurrentSeasonHeader(sheet);
 
         int rows = sheet.getLastRowNum();
         Cell cell;
