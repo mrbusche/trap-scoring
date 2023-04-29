@@ -1,5 +1,7 @@
 package trap.report;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.Font;
@@ -15,7 +17,8 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
-public class ExcelHelper {
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+public final class ExcelHelper {
     public static CellStyle setFontForHeaders(Workbook workbook) {
         Font font = workbook.createFont();
         font.setFontName("Calibri");
