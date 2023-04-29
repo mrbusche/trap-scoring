@@ -202,7 +202,7 @@ public class ReportHelper {
         }
     }
 
-    private void populateIndividualData(Workbook workbook, String sheetName, String gender, CellStyle style, CellStyle mainTextStyle, HashMap<String, IndividualTotal> allRoundScores) {
+    private void populateIndividualData(Workbook workbook, String sheetName, String gender, CellStyle style, CellStyle mainTextStyle, Map<String, IndividualTotal> allRoundScores) {
         long initialStart = System.currentTimeMillis();
         Sheet sheet = workbook.getSheet(sheetName);
         excelHelper.setCurrentDateHeader(sheet, currentDate);
@@ -300,7 +300,7 @@ public class ReportHelper {
         return teamScoresThatCount;
     }
 
-    private List<IndividualTotal> getTeamScoresByTotal(HashMap<String, IndividualTotal> allRoundScores) {
+    private List<IndividualTotal> getTeamScoresByTotal(Map<String, IndividualTotal> allRoundScores) {
         List<IndividualTotal> teamScoresByTotal = new ArrayList<>(allRoundScores.values());
         teamScoresByTotal.sort(Comparator.comparingInt(IndividualTotal::getTotal).reversed());
         return teamScoresByTotal;
@@ -325,7 +325,7 @@ public class ReportHelper {
         System.out.println("Team Individual Scores data populated in " + (System.currentTimeMillis() - startTime) + "ms");
     }
 
-    private void populateAllIndividualData(Workbook workbook, String sheetName, HashMap<String, IndividualTotal> allRoundScores) {
+    private void populateAllIndividualData(Workbook workbook, String sheetName, Map<String, IndividualTotal> allRoundScores) {
         Sheet sheet = workbook.getSheet(sheetName);
         long trueStart = System.currentTimeMillis();
         long start = System.currentTimeMillis();
