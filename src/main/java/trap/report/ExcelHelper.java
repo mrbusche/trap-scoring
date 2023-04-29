@@ -16,7 +16,7 @@ import java.util.Calendar;
 import java.util.Date;
 
 public class ExcelHelper {
-    public CellStyle setFontForHeaders(Workbook workbook) {
+    public static CellStyle setFontForHeaders(Workbook workbook) {
         Font font = workbook.createFont();
         font.setFontName("Calibri");
         font.setItalic(true);
@@ -27,7 +27,7 @@ public class ExcelHelper {
         return style;
     }
 
-    public CellStyle getCellStyle(Workbook workbook) {
+    public static CellStyle getCellStyle(Workbook workbook) {
         Font mainText = workbook.createFont();
         mainText.setFontName("Calibri");
         mainText.setFontHeightInPoints((short) 12);
@@ -36,11 +36,11 @@ public class ExcelHelper {
         return mainTextStyle;
     }
 
-    public void setCurrentDateHeader(Sheet sheet, String currentDate) {
+    public static void setCurrentDateHeader(Sheet sheet, String currentDate) {
         sheet.getRow(9).getCell(1).setCellValue(sheet.getRow(9).getCell(1).getStringCellValue() + currentDate);
     }
 
-    public void setCurrentSeasonHeader(Sheet sheet) {
+    public static void setCurrentSeasonHeader(Sheet sheet) {
         java.util.Date date = new Date();
         Calendar cal = Calendar.getInstance();
         cal.setTime(date);
@@ -50,7 +50,7 @@ public class ExcelHelper {
         sheet.getRow(8).getCell(1).setCellValue(currentSeason + " " + sheet.getRow(8).getCell(1).getStringCellValue());
     }
 
-    public void createFile(Workbook workbook, String teamType) throws IOException {
+    public static void createFile(Workbook workbook, String teamType) throws IOException {
         long start;
         start = System.currentTimeMillis();
         Date date = new Date();
@@ -64,7 +64,7 @@ public class ExcelHelper {
         System.out.println("Wrote the contents to a file in " + (System.currentTimeMillis() - start) + "ms");
     }
 
-    public void addCleanData(Row row, RoundScore rowData) {
+    public static void addCleanData(Row row, RoundScore rowData) {
         Cell cell;
         cell = row.createCell(0);
         cell.setCellValue(rowData.getEventId());
