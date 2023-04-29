@@ -2,7 +2,8 @@ package trap.report;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URL;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -15,7 +16,7 @@ import static org.apache.commons.io.FileUtils.copyURLToFile;
 
 public class DownloadHelper {
 
-    public void downloadFiles(String[] trapTypes) throws IOException {
+    public void downloadFiles(String[] trapTypes) throws IOException, URISyntaxException {
         long start = System.currentTimeMillis();
         System.out.println("Started downloading files");
 
@@ -31,7 +32,7 @@ public class DownloadHelper {
         Charset charset = StandardCharsets.UTF_8;
         for (String type : trapTypes) {
             System.out.println("Downloading " + type + " file");
-            copyURLToFile(new URL(fileUrls.get(type)), new File(type + ".csv"), 60000, 60000);
+            copyURLToFile(new URI(fileUrls.get(type)).toURL(), new File(type + ".csv"), 60000, 60000);
             System.out.println("Finished downloading " + type + " file");
 
             System.out.println("Replacing double spaces for " + type + " file");
