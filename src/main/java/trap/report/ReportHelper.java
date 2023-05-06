@@ -90,7 +90,7 @@ public class ReportHelper {
         populateIndividualData(workbook, "Individual-Ladies", "F", style, mainTextStyle, playerFinalTotal);
 
         populateTeamIndividualData(workbook, "Team-Individual-Scores", teamScoresByTotal);
-        teamScoresByTotal = null
+        teamScoresByTotal = null;
         populateAllIndividualData(workbook, "Individual-All-Scores", playerFinalTotal);
 
         ExcelHelper.createFile(workbook, "league-data");
