@@ -1,20 +1,19 @@
 plugins {
-    id("org.springframework.boot") version "3.0.6"
+    java
+    id("org.springframework.boot") version "3.1.0-RC2"
     id("io.spring.dependency-management") version "1.1.0"
-    id("java")
 }
 
 group = "com.trap-scoring"
 version = "5.0.1"
 
-java {
-    sourceCompatibility = JavaVersion.VERSION_17
-    targetCompatibility = JavaVersion.VERSION_17
-}
 
+java.sourceCompatibility = JavaVersion.VERSION_17
+java.targetCompatibility = JavaVersion.VERSION_17
 
 repositories {
     mavenCentral()
+    maven { url = uri("https://repo.spring.io/milestone") }
 }
 
 dependencies {
@@ -31,6 +30,6 @@ dependencies {
     testCompileOnly("org.junit.jupiter:junit-jupiter-api")
 }
 
-tasks.test {
+tasks.withType<Test> {
     useJUnitPlatform()
 }
