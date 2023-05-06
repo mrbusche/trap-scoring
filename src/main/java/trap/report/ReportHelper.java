@@ -73,7 +73,9 @@ public class ReportHelper {
 
         var playerRoundTotals = trapHelper.calculatePlayerRoundTotals(allRoundScores);
         var playerIndividualTotal = trapHelper.calculatePlayerIndividualTotal(allRoundScores, playerRoundTotals);
+        playerRoundTotals = null;
         var playerFinalTotal = trapHelper.calculatePlayerFinalTotal(playerIndividualTotal);
+        playerIndividualTotal = null;
         var teamScoresByTotal = getTeamScoresByTotal(playerFinalTotal);
         var teamScoresThatCount = calculateTeamScores(teamScoresByTotal);
 
@@ -82,11 +84,13 @@ public class ReportHelper {
             populateTeamData(workbook.getSheet(entry.getKey()), entry.getValue(), mainTextStyle, teamScoresThatCount);
             System.out.println(entry.getKey() + " data populated in " + (System.currentTimeMillis() - start) + "ms");
         }
+        teamScoresThatCount = null;
 
         populateIndividualData(workbook, "Individual-Men", "M", style, mainTextStyle, playerFinalTotal);
         populateIndividualData(workbook, "Individual-Ladies", "F", style, mainTextStyle, playerFinalTotal);
 
         populateTeamIndividualData(workbook, "Team-Individual-Scores", teamScoresByTotal);
+        teamScoresByTotal = null
         populateAllIndividualData(workbook, "Individual-All-Scores", playerFinalTotal);
 
         ExcelHelper.createFile(workbook, "league-data");
@@ -251,10 +255,10 @@ public class ReportHelper {
             List<IndividualTotal> justValues = new ArrayList<>(allRoundScores.values());
             justValues.sort(Comparator.comparingInt(IndividualTotal::getTotal).reversed());
 
-            var individualSinglesData = justValues.stream().filter(f -> f.getGender().equals(gender) && f.getTeamClassification().equals(classification) && f.getType().equals(SINGLES)).toList();
+            var individualData = justValues.stream().filter(f -> f.getGender().equals(gender) && f.getTeamClassification().equals(classification) && f.getType().equals(SINGLES)).toList();
             System.out.println("Ran query for singles by " + gender + " and " + classification + " " + (System.currentTimeMillis() - start) + "ms");
 
-            for (IndividualTotal singlesRowData : individualSinglesData) {
+            for (IndividualTotal singlesRowData : individualData) {
                 row = sheet.createRow(++updateRow);
                 ExcelHelper.addPlayerData(row, column, singlesRowData.getAthlete(), singlesRowData.getTotal(), singlesRowData.getTeam(), mainTextStyle);
             }
@@ -266,7 +270,7 @@ public class ReportHelper {
                 updateRow = classificationStartRow;
                 updateRow++;
                 start = System.currentTimeMillis();
-                var individualData = justValues.stream().filter(f -> f.getGender().equals(gender) && f.getTeamClassification().equals(classification) && f.getType().equals(type)).toList();
+                individualData = justValues.stream().filter(f -> f.getGender().equals(gender) && f.getTeamClassification().equals(classification) && f.getType().equals(type)).toList();
                 System.out.println("Ran query for " + type + " by " + gender + " and " + classification + " " + (System.currentTimeMillis() - start) + "ms");
                 for (IndividualTotal data : individualData) {
                     row = sheet.getRow(++updateRow);
