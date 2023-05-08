@@ -70,9 +70,10 @@ public class ReportHelper {
 
         List<RoundScore> allRoundScores = generateRoundScores();
         populateCleanData(workbook.getSheet("Clean Data"), allRoundScores);
-//        ExcelHelper.createFile(workbook, "main-template");
-//        workbook = getWorkbook();
+        ExcelHelper.createFile(workbook, "main-template");
+        workbook.close();
 
+        workbook = getWorkbook();
         var playerRoundTotals = trapHelper.calculatePlayerRoundTotals(allRoundScores);
         var playerIndividualTotal = trapHelper.calculatePlayerIndividualTotal(allRoundScores, playerRoundTotals);
         var playerFinalTotal = trapHelper.calculatePlayerFinalTotal(playerIndividualTotal);
