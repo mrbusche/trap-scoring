@@ -65,6 +65,7 @@ public final class ExcelHelper {
         System.out.println("Writing file");
         workbook.write(fileOutputStream);
         System.out.println("closing output stream");
+        fileOutputStream.flush();
         fileOutputStream.close();
         System.out.println("Created file " + newFilename);
         System.out.println("Wrote the contents to a file in " + (System.currentTimeMillis() - start) + "ms");
