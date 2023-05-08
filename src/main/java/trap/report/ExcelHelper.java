@@ -60,8 +60,11 @@ public final class ExcelHelper {
         SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmss");
         String currentDate = formatter.format(date);
         String newFilename = teamType + "-" + currentDate + ".xlsx";
+        System.out.println("Creating file");
         FileOutputStream fileOutputStream = new FileOutputStream(newFilename);
+        System.out.println("Writing file");
         workbook.write(fileOutputStream);
+        System.out.println("closing output stream");
         fileOutputStream.close();
         System.out.println("Created file " + newFilename);
         System.out.println("Wrote the contents to a file in " + (System.currentTimeMillis() - start) + "ms");
