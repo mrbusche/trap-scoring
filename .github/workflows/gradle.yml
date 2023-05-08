@@ -26,4 +26,4 @@ jobs:
         with:
           swap-size-gb: 10
       - name: Build and analyze
-        run: ./gradlew build --no-daemon --info --args:"-XX:MaxMetaspaceSize=1024m -XX:+HeapDumpOnOutOfMemoryError -Xms1024m -Xmx1024m"
+        run: ./gradlew build --no-daemon --info --args:"-Xms1024m -Xmx1024m"
