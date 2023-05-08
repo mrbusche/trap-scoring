@@ -2,6 +2,9 @@ name: Main Branch
 
 on:
   push:
+  
+env:
+  GRADLE_OPTS: "-Xms2048m -Xmx2048m"
 
 jobs:
   build:
@@ -26,4 +29,4 @@ jobs:
         with:
           swap-size-gb: 10
       - name: Build and analyze
-        run: ./gradlew build --no-daemon --info --args:"-Xms1024m -Xmx1024m"
+        run: ./gradlew build --no-daemon --info
