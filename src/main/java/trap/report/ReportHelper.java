@@ -49,7 +49,7 @@ public class ReportHelper {
     DownloadHelper downloadHelper = new DownloadHelper();
 
     public void doItAll() throws Exception {
-//        downloadHelper.downloadFiles(trapTypes);
+        downloadHelper.downloadFiles(trapTypes);
 
         Workbook workbook = getWorkbook("main");
 
