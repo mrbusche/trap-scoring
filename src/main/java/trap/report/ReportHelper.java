@@ -51,7 +51,7 @@ public class ReportHelper {
     public void doItAll() throws Exception {
         downloadHelper.downloadFiles(trapTypes);
 
-        Workbook workbook = getWorkbook("main");
+        Workbook workbook = getWorkbook();
 
         System.out.println("Starting file creation");
         System.out.println("Workbook has " + workbook.getNumberOfSheets() + " sheets");
@@ -70,6 +70,8 @@ public class ReportHelper {
 
         List<RoundScore> allRoundScores = generateRoundScores();
         populateCleanData(workbook.getSheet("Clean Data"), allRoundScores);
+//        ExcelHelper.createFile(workbook, "main-template");
+//        workbook = getWorkbook();
 
         var playerRoundTotals = trapHelper.calculatePlayerRoundTotals(allRoundScores);
         var playerIndividualTotal = trapHelper.calculatePlayerIndividualTotal(allRoundScores, playerRoundTotals);
@@ -89,7 +91,7 @@ public class ReportHelper {
         populateTeamIndividualData(workbook, "Team-Individual-Scores", teamScoresByTotal);
         populateAllIndividualData(workbook, "Individual-All-Scores", playerFinalTotal);
 
-        ExcelHelper.createFile(workbook, "league-data");
+        ExcelHelper.createFile(workbook, null);
 
         System.out.println("Finished creating file in " + (System.currentTimeMillis() - trueStart) + "ms");
         workbook.close();
@@ -109,8 +111,8 @@ public class ReportHelper {
         }
     }
 
-    private Workbook getWorkbook(String templateName) throws IOException {
-        InputStream in = getClass().getResourceAsStream("/" + templateName + "-template.xlsx");
+    private Workbook getWorkbook() throws IOException {
+        InputStream in = getClass().getResourceAsStream("/main-template.xlsx");
         return WorkbookFactory.create(Objects.requireNonNull(in));
     }
 
