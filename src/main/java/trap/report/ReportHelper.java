@@ -49,7 +49,7 @@ public class ReportHelper {
     DownloadHelper downloadHelper = new DownloadHelper();
 
     public void doItAll() throws Exception {
-        downloadHelper.downloadFiles(trapTypes);
+//        downloadHelper.downloadFiles(trapTypes);
 
         Workbook workbook = getWorkbook("main");
 
@@ -73,9 +73,7 @@ public class ReportHelper {
 
         var playerRoundTotals = trapHelper.calculatePlayerRoundTotals(allRoundScores);
         var playerIndividualTotal = trapHelper.calculatePlayerIndividualTotal(allRoundScores, playerRoundTotals);
-        playerRoundTotals = null;
         var playerFinalTotal = trapHelper.calculatePlayerFinalTotal(playerIndividualTotal);
-        playerIndividualTotal = null;
         var teamScoresByTotal = getTeamScoresByTotal(playerFinalTotal);
         var teamScoresThatCount = calculateTeamScores(teamScoresByTotal);
 
@@ -84,13 +82,11 @@ public class ReportHelper {
             populateTeamData(workbook.getSheet(entry.getKey()), entry.getValue(), mainTextStyle, teamScoresThatCount);
             System.out.println(entry.getKey() + " data populated in " + (System.currentTimeMillis() - start) + "ms");
         }
-        teamScoresThatCount = null;
 
         populateIndividualData(workbook, "Individual-Men", "M", style, mainTextStyle, playerFinalTotal);
         populateIndividualData(workbook, "Individual-Ladies", "F", style, mainTextStyle, playerFinalTotal);
 
         populateTeamIndividualData(workbook, "Team-Individual-Scores", teamScoresByTotal);
-        teamScoresByTotal = null;
         populateAllIndividualData(workbook, "Individual-All-Scores", playerFinalTotal);
 
         ExcelHelper.createFile(workbook, "league-data");
