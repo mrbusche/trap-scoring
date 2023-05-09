@@ -30,3 +30,4 @@ jobs:
         run: >-
           ./gradlew build --no-daemon --info
           -Dorg.gradle.jvmargs="-Xms4g -Xmx6g -XX:+HeapDumpOnOutOfMemoryError -XX:MaxMetaspaceSize=512m"
+          -Dkotlin.daemon.jvm.options="-Xmx1g"
