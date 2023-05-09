@@ -21,13 +21,22 @@ jobs:
           cache: 'gradle'
           distribution: 'temurin'
           java-version: ${{ matrix.java-version }}
-      - name: Set Swap Space
-        uses: pierotofy/set-swap-space@master
-        with:
-          swap-size-gb: 10
-      - name: Build and analyze
+      - name: Setup and execute Gradle
+        uses: gradle/gradle-build-action@v2.1.5
+      - name: Run Gradle task
         shell: bash
         run: >-
           ./gradlew build --no-daemon --info
+          -Dorg.gradle.parallel=true
+          -Dorg.gradle.caching=true
           -Dorg.gradle.jvmargs="-Xms4g -Xmx6g -XX:+HeapDumpOnOutOfMemoryError -XX:MaxMetaspaceSize=512m"
-          -Dkotlin.daemon.jvm.options="-Xmx1g"
+#       - name: Set Swap Space
+#         uses: pierotofy/set-swap-space@master
+#         with:
+#           swap-size-gb: 10
+#       - name: Build and analyze
+#         shell: bash
+#         run: >-
+#           ./gradlew build --no-daemon --info
+#           -Dorg.gradle.jvmargs="-Xms4g -Xmx6g -XX:+HeapDumpOnOutOfMemoryError -XX:MaxMetaspaceSize=512m"
+#           -Dkotlin.daemon.jvm.options="-Xmx1g"
