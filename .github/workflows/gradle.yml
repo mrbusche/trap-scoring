@@ -29,4 +29,4 @@ jobs:
         shell: bash
         run: >-
           ./gradlew build --no-daemon --info
-          -Dorg.gradle.jvmargs="-Xmx3g -XX:+HeapDumpOnOutOfMemoryError -XX:MaxMetaspaceSize=256m"
+          -Dorg.gradle.jvmargs="-Xms4g -Xmx6g -XX:+HeapDumpOnOutOfMemoryError -XX:MaxMetaspaceSize=512m"
