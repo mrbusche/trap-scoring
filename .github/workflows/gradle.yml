@@ -26,4 +26,7 @@ jobs:
         with:
           swap-size-gb: 10
       - name: Build and analyze
-        run: ./gradlew build --no-daemon --info -Dorg.gradle.jvmargs="-Xms4g -Xmx8g"
+        shell: bash
+        run: >-
+          ./gradlew build --no-daemon --info
+          -Dorg.gradle.jvmargs="-Xmx3g -XX:+HeapDumpOnOutOfMemoryError -XX:MaxMetaspaceSize=256m"
