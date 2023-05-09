@@ -26,4 +26,4 @@ jobs:
         with:
           swap-size-gb: 10
       - name: Build and analyze
-        run: ./gradlew build --no-daemon --info -Dorg.gradle.jvmargs="-Xmx2g -XX:MaxPermSize=512m"
+        run: ./gradlew build --no-daemon --info -Dorg.gradle.jvmargs="-Xmx2g"
