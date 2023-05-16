@@ -26,7 +26,4 @@ jobs:
       - name: Run Gradle task
         shell: bash
         run: >-
-          ./gradlew build --no-daemon --info
-          -Dorg.gradle.parallel=true
-          -Dorg.gradle.caching=true
-          -Dorg.gradle.jvmargs="-Xms4g -Xmx6g -XX:+HeapDumpOnOutOfMemoryError -XX:MaxMetaspaceSize=512m"
+          ./gradlew build --no-daemon --info -Dorg.gradle.jvmargs="-Xms4g -Xmx6g -XX:+HeapDumpOnOutOfMemoryError -XX:MaxMetaspaceSize=512m"
