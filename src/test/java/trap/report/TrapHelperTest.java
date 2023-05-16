@@ -14,7 +14,7 @@ class TrapHelperTest {
     TrapHelper trapHelper = new TrapHelper();
 
     private List<RoundScore> getRoundScoresPlayer1() {
-        List<RoundScore> roundScores = new ArrayList();
+        List<RoundScore> roundScores = new ArrayList<>();
 
         roundScores.add(new RoundScore(16923, "NS Trap Fall Invitational", 1132, "Clinton County Sportsman Club", "2022-10-29", "Wilton Varsity", "UNI Trap Team", "Scott W Busche", "Senior/Varsity", "M", 22, 23, 0, 0, 0, 0, 0, 0, "singles"));
         roundScores.add(new RoundScore(16945, "Stockdale/Jags season Opener! Sunday", 73, "Stockdale Gun Club", "2022-09-04", "UNI Trap Team", "UNI Trap Team", "Scott W Busche", "Senior/Varsity", "M", 23, 24, 24, 24, 0, 0, 0, 0, "singles"));
@@ -32,7 +32,7 @@ class TrapHelperTest {
     }
 
     private List<RoundScore> getRoundScoresPlayer2() {
-        List<RoundScore> roundScores = new ArrayList();
+        List<RoundScore> roundScores = new ArrayList<>();
 
         roundScores.add(new RoundScore(17258, "Otter Creek October ATA Shoot", 1, "Otter Creek Sportsmans Club", "2022-10-09", "UNI Trap Team", "UNI Trap Team", "Matt Busche", "Senior/Varsity", "M", 25, 24, 25, 24, 0, 0, 0, 0, "singles"));
         roundScores.add(new RoundScore(17277, "Wilton Invitational", 1, "Muscatine Izaak Walton League", "2022-10-08", "Wilton / Mt. Pleasant - High School", "UNI Trap Team", "Matt Busche", "Senior/Varsity", "M", 25, 24, 0, 0, 0, 0, 0, 0, "singles"));
@@ -46,7 +46,7 @@ class TrapHelperTest {
     }
 
     private List<RoundScore> getRoundScoresPlayer3() {
-        List<RoundScore> roundScores = new ArrayList();
+        List<RoundScore> roundScores = new ArrayList<>();
 
         roundScores.add(new RoundScore(16892, "Pleasant Valley Invitational Trap Meet - 1st 50 Singles", 1132, "Clinton County Sportsman Club", "2022-09-24", "DYT HS 1 Singles 1st 50", "Minnesota Vikings", "Justin Jefferson", "Senior/Varsity", "M", 24, 23, 0, 0, 0, 0, 0, 0, "singles"));
         roundScores.add(new RoundScore(16920, "NORTH SCOTT TRAP FALL INVITATIONAL FIRST 50 SINGLES", 1132, "Clinton County Sportsman Club", "2022-09-17", "DYT HS Singles 1 1st 50", "Minnesota Vikings", "Justin Jefferson", "Senior/Varsity", "M", 25, 25, 0, 0, 0, 0, 0, 0, "singles"));
@@ -62,7 +62,7 @@ class TrapHelperTest {
     }
 
     private List<RoundScore> getRoundScoresPlayer4() {
-        List<RoundScore> roundScores = new ArrayList();
+        List<RoundScore> roundScores = new ArrayList<>();
 
         roundScores.add(new RoundScore(16933, "September 3/4 NSCA/SCTP Sporting Clays 1st 100 rounds", 986, "Black Oak Clays", "2022-09-03", "Ankeny Jags", "Ankeny Centennial Jaguars Shooting Sports", "Sam LaPorta", "Senior/Varsity", "M", 48, 48, 0, 0, 0, 0, 0, 0, "clays"));
         roundScores.add(new RoundScore(16940, "NPGC NSCA SPORTING CLAYS", 50, "New Pioneer Clay Target Center", "2022-09-11", "Ankeny Centennial Jaguars Shooting Sports", "Ankeny Centennial Jaguars Shooting Sports", "Sam LaPorta", "Senior/Varsity", "M", 45, 44, 0, 0, 0, 0, 0, 0, "clays"));
@@ -76,7 +76,7 @@ class TrapHelperTest {
     }
 
     private List<RoundScore> getRoundScoresPlayer5() {
-        List<RoundScore> roundScores = new ArrayList();
+        List<RoundScore> roundScores = new ArrayList<>();
 
         roundScores.add(new RoundScore(16923,"NS Trap Fall Invitational",1132,"Clinton County Sportsman Club","2022-10-29","Wilton JV/IA","Wilton Trap Team","TJ Hockenson","Intermediate/Advanced","M",21,21,0,0,0,0,0,0,"singles"));
         roundScores.add(new RoundScore(17166,"Camanche Trap",1132,"Clinton County Sportsman Club","2022-10-01","Wilton - Intermediates","Wilton Trap Team","TJ Hockenson","Intermediate/Advanced","M",22,22,0,0,0,0,0,0,"singles"));
