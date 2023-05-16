@@ -51,7 +51,7 @@ public class ReportHelper {
     public void doItAll() throws Exception {
         downloadHelper.downloadFiles(trapTypes);
 
-        Workbook workbook = getWorkbook("main");
+        Workbook workbook = getWorkbook();
 
         System.out.println("Starting file creation");
         System.out.println("Workbook has " + workbook.getNumberOfSheets() + " sheets");
@@ -70,7 +70,10 @@ public class ReportHelper {
 
         List<RoundScore> allRoundScores = generateRoundScores();
         populateCleanData(workbook.getSheet("Clean Data"), allRoundScores);
+        ExcelHelper.createFile(workbook, "main-template");
+        workbook.close();
 
+        workbook = getWorkbook();
         var playerRoundTotals = trapHelper.calculatePlayerRoundTotals(allRoundScores);
         var playerIndividualTotal = trapHelper.calculatePlayerIndividualTotal(allRoundScores, playerRoundTotals);
         var playerFinalTotal = trapHelper.calculatePlayerFinalTotal(playerIndividualTotal);
@@ -89,7 +92,7 @@ public class ReportHelper {
         populateTeamIndividualData(workbook, "Team-Individual-Scores", teamScoresByTotal);
         populateAllIndividualData(workbook, "Individual-All-Scores", playerFinalTotal);
 
-        ExcelHelper.createFile(workbook, "league-data");
+        ExcelHelper.createFile(workbook, null);
 
         System.out.println("Finished creating file in " + (System.currentTimeMillis() - trueStart) + "ms");
         workbook.close();
@@ -109,8 +112,8 @@ public class ReportHelper {
         }
     }
 
-    private Workbook getWorkbook(String templateName) throws IOException {
-        InputStream in = getClass().getResourceAsStream("/" + templateName + "-template.xlsx");
+    private Workbook getWorkbook() throws IOException {
+        InputStream in = getClass().getResourceAsStream("/main-template.xlsx");
         return WorkbookFactory.create(Objects.requireNonNull(in));
     }
 
@@ -251,10 +254,10 @@ public class ReportHelper {
             List<IndividualTotal> justValues = new ArrayList<>(allRoundScores.values());
             justValues.sort(Comparator.comparingInt(IndividualTotal::getTotal).reversed());
 
-            var individualSinglesData = justValues.stream().filter(f -> f.getGender().equals(gender) && f.getTeamClassification().equals(classification) && f.getType().equals(SINGLES)).toList();
+            var individualData = justValues.stream().filter(f -> f.getGender().equals(gender) && f.getTeamClassification().equals(classification) && f.getType().equals(SINGLES)).toList();
             System.out.println("Ran query for singles by " + gender + " and " + classification + " " + (System.currentTimeMillis() - start) + "ms");
 
-            for (IndividualTotal singlesRowData : individualSinglesData) {
+            for (IndividualTotal singlesRowData : individualData) {
                 row = sheet.createRow(++updateRow);
                 ExcelHelper.addPlayerData(row, column, singlesRowData.getAthlete(), singlesRowData.getTotal(), singlesRowData.getTeam(), mainTextStyle);
             }
@@ -266,7 +269,7 @@ public class ReportHelper {
                 updateRow = classificationStartRow;
                 updateRow++;
                 start = System.currentTimeMillis();
-                var individualData = justValues.stream().filter(f -> f.getGender().equals(gender) && f.getTeamClassification().equals(classification) && f.getType().equals(type)).toList();
+                individualData = justValues.stream().filter(f -> f.getGender().equals(gender) && f.getTeamClassification().equals(classification) && f.getType().equals(type)).toList();
                 System.out.println("Ran query for " + type + " by " + gender + " and " + classification + " " + (System.currentTimeMillis() - start) + "ms");
                 for (IndividualTotal data : individualData) {
                     row = sheet.getRow(++updateRow);
