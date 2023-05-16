@@ -21,8 +21,7 @@ public class TrapHelper {
         }
         for (RoundScore r : roundScores) {
             var currentPlayerRoundTotal = playerRoundTotals.get(r.getUniqueName());
-            // clays and doubles do not combine rounds
-            if (r.getType().equals("clays") || r.getType().equals("doubles")) {
+            if (singleRound(r.getType())) {
                 currentPlayerRoundTotal.add(new RoundTotal(r.getEventId(), r.getLocationId(), r.getTeam(), r.getAthlete(), r.getClassification(), r.getGender(), r.getRound1(), r.getType()));
                 if (r.getRound2() > 0) {
                     currentPlayerRoundTotal.add(new RoundTotal(r.getEventId(), r.getLocationId(), r.getTeam(), r.getAthlete(), r.getClassification(), r.getGender(), r.getRound2(), r.getType()));
@@ -97,7 +96,11 @@ public class TrapHelper {
         return playerFinalTotal;
     }
 
-    private int subtractScores(String roundtype) {
-        return roundtype.equals("clays") || roundtype.equals("skeet") || roundtype.equals("fivestand") ? 1 : 0;
+    private int subtractScores(String roundType) {
+        return roundType.equals("clays") || roundType.equals("skeet") || roundType.equals("fivestand") || roundType.equals("doublesskeet") ? 1 : 0;
+    }
+
+    private boolean singleRound(String roundType) {
+        return roundType.equals("clays") || roundType.equals("doubles") || roundType.equals("doublesskeet");
     }
 }
