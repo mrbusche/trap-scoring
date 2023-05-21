@@ -30,6 +30,8 @@ jobs:
       - name: Generate file
         run: |
           ls -ltra
+          cd build/libs/
+          ls -ltra
           java -jar trap-5.1.0.jar
           ls -ltra
 
