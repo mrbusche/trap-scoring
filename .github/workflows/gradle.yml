@@ -35,4 +35,8 @@ jobs:
           java -jar trap.jar
           ls -ltra
           test -f league-data-*.xlsx || exit 1
+          ls -ltra ../../src/main/resources/main-template.xlsx
+          stat --format=%s ../../src/main/resources/main-template.xlsx
+          test stat --format=%s league-data-*.xlsx > 1000000 || exit 1
+
 
