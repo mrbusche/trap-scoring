@@ -29,7 +29,7 @@ jobs:
           export SPRING_PROFILES_ACTIVE=test && ./gradlew build --no-daemon --info
       - name: Generate file
         shell: bash
-        run: >-
+        run: |
           cd build/libs/
           mv trap-*.jar trap.jar
           java -jar trap.jar
