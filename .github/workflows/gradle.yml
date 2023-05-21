@@ -34,16 +34,16 @@ jobs:
           java -jar trap.jar
           ls -ltra
           test -f league-data-*.xlsx || exit 1
-#          file1size=stat -c %s league-data-*.xlsx
-#          echo "file 1 size successful"
-#          file2size=stat -c %s ../../src/main/resources/main-template.xlsx
-#          echo "file 2 size successful"
-#          echo "file1size"
-#          echo $file1size
-#          echo "file2size"
-#          echo $file2size
-#          if("file1size" -lt "file2size");then
-#            echo "file 1 is smaller"
-#          fi
+          file1size=$(stat -c %s league-data-*.xlsx)
+          echo "file 1 size successful"
+          file2size=$(stat -c %s ../../src/main/resources/main-template.xlsx)
+          echo "file 2 size successful"
+          echo "file1size"
+          echo $file1size
+          echo "file2size"
+          echo $file2size
+          if("file1size" -lt "file2size");then
+            echo "file 1 is smaller"
+          fi
 
 
