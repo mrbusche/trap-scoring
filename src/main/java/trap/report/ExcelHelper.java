@@ -113,7 +113,7 @@ public final class ExcelHelper {
         cell.setCellValue(rowData.getType());
     }
 
-    public static void addTeamData(Row row, int startColumn, String team, Integer total, CellStyle mainTextStyle) {
+    public static void addTeamData(Row row, int startColumn, String team, int total, CellStyle mainTextStyle) {
         Cell cell = row.createCell(startColumn);
         cell.setCellValue(team);
         cell.setCellStyle(mainTextStyle);
@@ -122,7 +122,7 @@ public final class ExcelHelper {
         cell.setCellStyle(mainTextStyle);
     }
 
-    public static void addPlayerData(Row row, int column, String athlete, Integer total, String team, CellStyle mainTextStyle) {
+    public static void addPlayerData(Row row, int column, String athlete, int total, String team, CellStyle mainTextStyle) {
         if (row != null) {
             Cell cell = row.createCell(column);
             cell.setCellValue(athlete);
