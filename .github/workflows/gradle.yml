@@ -30,11 +30,21 @@ jobs:
       - name: Generate file
         shell: bash
         run: |
+          #!/bin/sh
+          
           cd build/libs/
           mv trap-*.jar trap.jar
           java -jar trap.jar
           ls -ltra
           test -f league-data-*.xlsx || exit 1
-          test stat --format=%s league-data-*.xlsx > stat --format=%s ../../src/main/resources/main-template.xlsx || exit 1
+          file1size=stat -c%s league-data-*.xlsx
+          file2size=stat -c%s ../../src/main/resources/main-template.xlsx
+          echo "file1size"
+          echo $file1size
+          echo "file2size"
+          echo $file2size
+          if("file1size" -lt "file2size");then
+            echo "file 1 is smaller"
+          fi
 
 
