@@ -7,5 +7,5 @@ import lombok.Data;
 @AllArgsConstructor
 public class TeamScore {
     String name;
-    Integer total;
+    int total;
 }
