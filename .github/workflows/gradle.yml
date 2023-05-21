@@ -12,7 +12,7 @@ jobs:
         java-version: [ 17, 20 ]
 
     steps:
-      - uses: actions/checkout@v3.5.2
+      - uses: actions/checkout@v3
         with:
           fetch-depth: 0
       - name: Set up JDK ${{ matrix.java-version }}
@@ -23,10 +23,27 @@ jobs:
           java-version: ${{ matrix.java-version }}
       - name: Setup and execute Gradle
         uses: gradle/gradle-build-action@v2
-      - name: Run Gradle task
+      - name: Run Gradle build
         shell: bash
         run: >-
-          ./gradlew build --no-daemon --info
-          -Dorg.gradle.parallel=true
-          -Dorg.gradle.caching=true
-          -Dorg.gradle.jvmargs="-Xms4g -Xmx6g -XX:+HeapDumpOnOutOfMemoryError -XX:MaxMetaspaceSize=512m"
+          export SPRING_PROFILES_ACTIVE=test && ./gradlew build --no-daemon --info
+      - name: Generate file
+        run: |
+          cd build/libs/
+          mv trap-*.jar trap.jar
+          java -jar trap.jar
+          ls -ltra
+          test -f league-data-*.xlsx || exit 1
+#          file1size=stat -c %s league-data-*.xlsx
+#          echo "file 1 size successful"
+#          file2size=stat -c %s ../../src/main/resources/main-template.xlsx
+#          echo "file 2 size successful"
+#          echo "file1size"
+#          echo $file1size
+#          echo "file2size"
+#          echo $file2size
+#          if("file1size" -lt "file2size");then
+#            echo "file 1 is smaller"
+#          fi
+
+
