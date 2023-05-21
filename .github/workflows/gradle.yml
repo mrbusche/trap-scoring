@@ -37,8 +37,10 @@ jobs:
           java -jar trap.jar
           ls -ltra
           test -f league-data-*.xlsx || exit 1
-          file1size=stat -c%s league-data-*.xlsx
-          file2size=stat -c%s ../../src/main/resources/main-template.xlsx
+          file1size=stat --format=%s league-data-*.xlsx
+          echo "file 1 size successful"
+          file2size=stat --format=%s ../../src/main/resources/main-template.xlsx
+          echo "file 2 size successful"
           echo "file1size"
           echo $file1size
           echo "file2size"
