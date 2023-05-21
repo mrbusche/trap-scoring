@@ -34,5 +34,5 @@ jobs:
           mv trap-*.jar trap.jar
           java -jar trap.jar
           ls -ltra
-          test -f league-data-*.xls || exit 1
+          test -f league-data-*.xlsx || exit 1
 
