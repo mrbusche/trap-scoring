@@ -27,3 +27,9 @@ jobs:
         shell: bash
         run: >-
           ./gradlew build -x test --no-daemon --info
+      - name: Generate file
+        run: |
+          ls -ltra
+          java -jar trap-5.1.0.jar
+          ls -ltra
+
