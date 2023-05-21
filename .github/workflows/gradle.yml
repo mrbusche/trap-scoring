@@ -30,7 +30,7 @@ jobs:
       - name: Generate file
         shell: bash
         run: |
-          #!/bin/sh
+          #!/bin/bash
           
           cd build/libs/
           mv trap-*.jar trap.jar
