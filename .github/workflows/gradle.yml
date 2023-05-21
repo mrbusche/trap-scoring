@@ -12,7 +12,7 @@ jobs:
         java-version: [ 17, 20 ]
 
     steps:
-      - uses: actions/checkout@v3.5.2
+      - uses: actions/checkout@v3
         with:
           fetch-depth: 0
       - name: Set up JDK ${{ matrix.java-version }}
@@ -28,10 +28,11 @@ jobs:
         run: >-
           export SPRING_PROFILES_ACTIVE=test && ./gradlew build --no-daemon --info
       - name: Generate file
-        run: |
-          ls -ltra
+        shell: bash
+        run: >-
           cd build/libs/
+          mv trap-*.jar trap.jar
+          java -jar trap.jar
           ls -ltra
-          java -jar trap-5.1.0.jar
-          ls -ltra
+          test -f league-data-*.xls || exit 1
 
