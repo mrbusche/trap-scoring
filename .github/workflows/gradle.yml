@@ -42,6 +42,7 @@ jobs:
           echo $file1size
           echo "file2size"
           echo $file2size
-          if($file1size -lt $file2size);then
+          if [ "$file1size" -lt "$file2size" ]; then
             echo "file 1 is smaller"
+            exit 1
           fi
