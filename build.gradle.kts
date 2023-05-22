@@ -5,7 +5,7 @@ plugins {
 }
 
 group = "com.trap-scoring"
-version = "5.1.0"
+version = "5.1.1"
 
 java.sourceCompatibility = JavaVersion.VERSION_17
 java.targetCompatibility = JavaVersion.VERSION_17
