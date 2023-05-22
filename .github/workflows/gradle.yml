@@ -33,7 +33,15 @@ jobs:
           mv trap-*.jar trap.jar
           java -jar trap.jar
           ls -ltra
+      - name: Test file exists
+        run: |
+          cd build/libs/
+          ls -ltra
           test -f league-data-*.xlsx || exit 1
+      - name: Test file was generate properly
+        run: |
+          cd build/libs/
+          ls -ltra
           file1size=$(stat -c %s league-data-*.xlsx)
           echo "file 1 size successful"
           file2size=$(stat -c %s ../../src/main/resources/main-template.xlsx)
