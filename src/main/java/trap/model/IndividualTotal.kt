@@ -1,6 +1,6 @@
 package trap.model
 
-class IndividualTotal(val locationId: Int, val team: String, val athlete: String, val classification: String, val gender: String, val total: Int, val type: String) {
+class IndividualTotal(val locationId: Int, val team: String, val athlete: String, val classification: String, val gender: String, var total: Int, val type: String) {
 
     val teamForScores: String
         get() = "$type $team $teamClassificationForTotal"
