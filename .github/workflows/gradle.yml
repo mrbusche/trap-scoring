@@ -27,10 +27,15 @@ jobs:
       - name: Setup and execute Gradle
         uses: gradle/gradle-build-action@v2
 
+      - name: Run Gradle tests
+        shell: bash
+        run: >-
+          ./gradlew test
+
       - name: Run Gradle build
         shell: bash
         run: >-
-          export SPRING_PROFILES_ACTIVE=test && ./gradlew build --no-daemon --info
+          export SPRING_PROFILES_ACTIVE=test && ./gradlew build -x test --no-daemon --info
 
       - name: Generate file
         run: |
