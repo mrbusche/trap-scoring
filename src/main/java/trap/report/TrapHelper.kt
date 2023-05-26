@@ -35,7 +35,7 @@ class TrapHelper {
         return playerRoundTotals
     }
 
-    fun calculatePlayerIndividualTotal(roundScores: List<RoundScore>, playerRoundTotals: Map<String?, ArrayList<RoundTotal>>): Map<String, ArrayList<IndividualTotal>> {
+    fun calculatePlayerIndividualTotal(roundScores: List<RoundScore>, playerRoundTotals: Map<String, ArrayList<RoundTotal>>): Map<String, ArrayList<IndividualTotal>> {
         val playerIndividualTotal: MutableMap<String, ArrayList<IndividualTotal>> = HashMap()
         for (r in roundScores) {
             playerIndividualTotal[r.uniqueName] = ArrayList()
