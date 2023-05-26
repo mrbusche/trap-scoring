@@ -2,13 +2,18 @@ package trap.report
 
 import lombok.AccessLevel
 import lombok.NoArgsConstructor
-import org.apache.poi.ss.usermodel.*
+import org.apache.poi.ss.usermodel.Cell
+import org.apache.poi.ss.usermodel.CellStyle
+import org.apache.poi.ss.usermodel.Row
+import org.apache.poi.ss.usermodel.Sheet
+import org.apache.poi.ss.usermodel.Workbook
 import trap.model.IndividualTotal
 import trap.model.RoundScore
 import java.io.FileOutputStream
 import java.io.IOException
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Calendar
+import java.util.Date
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 object ExcelHelper {
@@ -138,8 +143,8 @@ object ExcelHelper {
 
     @JvmStatic
     fun getRows(sheet: Sheet, rows: Int, rowData: IndividualTotal): Int {
-        var rows = rows
-        val row = sheet.createRow(++rows)
+        var countedRows = rows
+        val row = sheet.createRow(++countedRows)
         var cell = row.createCell(0)
         cell.setCellValue(rowData.type)
         cell = row.createCell(1)
