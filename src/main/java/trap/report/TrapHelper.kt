@@ -12,25 +12,27 @@ class TrapHelper {
             playerRoundTotals[r.uniqueName] = ArrayList()
         }
         for (r in roundScores) {
-            val currentPlayerRoundTotal = playerRoundTotals[r.uniqueName]!!
-            if (singleRound(r.type)) {
-                currentPlayerRoundTotal.add(RoundTotal(r.eventId, r.locationId, r.team, r.athlete, r.classification, r.gender, r.round1, r.type))
-                if (r.round2 > 0) {
-                    currentPlayerRoundTotal.add(RoundTotal(r.eventId, r.locationId, r.team, r.athlete, r.classification, r.gender, r.round2, r.type))
-                }
-            } else {
-                currentPlayerRoundTotal.add(RoundTotal(r.eventId, r.locationId, r.team, r.athlete, r.classification, r.gender, r.round1 + r.round2, r.type))
-                if (r.round3 + r.round4 > 0) {
-                    currentPlayerRoundTotal.add(RoundTotal(r.eventId, r.locationId, r.team, r.athlete, r.classification, r.gender, r.round3 + r.round4, r.type))
-                    if (r.round5 + r.round6 > 0) {
-                        currentPlayerRoundTotal.add(RoundTotal(r.eventId, r.locationId, r.team, r.athlete, r.classification, r.gender, r.round5 + r.round6, r.type))
-                        if (r.round7 + r.round8 > 0) {
-                            currentPlayerRoundTotal.add(RoundTotal(r.eventId, r.locationId, r.team, r.athlete, r.classification, r.gender, r.round7 + r.round8, r.type))
+            val currentPlayerRoundTotal = playerRoundTotals[r.uniqueName]
+            if (!currentPlayerRoundTotal.isNullOrEmpty()) {
+                if (singleRound(r.type)) {
+                    currentPlayerRoundTotal.add(RoundTotal(r.eventId, r.locationId, r.team, r.athlete, r.classification, r.gender, r.round1, r.type))
+                    if (r.round2 > 0) {
+                        currentPlayerRoundTotal.add(RoundTotal(r.eventId, r.locationId, r.team, r.athlete, r.classification, r.gender, r.round2, r.type))
+                    }
+                } else {
+                    currentPlayerRoundTotal.add(RoundTotal(r.eventId, r.locationId, r.team, r.athlete, r.classification, r.gender, r.round1 + r.round2, r.type))
+                    if (r.round3 + r.round4 > 0) {
+                        currentPlayerRoundTotal.add(RoundTotal(r.eventId, r.locationId, r.team, r.athlete, r.classification, r.gender, r.round3 + r.round4, r.type))
+                        if (r.round5 + r.round6 > 0) {
+                            currentPlayerRoundTotal.add(RoundTotal(r.eventId, r.locationId, r.team, r.athlete, r.classification, r.gender, r.round5 + r.round6, r.type))
+                            if (r.round7 + r.round8 > 0) {
+                                currentPlayerRoundTotal.add(RoundTotal(r.eventId, r.locationId, r.team, r.athlete, r.classification, r.gender, r.round7 + r.round8, r.type))
+                            }
                         }
                     }
                 }
+                playerRoundTotals[r.uniqueName] = currentPlayerRoundTotal
             }
-            playerRoundTotals[r.uniqueName] = currentPlayerRoundTotal
         }
         return playerRoundTotals
     }

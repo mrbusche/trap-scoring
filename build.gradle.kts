@@ -4,14 +4,12 @@ plugins {
     java
     id("org.springframework.boot") version "3.1.0"
     id("io.spring.dependency-management") version "1.1.0"
-    kotlin("jvm") version "1.8.21"
-    kotlin("plugin.spring") version "1.8.21"
-//    kotlin("plugin.lombok") version "1.8.21"
-//    id("io.freefair.lombok") version "5.3.0"
+    kotlin("jvm") version "1.9.0-Beta"
+    kotlin("plugin.spring") version "1.9.0-Beta"
 }
 
 group = "com.trap-scoring"
-version = "5.1.1"
+version = "6.0.0"
 
 java.sourceCompatibility = JavaVersion.VERSION_17
 
