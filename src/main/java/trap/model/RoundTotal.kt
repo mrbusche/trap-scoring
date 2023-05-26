@@ -10,5 +10,5 @@ class RoundTotal(val eventId: Int,
                  val type: String? = null) {
 
     val uniqueName: String
-        get() = "$athlete $team {classification $type"
+        get() = "$athlete $team $classification $type"
 }

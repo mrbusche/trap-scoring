@@ -88,27 +88,29 @@ internal class TrapHelperTest {
         roundScores.addAll(roundScoresPlayer1)
         roundScores.addAll(roundScoresPlayer2)
         val playerRoundTotals = trapHelper.calculatePlayerRoundTotals(roundScores)
+
         val player1 = playerRoundTotals[roundScoresPlayer1[0].uniqueName]!!
         Assertions.assertEquals(16, player1.size)
+
         val player2 = playerRoundTotals[roundScoresPlayer2[0].uniqueName]!!
         Assertions.assertEquals(6, player2.size)
     }
 
     @Test
     fun testPlayerIndividualTotals() {
-        val roundScoresPlayer1 = roundScoresPlayer1
-        val roundScoresPlayer2 = roundScoresPlayer2
         val roundScores: MutableList<RoundScore> = ArrayList()
         roundScores.addAll(roundScoresPlayer1)
         roundScores.addAll(roundScoresPlayer2)
         val playerRoundTotals: Map<String, ArrayList<RoundTotal>> = trapHelper.calculatePlayerRoundTotals(roundScores)
         val playerIndividualTotal = trapHelper.calculatePlayerIndividualTotal(roundScores, playerRoundTotals)
+
         val player1 = playerIndividualTotal[roundScoresPlayer1[0].uniqueName]!!
         Assertions.assertEquals(4, player1.size)
         Assertions.assertEquals(49, player1[0].total)
         Assertions.assertEquals(48, player1[1].total)
         Assertions.assertEquals(48, player1[2].total)
         Assertions.assertEquals(48, player1[3].total)
+
         val player2 = playerIndividualTotal[roundScoresPlayer2[0].uniqueName]!!
         Assertions.assertEquals(4, player2.size)
         Assertions.assertEquals(49, player2[0].total)
@@ -135,8 +137,8 @@ internal class TrapHelperTest {
         Assertions.assertEquals("M", playerFinalTotal[player1.uniqueName]!!.gender)
         Assertions.assertEquals(193, playerFinalTotal[player1.uniqueName]!!.total)
         Assertions.assertEquals("singles", playerFinalTotal[player1.uniqueName]!!.type)
-        val player2 = roundScoresPlayer2[0]
         Assertions.assertEquals(4, playerFinalTotal.size)
+
         val firstResult = roundScoresPlayer2[0].uniqueName
         Assertions.assertEquals(0, playerFinalTotal[firstResult]!!.locationId)
         Assertions.assertEquals("UNI Trap Team", playerFinalTotal[firstResult]!!.team)
@@ -145,6 +147,7 @@ internal class TrapHelperTest {
         Assertions.assertEquals("M", playerFinalTotal[firstResult]!!.gender)
         Assertions.assertEquals(187, playerFinalTotal[firstResult]!!.total)
         Assertions.assertEquals("singles", playerFinalTotal[firstResult]!!.type)
+
         val secondResult = roundScoresPlayer2[5].uniqueName
         Assertions.assertEquals(0, playerFinalTotal[secondResult]!!.locationId)
         Assertions.assertEquals("UNI Trap Team", playerFinalTotal[secondResult]!!.team)
@@ -153,6 +156,7 @@ internal class TrapHelperTest {
         Assertions.assertEquals("M", playerFinalTotal[secondResult]!!.gender)
         Assertions.assertEquals(27, playerFinalTotal[secondResult]!!.total)
         Assertions.assertEquals("singles", playerFinalTotal[secondResult]!!.type)
+
         val thirdResult = roundScoresPlayer2[6].uniqueName
         Assertions.assertEquals(0, playerFinalTotal[thirdResult]!!.locationId)
         Assertions.assertEquals("UNI Trap Team", playerFinalTotal[thirdResult]!!.team)
