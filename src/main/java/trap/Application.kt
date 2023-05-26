@@ -11,7 +11,7 @@ import java.util.logging.Logger
 class Application {
     @Bean
     fun commandLineRunner(ctx: ApplicationContext?): CommandLineRunner {
-        return CommandLineRunner { args: Array<String?>? -> LOG.info("File created") }
+        return CommandLineRunner { LOG.info("File created") }
     }
 
     companion object {
