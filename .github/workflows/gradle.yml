@@ -35,7 +35,7 @@ jobs:
       - name: Run Gradle tests
         shell: bash
         run: >-
-          ./gradlew test
+          export SPRING_PROFILES_ACTIVE=test && ./gradlew test
 
       - name: Generate file
         run: |
