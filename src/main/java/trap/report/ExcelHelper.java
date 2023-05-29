@@ -139,6 +139,11 @@ public final class ExcelHelper {
     public static int getRows(Sheet sheet, int rows, IndividualTotal rowData) {
         Row row = sheet.createRow(++rows);
         Cell cell = row.createCell(0);
+        generateTeamRows(rowData, row, cell);
+        return rows;
+    }
+
+    public static void generateTeamRows(IndividualTotal rowData, Row row, Cell cell) {
         cell.setCellValue(rowData.getType());
         cell = row.createCell(1);
         cell.setCellValue(rowData.getTeam());
@@ -148,6 +153,5 @@ public final class ExcelHelper {
         cell.setCellValue(rowData.getAthlete());
         cell = row.createCell(4);
         cell.setCellValue(rowData.getTotal());
-        return rows;
     }
 }

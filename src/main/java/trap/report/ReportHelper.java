@@ -340,15 +340,7 @@ public class ReportHelper {
         for (IndividualTotal rowData : justValues) {
             row = sheet.createRow(++rows);
             cell = row.createCell(0);
-            cell.setCellValue(rowData.getType());
-            cell = row.createCell(1);
-            cell.setCellValue(rowData.getTeam());
-            cell = row.createCell(2);
-            cell.setCellValue(rowData.getClassification());
-            cell = row.createCell(3);
-            cell.setCellValue(rowData.getAthlete());
-            cell = row.createCell(4);
-            cell.setCellValue(rowData.getTotal());
+            ExcelHelper.generateTeamRows(rowData, row, cell);
             cell = row.createCell(5);
             cell.setCellValue(rowData.getGender());
         }
