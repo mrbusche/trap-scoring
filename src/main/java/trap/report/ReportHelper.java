@@ -89,7 +89,7 @@ public class ReportHelper {
         populateTeamIndividualData(workbook, "Team-Individual-Scores", teamScoresByTotal);
         populateAllIndividualData(workbook, "Individual-All-Scores", playerFinalTotal);
 
-        ExcelHelper.createFile(workbook, null);
+        ExcelHelper.createFile(workbook);
 
         System.out.println("Finished creating file in " + (System.currentTimeMillis() - trueStart) + "ms");
         workbook.close();

@@ -53,21 +53,21 @@ public final class ExcelHelper {
         sheet.getRow(8).getCell(1).setCellValue(currentSeason + " " + sheet.getRow(8).getCell(1).getStringCellValue());
     }
 
-    public static void createFile(Workbook workbook, String filename) throws IOException {
+    public static void createFile(Workbook workbook) throws IOException {
         long start;
         start = System.currentTimeMillis();
         Date date = new Date();
         SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmss");
         String currentDate = formatter.format(date);
-        String newFilename = filename != null ? filename + ".xlsx" : "league-data" + "-" + currentDate + ".xlsx";
+        String filename = "league-data-" + currentDate + ".xlsx";
         System.out.println("Creating file");
-        FileOutputStream fileOutputStream = new FileOutputStream(newFilename);
+        FileOutputStream fileOutputStream = new FileOutputStream(filename);
         System.out.println("Writing file");
         workbook.write(fileOutputStream);
         System.out.println("closing output stream");
         fileOutputStream.flush();
         fileOutputStream.close();
-        System.out.println("Created file " + newFilename);
+        System.out.println("Created file " + filename);
         System.out.println("Wrote the contents to a file in " + (System.currentTimeMillis() - start) + "ms");
     }
 
