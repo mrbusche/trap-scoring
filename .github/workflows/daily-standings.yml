@@ -42,5 +42,5 @@ jobs:
       - name: Upload results
         uses: actions/upload-artifact@v3
         with:
-          name: my-artifact
+          name: trap-league-standings
           path: build/libs/league-data-*.xlsx
