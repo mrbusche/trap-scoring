@@ -32,7 +32,7 @@ public class DownloadHelper {
         Charset charset = StandardCharsets.UTF_8;
         for (String type : trapTypes) {
             System.out.println("Downloading " + type + " file");
-            copyURLToFile(new URI(fileUrls.get(type)).toURL(), new File(type + ".csv"), 60000, 60000);
+            copyURLToFile(new URI(fileUrls.get(type)).toURL(), new File(type + ".csv"), 120000, 120000);
             System.out.println("Finished downloading " + type + " file");
 
             System.out.println("Replacing double spaces for " + type + " file");
