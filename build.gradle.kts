@@ -1,7 +1,7 @@
 plugins {
     java
     id("org.springframework.boot") version "3.2.0-M1"
-    id("io.spring.dependency-management") version "1.1.2"
+    id("io.spring.dependency-management") version "1.1.3"
 }
 
 group = "com.trap-scoring"
