@@ -2,21 +2,19 @@ package trap.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.Setter;
 
 @AllArgsConstructor
 @Data
 public class IndividualTotal {
     int locationId;
+    @Setter
     String team;
     String athlete;
     String classification;
     String gender;
     int total;
     String type;
-
-    public void setTeam(String team) {
-        this.team = team;
-    }
 
     public String getTeamForScores() {
         return this.type + " " + this.team + " " + this.getTeamClassificationForTotal();
