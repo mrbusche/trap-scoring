@@ -4,4 +4,5 @@ pluginManagement {
         gradlePluginPortal()
     }
 }
-rootProject.name = 'trap'
+
+rootProject.name = "trap"
