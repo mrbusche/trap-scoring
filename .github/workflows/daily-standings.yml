@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        java-version: [ 20 ]
+        java-version: [ 21 ]
         os: [ ubuntu-latest ]
 
     steps:
