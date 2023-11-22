@@ -23,7 +23,7 @@ dependencies {
 
     implementation("org.apache.poi:poi-ooxml:5.2.4")
 
-    implementation("com.opencsv:opencsv:5.8")
+    implementation("com.opencsv:opencsv:5.9")
 }
 
 tasks.withType<Test> {
