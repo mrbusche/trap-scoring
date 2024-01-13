@@ -51,7 +51,7 @@ public class TrapHelper {
         }
         for (ArrayList<RoundTotal> playerRoundTotal : playerRoundTotals.values()) {
             // clays, skeet, and fivestand are top 3 scores only, minimum 2 locations
-            var subtractScores = subtractScores(playerRoundTotal.get(0).getType());
+            var subtractScores = subtractScores(playerRoundTotal.getFirst().getType());
             ArrayList<IndividualTotal> indTotal = new ArrayList<>();
             playerRoundTotal.sort(Comparator.comparingInt(RoundTotal::getTotal).reversed());
             for (RoundTotal t : playerRoundTotal) {
@@ -73,7 +73,7 @@ public class TrapHelper {
 
                 }
             }
-            playerIndividualTotal.put(playerRoundTotal.get(0).getUniqueName(), indTotal);
+            playerIndividualTotal.put(playerRoundTotal.getFirst().getUniqueName(), indTotal);
         }
 
         return playerIndividualTotal;
@@ -89,7 +89,7 @@ public class TrapHelper {
                 for (IndividualTotal t : value) {
                     total += t.getTotal();
                 }
-                playerFinalTotal.put(key, new IndividualTotal(0, value.get(0).getTeam(), value.get(0).getAthlete(), value.get(0).getClassification(), value.get(0).getGender(), total, value.get(0).getType()));
+                playerFinalTotal.put(key, new IndividualTotal(0, value.getFirst().getTeam(), value.getFirst().getAthlete(), value.getFirst().getClassification(), value.getFirst().getGender(), total, value.getFirst().getType()));
             }
         }
 
