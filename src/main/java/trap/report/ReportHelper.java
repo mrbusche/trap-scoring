@@ -117,7 +117,7 @@ public class ReportHelper {
     private List<RoundScore> generateRoundScores(String type) throws IOException, CsvException {
         CSVReader reader = new CSVReader(new FileReader(type + ".csv"));
         List<String[]> roundScores = reader.readAll();
-        roundScores.remove(0);
+        roundScores.removeFirst();
         List<RoundScore> roundScoresList = new ArrayList<>();
         roundScores.forEach((s) -> roundScoresList.add(new RoundScore(Integer.parseInt(s[1]), s[2].trim(), Integer.parseInt(s[3]), s[4].trim(), s[5].trim(), s[6].trim(), s[7].trim().replace("Club", "Team"), s[8].trim(), s[10].trim(), s[11].trim(), "".equals(s[12]) ? 0 : Integer.parseInt(s[12]), "".equals(s[13]) ? 0 : Integer.parseInt(s[13]), "".equals(s[14]) ? 0 : Integer.parseInt(s[14]), "".equals(s[15]) ? 0 : Integer.parseInt(s[15]), "".equals(s[16]) ? 0 : Integer.parseInt(s[16]), "".equals(s[17]) ? 0 : Integer.parseInt(s[17]), "".equals(s[18]) ? 0 : Integer.parseInt(s[18]), "".equals(s[19]) ? 0 : Integer.parseInt(s[19]), type)));
         return roundScoresList;
@@ -146,12 +146,12 @@ public class ReportHelper {
     private List<TeamScore> getTeamScores(List<Map.Entry<String, ArrayList<IndividualTotal>>> teamData) {
         HashMap<String, TeamScore> teamScoresThatCount = new HashMap<>();
         for (Map.Entry<String, ArrayList<IndividualTotal>> total : teamData) {
-            var details = new TeamScore(total.getValue().get(0).getTeam(), 0);
-            teamScoresThatCount.put(total.getValue().get(0).getTeam(), details);
+            var details = new TeamScore(total.getValue().getFirst().getTeam(), 0);
+            teamScoresThatCount.put(total.getValue().getFirst().getTeam(), details);
         }
 
         for (Map.Entry<String, ArrayList<IndividualTotal>> total : teamData) {
-            TeamScore teamTotal = teamScoresThatCount.get(total.getValue().get(0).getTeam());
+            TeamScore teamTotal = teamScoresThatCount.get(total.getValue().getFirst().getTeam());
             for (IndividualTotal indTotal : total.getValue()) {
                 int currentTotal = teamTotal.getTotal();
                 teamTotal.setTotal(currentTotal + indTotal.getTotal());
@@ -173,7 +173,7 @@ public class ReportHelper {
         int startColumn = 1;
         long start = System.currentTimeMillis();
 
-        List<Map.Entry<String, ArrayList<IndividualTotal>>> teamData = teamScoresByTotal.entrySet().stream().filter(f -> f.getValue().get(0).getTeamClassificationForTotal().equals(teamType) && f.getValue().get(0).getType().equals(SINGLES)).toList();
+        List<Map.Entry<String, ArrayList<IndividualTotal>>> teamData = teamScoresByTotal.entrySet().stream().filter(f -> f.getValue().getFirst().getTeamClassificationForTotal().equals(teamType) && f.getValue().getFirst().getType().equals(SINGLES)).toList();
         List<TeamScore> teamScores = getTeamScores(teamData);
         System.out.println("Ran query for singles by " + teamType + " " + (System.currentTimeMillis() - start) + "ms");
         for (TeamScore teamScore : teamScores) {
@@ -188,7 +188,7 @@ public class ReportHelper {
             for (String type : types) {
                 updateRow = rows;
                 start = System.currentTimeMillis();
-                teamData = teamScoresByTotal.entrySet().stream().filter(f -> f.getValue().get(0).getTeamClassificationForTotal().equals(teamType) && f.getValue().get(0).getType().equals(type)).toList();
+                teamData = teamScoresByTotal.entrySet().stream().filter(f -> f.getValue().getFirst().getTeamClassificationForTotal().equals(teamType) && f.getValue().getFirst().getType().equals(type)).toList();
                 teamScores = getTeamScores(teamData);
                 System.out.println("Ran query for " + type + " by " + teamType + " " + (System.currentTimeMillis() - start) + "ms");
                 for (TeamScore teamScore : teamScores) {

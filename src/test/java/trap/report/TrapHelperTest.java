@@ -101,9 +101,9 @@ class TrapHelperTest {
         roundScores.addAll(roundScoresPlayer2);
         var playerRoundTotals = trapHelper.calculatePlayerRoundTotals(roundScores);
 
-        var player1 = playerRoundTotals.get(roundScoresPlayer1.get(0).getUniqueName());
+        var player1 = playerRoundTotals.get(roundScoresPlayer1.getFirst().getUniqueName());
         assertEquals(16, player1.size());
-        var player2 = playerRoundTotals.get(roundScoresPlayer2.get(0).getUniqueName());
+        var player2 = playerRoundTotals.get(roundScoresPlayer2.getFirst().getUniqueName());
         assertEquals(6, player2.size());
     }
 
@@ -118,14 +118,14 @@ class TrapHelperTest {
 
         var playerIndividualTotal = trapHelper.calculatePlayerIndividualTotal(roundScores, playerRoundTotals);
 
-        var player1 = playerIndividualTotal.get(roundScoresPlayer1.get(0).getUniqueName());
+        var player1 = playerIndividualTotal.get(roundScoresPlayer1.getFirst().getUniqueName());
         assertEquals(4, player1.size());
         assertEquals(49, player1.get(0).getTotal());
         assertEquals(48, player1.get(1).getTotal());
         assertEquals(48, player1.get(2).getTotal());
         assertEquals(48, player1.get(3).getTotal());
 
-        var player2 = playerIndividualTotal.get(roundScoresPlayer2.get(0).getUniqueName());
+        var player2 = playerIndividualTotal.get(roundScoresPlayer2.getFirst().getUniqueName());
         assertEquals(4, player2.size());
         assertEquals(49, player2.get(0).getTotal());
         assertEquals(49, player2.get(1).getTotal());
@@ -144,7 +144,7 @@ class TrapHelperTest {
         var playerIndividualTotal = trapHelper.calculatePlayerIndividualTotal(roundScores, playerRoundTotals);
         var playerFinalTotal = trapHelper.calculatePlayerFinalTotal(playerIndividualTotal);
 
-        var player1 = roundScoresPlayer1.get(0);
+        var player1 = roundScoresPlayer1.getFirst();
         assertEquals(0, playerFinalTotal.get(player1.getUniqueName()).getLocationId());
         assertEquals("UNI Trap Team", playerFinalTotal.get(player1.getUniqueName()).getTeam());
         assertEquals("Scott W Busche", playerFinalTotal.get(player1.getUniqueName()).getAthlete());
@@ -153,11 +153,11 @@ class TrapHelperTest {
         assertEquals(193, playerFinalTotal.get(player1.getUniqueName()).getTotal());
         assertEquals("singles", playerFinalTotal.get(player1.getUniqueName()).getType());
 
-        var player2 = roundScoresPlayer2.get(0);
+        var player2 = roundScoresPlayer2.getFirst();
 
         assertEquals(4, playerFinalTotal.size());
 
-        var firstResult = roundScoresPlayer2.get(0).getUniqueName();
+        var firstResult = roundScoresPlayer2.getFirst().getUniqueName();
         assertEquals(0, playerFinalTotal.get(firstResult).getLocationId());
         assertEquals("UNI Trap Team", playerFinalTotal.get(firstResult).getTeam());
         assertEquals("Matt Busche", playerFinalTotal.get(firstResult).getAthlete());
@@ -192,7 +192,7 @@ class TrapHelperTest {
         var playerIndividualTotal = trapHelper.calculatePlayerIndividualTotal(roundScores, playerRoundTotals);
         var playerFinalTotal = trapHelper.calculatePlayerFinalTotal(playerIndividualTotal);
 
-        var player1 = roundScores.get(0);
+        var player1 = roundScores.getFirst();
         assertEquals(0, playerFinalTotal.get(player1.getUniqueName()).getLocationId());
         assertEquals("Minnesota Vikings", playerFinalTotal.get(player1.getUniqueName()).getTeam());
         assertEquals("Justin Jefferson", playerFinalTotal.get(player1.getUniqueName()).getAthlete());
@@ -209,7 +209,7 @@ class TrapHelperTest {
         var playerIndividualTotal = trapHelper.calculatePlayerIndividualTotal(roundScores, playerRoundTotals);
         var playerFinalTotal = trapHelper.calculatePlayerFinalTotal(playerIndividualTotal);
 
-        var player1 = roundScores.get(0);
+        var player1 = roundScores.getFirst();
         assertEquals(0, playerFinalTotal.get(player1.getUniqueName()).getLocationId());
         assertEquals("Ankeny Centennial Jaguars Shooting Sports", playerFinalTotal.get(player1.getUniqueName()).getTeam());
         assertEquals("Sam LaPorta", playerFinalTotal.get(player1.getUniqueName()).getAthlete());
@@ -226,7 +226,7 @@ class TrapHelperTest {
         var playerIndividualTotal = trapHelper.calculatePlayerIndividualTotal(roundScores, playerRoundTotals);
         var playerFinalTotal = trapHelper.calculatePlayerFinalTotal(playerIndividualTotal);
 
-        var player1 = roundScores.get(0);
+        var player1 = roundScores.getFirst();
         assertEquals(0, playerFinalTotal.get(player1.getUniqueName()).getLocationId());
         assertEquals("Wilton Trap Team", playerFinalTotal.get(player1.getUniqueName()).getTeam());
         assertEquals("TJ Hockenson", playerFinalTotal.get(player1.getUniqueName()).getAthlete());
