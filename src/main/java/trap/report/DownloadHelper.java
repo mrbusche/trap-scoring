@@ -3,10 +3,8 @@ package trap.report;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
@@ -16,20 +14,20 @@ import static org.apache.commons.io.FileUtils.copyURLToFile;
 public class DownloadHelper {
 
     public void downloadFiles(String[] trapTypes) throws IOException {
-        long start = System.currentTimeMillis();
+        var start = System.currentTimeMillis();
         System.out.println("Started downloading files");
 
-        Map<String, String> fileUrls = getFileUrls();
+        var fileUrls = getFileUrls();
 
-        Charset charset = StandardCharsets.UTF_8;
-        for (String type : trapTypes) {
+        var charset = StandardCharsets.UTF_8;
+        for (var type : trapTypes) {
             System.out.println("Downloading " + type + " file");
             copyURLToFile(URI.create(fileUrls.get(type)).toURL(), new File(type + ".csv"), 120000, 120000);
             System.out.println("Finished downloading " + type + " file");
 
             System.out.println("Replacing double spaces for " + type + " file");
-            Path path = Paths.get(type + ".csv");
-            String content = Files.readString(path, charset);
+            var path = Paths.get(type + ".csv");
+            var content = Files.readString(path, charset);
             content = content.replaceAll(" {2}", " ");
             Files.writeString(path, content, charset);
             System.out.println("Finished replacing double spaces for " + type + " file");
@@ -38,7 +36,7 @@ public class DownloadHelper {
     }
 
     private static Map<String, String> getFileUrls() {
-        Map<String, String> fileUrls = new HashMap<>();
+        var fileUrls = new HashMap<String, String>();
         fileUrls.put("singles", "https://metabase.sssfonline.com/public/question/8648faf9-42e8-4a9c-b55d-2f251349de7f.csv");
         fileUrls.put("doubles", "https://metabase.sssfonline.com/public/question/5d5a78a5-2356-477f-b1b8-fe6ee11d25b1.csv");
         fileUrls.put("handicap", "https://metabase.sssfonline.com/public/question/69ca55d9-3e18-45bc-b57f-73aeb205ece8.csv");

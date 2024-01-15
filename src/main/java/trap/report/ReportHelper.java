@@ -16,7 +16,6 @@ import trap.model.TeamScore;
 
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -51,24 +50,24 @@ public class ReportHelper {
     public void doItAll() throws Exception {
         downloadHelper.downloadFiles(trapTypes);
 
-        Workbook workbook = getWorkbook();
+        var workbook = getWorkbook();
 
         System.out.println("Starting file creation");
         System.out.println("Workbook has " + workbook.getNumberOfSheets() + " sheets");
         workbook.forEach(sheet -> System.out.println("- " + sheet.getSheetName()));
 
         long start;
-        long trueStart = System.currentTimeMillis();
+        var trueStart = System.currentTimeMillis();
 
-        Map<String, String> types = new HashMap<>();
+        var types = new HashMap<String, String>();
         types.put("Team-Senior", VARSITY);
         types.put("Team-Intermediate", INTERMEDIATE_ENTRY);
         types.put("Team-Rookie", ROOKIE);
 
-        CellStyle mainTextStyle = ExcelHelper.getCellStyle(workbook);
-        CellStyle style = ExcelHelper.setFontForHeaders(workbook);
+        var mainTextStyle = ExcelHelper.getCellStyle(workbook);
+        var style = ExcelHelper.setFontForHeaders(workbook);
 
-        List<RoundScore> allRoundScores = generateRoundScores();
+        var allRoundScores = generateRoundScores();
         populateCleanData(workbook.getSheet("Clean Data"), allRoundScores);
 
         var playerRoundTotals = trapHelper.calculatePlayerRoundTotals(allRoundScores);
@@ -99,7 +98,7 @@ public class ReportHelper {
         List<RoundScore> allRoundScores;
         try {
             allRoundScores = new ArrayList<>();
-            for (String type : trapTypes) {
+            for (var type : trapTypes) {
                 allRoundScores.addAll(generateRoundScores(type));
             }
 
@@ -110,30 +109,30 @@ public class ReportHelper {
     }
 
     private Workbook getWorkbook() throws IOException {
-        InputStream in = getClass().getResourceAsStream("/main-template.xlsx");
+        var in = getClass().getResourceAsStream("/main-template.xlsx");
         return WorkbookFactory.create(Objects.requireNonNull(in));
     }
 
     private List<RoundScore> generateRoundScores(String type) throws IOException, CsvException {
-        CSVReader reader = new CSVReader(new FileReader(type + ".csv"));
-        List<String[]> roundScores = reader.readAll();
+        var reader = new CSVReader(new FileReader(type + ".csv"));
+        var roundScores = reader.readAll();
         roundScores.removeFirst();
-        List<RoundScore> roundScoresList = new ArrayList<>();
+        var roundScoresList = new ArrayList<RoundScore>();
         roundScores.forEach((s) -> roundScoresList.add(new RoundScore(Integer.parseInt(s[1]), s[2].trim(), Integer.parseInt(s[3]), s[4].trim(), s[5].trim(), s[6].trim(), s[7].trim().replace("Club", "Team"), s[8].trim(), s[10].trim(), s[11].trim(), "".equals(s[12]) ? 0 : Integer.parseInt(s[12]), "".equals(s[13]) ? 0 : Integer.parseInt(s[13]), "".equals(s[14]) ? 0 : Integer.parseInt(s[14]), "".equals(s[15]) ? 0 : Integer.parseInt(s[15]), "".equals(s[16]) ? 0 : Integer.parseInt(s[16]), "".equals(s[17]) ? 0 : Integer.parseInt(s[17]), "".equals(s[18]) ? 0 : Integer.parseInt(s[18]), "".equals(s[19]) ? 0 : Integer.parseInt(s[19]), type)));
         return roundScoresList;
     }
 
     private void populateCleanData(Sheet sheet, List<RoundScore> allRoundScores) {
-        long start = System.currentTimeMillis();
+        var start = System.currentTimeMillis();
 
         System.out.println("Ran get all data for clean data population " + (System.currentTimeMillis() - start) + "ms");
 
-        int rows = sheet.getLastRowNum();
+        var rows = sheet.getLastRowNum();
         Row row;
 
-        for (String type : trapTypes) {
-            List<RoundScore> typeRoundScores = allRoundScores.stream().filter(t -> t.getType().equals(type)).toList();
-            for (RoundScore score : typeRoundScores) {
+        for (var type : trapTypes) {
+            var typeRoundScores = allRoundScores.stream().filter(t -> t.getType().equals(type)).toList();
+            for (var score : typeRoundScores) {
                 row = sheet.createRow(++rows);
                 ExcelHelper.addCleanData(row, score);
             }
@@ -144,15 +143,15 @@ public class ReportHelper {
     }
 
     private List<TeamScore> getTeamScores(List<Map.Entry<String, ArrayList<IndividualTotal>>> teamData) {
-        HashMap<String, TeamScore> teamScoresThatCount = new HashMap<>();
+        var teamScoresThatCount = new HashMap<String, TeamScore>();
         for (Map.Entry<String, ArrayList<IndividualTotal>> total : teamData) {
             var details = new TeamScore(total.getValue().getFirst().getTeam(), 0);
             teamScoresThatCount.put(total.getValue().getFirst().getTeam(), details);
         }
 
         for (Map.Entry<String, ArrayList<IndividualTotal>> total : teamData) {
-            TeamScore teamTotal = teamScoresThatCount.get(total.getValue().getFirst().getTeam());
-            for (IndividualTotal indTotal : total.getValue()) {
+            var teamTotal = teamScoresThatCount.get(total.getValue().getFirst().getTeam());
+            for (var indTotal : total.getValue()) {
                 int currentTotal = teamTotal.getTotal();
                 teamTotal.setTotal(currentTotal + indTotal.getTotal());
                 teamScoresThatCount.put(indTotal.getTeam(), teamTotal);
@@ -166,7 +165,7 @@ public class ReportHelper {
         ExcelHelper.setCurrentDateHeader(sheet, currentDate);
         ExcelHelper.setCurrentSeasonHeader(sheet);
 
-        int rows = sheet.getLastRowNum();
+        var rows = sheet.getLastRowNum();
         Row row;
 
         int updateRow = rows;
@@ -176,7 +175,7 @@ public class ReportHelper {
         List<Map.Entry<String, ArrayList<IndividualTotal>>> teamData = teamScoresByTotal.entrySet().stream().filter(f -> f.getValue().getFirst().getTeamClassificationForTotal().equals(teamType) && f.getValue().getFirst().getType().equals(SINGLES)).toList();
         List<TeamScore> teamScores = getTeamScores(teamData);
         System.out.println("Ran query for singles by " + teamType + " " + (System.currentTimeMillis() - start) + "ms");
-        for (TeamScore teamScore : teamScores) {
+        for (var teamScore : teamScores) {
             row = sheet.createRow(++updateRow);
             ExcelHelper.addTeamData(row, startColumn, teamScore.getName(), teamScore.getTotal(), mainTextStyle);
         }
@@ -184,14 +183,14 @@ public class ReportHelper {
         if (!ROOKIE.equals(teamType)) {
             startColumn += 3;
 
-            String[] types = new String[]{HANDICAP, DOUBLES, SKEET, CLAYS, FIVESTAND, DOUBLESKEET};
-            for (String type : types) {
+            var types = new String[]{HANDICAP, DOUBLES, SKEET, CLAYS, FIVESTAND, DOUBLESKEET};
+            for (var type : types) {
                 updateRow = rows;
                 start = System.currentTimeMillis();
                 teamData = teamScoresByTotal.entrySet().stream().filter(f -> f.getValue().getFirst().getTeamClassificationForTotal().equals(teamType) && f.getValue().getFirst().getType().equals(type)).toList();
                 teamScores = getTeamScores(teamData);
                 System.out.println("Ran query for " + type + " by " + teamType + " " + (System.currentTimeMillis() - start) + "ms");
-                for (TeamScore teamScore : teamScores) {
+                for (var teamScore : teamScores) {
                     row = sheet.getRow(++updateRow);
                     ExcelHelper.addTeamData(row, startColumn, teamScore.getName(), teamScore.getTotal(), mainTextStyle);
                 }
@@ -202,22 +201,22 @@ public class ReportHelper {
     }
 
     private void populateIndividualData(Workbook workbook, String sheetName, String gender, CellStyle style, CellStyle mainTextStyle, Map<String, IndividualTotal> allRoundScores) {
-        long initialStart = System.currentTimeMillis();
-        Sheet sheet = workbook.getSheet(sheetName);
+        var initialStart = System.currentTimeMillis();
+        var sheet = workbook.getSheet(sheetName);
         ExcelHelper.setCurrentDateHeader(sheet, currentDate);
         ExcelHelper.setCurrentSeasonHeader(sheet);
 
-        int rows = sheet.getLastRowNum();
+        var rows = sheet.getLastRowNum();
         Cell cell;
         Row row;
 
         int updateRow;
         int maxRow = rows;
         int classificationStartRow;
-        boolean addBlankRowForHeader = false;
-        List<String> classificationList = Arrays.asList(VARSITY, JUNIOR_VARSITY, INTERMEDIATE_ADVANCED, INTERMEDIATE_ENTRY, ROOKIE);
+        var addBlankRowForHeader = false;
+        var classificationList = Arrays.asList(VARSITY, JUNIOR_VARSITY, INTERMEDIATE_ADVANCED, INTERMEDIATE_ENTRY, ROOKIE);
         long start;
-        for (String classification : classificationList) {
+        for (var classification : classificationList) {
             int column = 1;
             updateRow = maxRow;
             //Add blank row
@@ -282,12 +281,12 @@ public class ReportHelper {
     }
 
     private HashMap<String, ArrayList<IndividualTotal>> calculateTeamScores(List<IndividualTotal> justValues) {
-        HashMap<String, ArrayList<IndividualTotal>> teamScoresThatCount = new HashMap<>();
-        for (IndividualTotal total : justValues) {
+        var teamScoresThatCount = new HashMap<String, ArrayList<IndividualTotal>>();
+        for (var total : justValues) {
             teamScoresThatCount.put(total.getTeamForScores(), new ArrayList<>());
         }
 
-        for (IndividualTotal total : justValues) {
+        for (var total : justValues) {
             var currentTeam = teamScoresThatCount.get(total.getTeamForScores());
             var scoresToCount = total.getType().equals(SINGLES) || total.getType().equals(HANDICAP) || total.getType().equals(DOUBLES) ? 5 : 3;
             if (currentTeam.size() < scoresToCount) {
@@ -300,22 +299,22 @@ public class ReportHelper {
     }
 
     private List<IndividualTotal> getTeamScoresByTotal(Map<String, IndividualTotal> allRoundScores) {
-        List<IndividualTotal> teamScoresByTotal = new ArrayList<>(allRoundScores.values());
+        var teamScoresByTotal = new ArrayList<>(allRoundScores.values());
         teamScoresByTotal.sort(Comparator.comparingInt(IndividualTotal::getTotal).reversed());
         return teamScoresByTotal;
     }
 
     private void populateTeamIndividualData(Workbook workbook, String sheetName, List<IndividualTotal> teamScoresByTotal) {
-        Sheet sheet = workbook.getSheet(sheetName);
-        long startTime = System.currentTimeMillis();
-        long start = System.currentTimeMillis();
+        var sheet = workbook.getSheet(sheetName);
+        var startTime = System.currentTimeMillis();
+        var start = System.currentTimeMillis();
         System.out.println("Ran query for team scores " + (System.currentTimeMillis() - start) + "ms");
 
-        int rows = sheet.getLastRowNum();
+        var rows = sheet.getLastRowNum();
 
         var teamScoresThatCount = calculateTeamScores(teamScoresByTotal);
-        for (List<IndividualTotal> individualTotalList : teamScoresThatCount.values()) {
-            for (IndividualTotal rowData : individualTotalList) {
+        for (var individualTotalList : teamScoresThatCount.values()) {
+            for (var rowData : individualTotalList) {
                 rows = ExcelHelper.getRows(sheet, rows, rowData);
             }
         }
@@ -325,19 +324,19 @@ public class ReportHelper {
     }
 
     private void populateAllIndividualData(Workbook workbook, String sheetName, Map<String, IndividualTotal> allRoundScores) {
-        Sheet sheet = workbook.getSheet(sheetName);
-        long trueStart = System.currentTimeMillis();
-        long start = System.currentTimeMillis();
+        var sheet = workbook.getSheet(sheetName);
+        var trueStart = System.currentTimeMillis();
+        var start = System.currentTimeMillis();
 
-        List<IndividualTotal> justValues = new ArrayList<>(allRoundScores.values());
+        var justValues = new ArrayList<>(allRoundScores.values());
         justValues.sort(Comparator.comparing(IndividualTotal::getTeam));
         System.out.println("Ran query for all scores " + (System.currentTimeMillis() - start) + "ms");
 
-        int rows = sheet.getLastRowNum();
+        var rows = sheet.getLastRowNum();
 
         Cell cell;
         Row row;
-        for (IndividualTotal rowData : justValues) {
+        for (var rowData : justValues) {
             row = sheet.createRow(++rows);
             cell = row.createCell(0);
             ExcelHelper.generateTeamRows(rowData, row, cell);

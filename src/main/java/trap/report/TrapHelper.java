@@ -10,16 +10,15 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 public class TrapHelper {
 
     public Map<String, ArrayList<RoundTotal>> calculatePlayerRoundTotals(List<RoundScore> roundScores) {
-        Map<String, ArrayList<RoundTotal>> playerRoundTotals = new HashMap<>();
-        for (RoundScore r : roundScores) {
+        var playerRoundTotals = new HashMap<String, ArrayList<RoundTotal>>();
+        for (var r : roundScores) {
             playerRoundTotals.put(r.getUniqueName(), new ArrayList<>());
         }
-        for (RoundScore r : roundScores) {
+        for (var r : roundScores) {
             var currentPlayerRoundTotal = playerRoundTotals.get(r.getUniqueName());
             if (singleRound(r.getType())) {
                 currentPlayerRoundTotal.add(new RoundTotal(r.getEventId(), r.getLocationId(), r.getTeam(), r.getAthlete(), r.getClassification(), r.getGender(), r.getRound1(), r.getType()));
@@ -45,20 +44,20 @@ public class TrapHelper {
     }
 
     public Map<String, ArrayList<IndividualTotal>> calculatePlayerIndividualTotal(List<RoundScore> roundScores, Map<String, ArrayList<RoundTotal>> playerRoundTotals) {
-        Map<String, ArrayList<IndividualTotal>> playerIndividualTotal = new HashMap<>();
-        for (RoundScore r : roundScores) {
+        var playerIndividualTotal = new HashMap<String, ArrayList<IndividualTotal>>();
+        for (var r : roundScores) {
             playerIndividualTotal.put(r.getUniqueName(), new ArrayList<>());
         }
-        for (ArrayList<RoundTotal> playerRoundTotal : playerRoundTotals.values()) {
+        for (var playerRoundTotal : playerRoundTotals.values()) {
             // clays, skeet, and fivestand are top 3 scores only, minimum 2 locations
             var subtractScores = subtractScores(playerRoundTotal.getFirst().getType());
-            ArrayList<IndividualTotal> indTotal = new ArrayList<>();
+            var indTotal = new ArrayList<IndividualTotal>();
             playerRoundTotal.sort(Comparator.comparingInt(RoundTotal::getTotal).reversed());
-            for (RoundTotal t : playerRoundTotal) {
+            for (var t : playerRoundTotal) {
                 if (indTotal.size() < (3 - subtractScores)) {
                     indTotal.add(new IndividualTotal(t.getLocationId(), t.getTeam(), t.getAthlete(), t.getClassification(), t.getGender(), t.getTotal(), t.getType()));
                 } else {
-                    Set<Integer> locationIds = new HashSet<>();
+                    var locationIds = new HashSet<Integer>();
                     indTotal.forEach(l -> locationIds.add(l.getLocationId()));
                     // if location doesn't already exist
                     if (!locationIds.contains(t.getLocationId())) {
@@ -70,7 +69,6 @@ public class TrapHelper {
                         indTotal.add(new IndividualTotal(t.getLocationId(), t.getTeam(), t.getAthlete(), t.getClassification(), t.getGender(), t.getTotal(), t.getType()));
                         break;
                     }
-
                 }
             }
             playerIndividualTotal.put(playerRoundTotal.getFirst().getUniqueName(), indTotal);
@@ -80,13 +78,13 @@ public class TrapHelper {
     }
 
     public Map<String, IndividualTotal> calculatePlayerFinalTotal(Map<String, ArrayList<IndividualTotal>> playerIndividualTotal) {
-        Map<String, IndividualTotal> playerFinalTotal = new HashMap<>();
+        var playerFinalTotal = new HashMap<String, IndividualTotal>();
         for (Map.Entry<String, ArrayList<IndividualTotal>> entry : playerIndividualTotal.entrySet()) {
-            String key = entry.getKey();
+            var key = entry.getKey();
             ArrayList<IndividualTotal> value = entry.getValue();
             if (!value.isEmpty()) {
                 int total = 0;
-                for (IndividualTotal t : value) {
+                for (var t : value) {
                     total += t.getTotal();
                 }
                 playerFinalTotal.put(key, new IndividualTotal(0, value.getFirst().getTeam(), value.getFirst().getAthlete(), value.getFirst().getClassification(), value.getFirst().getGender(), total, value.getFirst().getType()));
