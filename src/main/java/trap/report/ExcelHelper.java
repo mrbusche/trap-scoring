@@ -4,7 +4,6 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
-import org.apache.poi.ss.usermodel.Font;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -20,21 +19,21 @@ import java.util.Date;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class ExcelHelper {
     public static CellStyle setFontForHeaders(Workbook workbook) {
-        Font font = workbook.createFont();
+        var font = workbook.createFont();
         font.setFontName("Calibri");
         font.setItalic(true);
         font.setBold(true);
         font.setFontHeightInPoints((short) 14);
-        CellStyle style = workbook.createCellStyle();
+        var style = workbook.createCellStyle();
         style.setFont(font);
         return style;
     }
 
     public static CellStyle getCellStyle(Workbook workbook) {
-        Font mainText = workbook.createFont();
+        var mainText = workbook.createFont();
         mainText.setFontName("Calibri");
         mainText.setFontHeightInPoints((short) 12);
-        CellStyle mainTextStyle = workbook.createCellStyle();
+        var mainTextStyle = workbook.createCellStyle();
         mainTextStyle.setFont(mainText);
         return mainTextStyle;
     }
@@ -44,22 +43,22 @@ public final class ExcelHelper {
     }
 
     public static void setCurrentSeasonHeader(Sheet sheet) {
-        java.util.Date date = new Date();
-        Calendar cal = Calendar.getInstance();
+        var date = new Date();
+        var cal = Calendar.getInstance();
         cal.setTime(date);
-        int month = cal.get(Calendar.MONTH);
-        int year = cal.get(Calendar.YEAR);
-        int currentSeason = month > 8 ? year + 1 : year;
+        var month = cal.get(Calendar.MONTH);
+        var year = cal.get(Calendar.YEAR);
+        var currentSeason = month > 8 ? year + 1 : year;
         sheet.getRow(8).getCell(1).setCellValue(currentSeason + " " + sheet.getRow(8).getCell(1).getStringCellValue());
     }
 
     public static void createFile(Workbook workbook) throws IOException {
         long start;
         start = System.currentTimeMillis();
-        Date date = new Date();
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmss");
-        String currentDate = formatter.format(date);
-        String filename = "league-data-" + currentDate + ".xlsx";
+        var date = new Date();
+        var formatter = new SimpleDateFormat("yyyyMMddHHmmss");
+        var currentDate = formatter.format(date);
+        var filename = "league-data-" + currentDate + ".xlsx";
         System.out.println("Creating file");
         FileOutputStream fileOutputStream = new FileOutputStream(filename);
         System.out.println("Writing file");
@@ -72,8 +71,7 @@ public final class ExcelHelper {
     }
 
     public static void addCleanData(Row row, RoundScore rowData) {
-        Cell cell;
-        cell = row.createCell(0);
+        var cell = row.createCell(0);
         cell.setCellValue(rowData.getEventId());
         cell = row.createCell(1);
         cell.setCellValue(rowData.getEvent());
@@ -114,7 +112,7 @@ public final class ExcelHelper {
     }
 
     public static void addTeamData(Row row, int startColumn, String team, int total, CellStyle mainTextStyle) {
-        Cell cell = row.createCell(startColumn);
+        var cell = row.createCell(startColumn);
         cell.setCellValue(team);
         cell.setCellStyle(mainTextStyle);
         cell = row.createCell(startColumn + 1);
@@ -124,7 +122,7 @@ public final class ExcelHelper {
 
     public static void addPlayerData(Row row, int column, String athlete, int total, String team, CellStyle mainTextStyle) {
         if (row != null) {
-            Cell cell = row.createCell(column);
+            var cell = row.createCell(column);
             cell.setCellValue(athlete);
             cell.setCellStyle(mainTextStyle);
             cell = row.createCell(column + 1);
@@ -137,8 +135,8 @@ public final class ExcelHelper {
     }
 
     public static int getRows(Sheet sheet, int rows, IndividualTotal rowData) {
-        Row row = sheet.createRow(++rows);
-        Cell cell = row.createCell(0);
+        var row = sheet.createRow(++rows);
+        var cell = row.createCell(0);
         generateTeamRows(rowData, row, cell);
         return rows;
     }
