@@ -9,6 +9,8 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.apache.poi.ss.util.CellRangeAddress;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import trap.model.IndividualTotal;
 import trap.model.RoundScore;
@@ -28,7 +30,6 @@ import java.util.Objects;
 
 @Service
 public class ReportHelper {
-    private static final String COMMA_DELIMITER = ",";
     private static final String SINGLES = "singles";
     private static final String DOUBLES = "doubles";
     private static final String HANDICAP = "handicap";
@@ -47,14 +48,16 @@ public class ReportHelper {
     TrapHelper trapHelper = new TrapHelper();
     DownloadHelper downloadHelper = new DownloadHelper();
 
+    Logger logger = LoggerFactory.getLogger(ReportHelper.class);
+
     public void doItAll() throws Exception {
         downloadHelper.downloadFiles(trapTypes);
 
         var workbook = getWorkbook();
 
-        System.out.println("Starting file creation");
-        System.out.println("Workbook has " + workbook.getNumberOfSheets() + " sheets");
-        workbook.forEach(sheet -> System.out.println("- " + sheet.getSheetName()));
+        logger.info("Starting file creation");
+        logger.info("Workbook has {} sheets", workbook.getNumberOfSheets());
+        workbook.forEach(sheet -> logger.info("- {}", sheet.getSheetName()));
 
         long start;
         var trueStart = System.currentTimeMillis();
@@ -79,7 +82,7 @@ public class ReportHelper {
         for (Map.Entry<String, String> entry : types.entrySet()) {
             start = System.currentTimeMillis();
             populateTeamData(workbook.getSheet(entry.getKey()), entry.getValue(), mainTextStyle, teamScoresThatCount);
-            System.out.println(entry.getKey() + " data populated in " + (System.currentTimeMillis() - start) + "ms");
+            logger.info("{} data populated in {} ms", entry.getKey(), System.currentTimeMillis() - start);
         }
 
         populateIndividualData(workbook, "Individual-Men", "M", style, mainTextStyle, playerFinalTotal);
@@ -90,7 +93,7 @@ public class ReportHelper {
 
         ExcelHelper.createFile(workbook);
 
-        System.out.println("Finished creating file in " + (System.currentTimeMillis() - trueStart) + "ms");
+        logger.info("Finished creating file in {} ms", System.currentTimeMillis() - trueStart);
         workbook.close();
     }
 
@@ -118,14 +121,14 @@ public class ReportHelper {
         var roundScores = reader.readAll();
         roundScores.removeFirst();
         var roundScoresList = new ArrayList<RoundScore>();
-        roundScores.forEach((s) -> roundScoresList.add(new RoundScore(Integer.parseInt(s[1]), s[2].trim(), Integer.parseInt(s[3]), s[4].trim(), s[5].trim(), s[6].trim(), s[7].trim().replace("Club", "Team"), s[8].trim(), s[10].trim(), s[11].trim(), "".equals(s[12]) ? 0 : Integer.parseInt(s[12]), "".equals(s[13]) ? 0 : Integer.parseInt(s[13]), "".equals(s[14]) ? 0 : Integer.parseInt(s[14]), "".equals(s[15]) ? 0 : Integer.parseInt(s[15]), "".equals(s[16]) ? 0 : Integer.parseInt(s[16]), "".equals(s[17]) ? 0 : Integer.parseInt(s[17]), "".equals(s[18]) ? 0 : Integer.parseInt(s[18]), "".equals(s[19]) ? 0 : Integer.parseInt(s[19]), type)));
+        roundScores.forEach(s -> roundScoresList.add(new RoundScore(Integer.parseInt(s[1]), trimString(s[2]), Integer.parseInt(s[3]), trimString(s[4]), trimString(s[5]), trimString(s[6]), trimString(s[7]).replace("Club", "Team"), trimString(s[8]), trimString(s[10]), trimString(s[11]), setStringToZero(s[12]), setStringToZero(s[13]), setStringToZero(s[14]), setStringToZero(s[15]), setStringToZero(s[16]), setStringToZero(s[17]), setStringToZero(s[18]), setStringToZero(s[19]), type)));
         return roundScoresList;
     }
 
     private void populateCleanData(Sheet sheet, List<RoundScore> allRoundScores) {
         var start = System.currentTimeMillis();
 
-        System.out.println("Ran get all data for clean data population " + (System.currentTimeMillis() - start) + "ms");
+        logger.info("Ran get all data for clean data population {} ms", System.currentTimeMillis() - start);
 
         var rows = sheet.getLastRowNum();
         Row row;
@@ -139,7 +142,7 @@ public class ReportHelper {
         }
 
         sheet.setAutoFilter(CellRangeAddress.valueOf("A1:S1"));
-        System.out.println("Clean data populated in " + (System.currentTimeMillis() - start) + "ms");
+        logger.info("Clean data populated in in {} ms", System.currentTimeMillis() - start);
     }
 
     private List<TeamScore> getTeamScores(List<Map.Entry<String, ArrayList<IndividualTotal>>> teamData) {
@@ -174,7 +177,7 @@ public class ReportHelper {
 
         List<Map.Entry<String, ArrayList<IndividualTotal>>> teamData = teamScoresByTotal.entrySet().stream().filter(f -> f.getValue().getFirst().getTeamClassificationForTotal().equals(teamType) && f.getValue().getFirst().getType().equals(SINGLES)).toList();
         List<TeamScore> teamScores = getTeamScores(teamData);
-        System.out.println("Ran query for singles by " + teamType + " " + (System.currentTimeMillis() - start) + "ms");
+        logger.info("Ran query for singles by {} in {} ms", teamType, System.currentTimeMillis() - start);
         for (var teamScore : teamScores) {
             row = sheet.createRow(++updateRow);
             ExcelHelper.addTeamData(row, startColumn, teamScore.getName(), teamScore.getTotal(), mainTextStyle);
@@ -189,7 +192,7 @@ public class ReportHelper {
                 start = System.currentTimeMillis();
                 teamData = teamScoresByTotal.entrySet().stream().filter(f -> f.getValue().getFirst().getTeamClassificationForTotal().equals(teamType) && f.getValue().getFirst().getType().equals(type)).toList();
                 teamScores = getTeamScores(teamData);
-                System.out.println("Ran query for " + type + " by " + teamType + " " + (System.currentTimeMillis() - start) + "ms");
+                logger.info("Ran query for {} by {} in {} ms", type, teamType, System.currentTimeMillis() - start);
                 for (var teamScore : teamScores) {
                     row = sheet.getRow(++updateRow);
                     ExcelHelper.addTeamData(row, startColumn, teamScore.getName(), teamScore.getTotal(), mainTextStyle);
@@ -251,7 +254,7 @@ public class ReportHelper {
             justValues.sort(Comparator.comparingInt(IndividualTotal::getTotal).reversed());
 
             var individualData = justValues.stream().filter(f -> f.getGender().equals(gender) && f.getTeamClassification().equals(classification) && f.getType().equals(SINGLES)).toList();
-            System.out.println("Ran query for singles by " + gender + " and " + classification + " " + (System.currentTimeMillis() - start) + "ms");
+            logger.info("Ran query for singles by {} and {} in {} ms", gender, classification, System.currentTimeMillis() - start);
 
             for (IndividualTotal singlesRowData : individualData) {
                 row = sheet.createRow(++updateRow);
@@ -266,7 +269,7 @@ public class ReportHelper {
                 updateRow++;
                 start = System.currentTimeMillis();
                 individualData = justValues.stream().filter(f -> f.getGender().equals(gender) && f.getTeamClassification().equals(classification) && f.getType().equals(type)).toList();
-                System.out.println("Ran query for " + type + " by " + gender + " and " + classification + " " + (System.currentTimeMillis() - start) + "ms");
+                logger.info("Ran query for {} by {} and {} in {} ms", type, gender, classification,  System.currentTimeMillis() - start);
                 for (IndividualTotal data : individualData) {
                     row = sheet.getRow(++updateRow);
                     ExcelHelper.addPlayerData(row, column, data.getAthlete(), data.getTotal(), data.getTeam(), mainTextStyle);
@@ -277,7 +280,7 @@ public class ReportHelper {
 
             sheet.setAutoFilter(CellRangeAddress.valueOf("A13:AB13"));
         }
-        System.out.println(sheetName + " data populated in " + (System.currentTimeMillis() - initialStart) + "ms");
+        logger.info("{} data populated in {} ms", sheetName, System.currentTimeMillis() - initialStart);
     }
 
     private HashMap<String, ArrayList<IndividualTotal>> calculateTeamScores(List<IndividualTotal> justValues) {
@@ -308,7 +311,7 @@ public class ReportHelper {
         var sheet = workbook.getSheet(sheetName);
         var startTime = System.currentTimeMillis();
         var start = System.currentTimeMillis();
-        System.out.println("Ran query for team scores " + (System.currentTimeMillis() - start) + "ms");
+        logger.info("Ran query for team scores in {} ms", System.currentTimeMillis() - start);
 
         var rows = sheet.getLastRowNum();
 
@@ -320,7 +323,7 @@ public class ReportHelper {
         }
 
         sheet.setAutoFilter(CellRangeAddress.valueOf("A1:E1"));
-        System.out.println("Team Individual Scores data populated in " + (System.currentTimeMillis() - startTime) + "ms");
+        logger.info("Team Individual Scores data populated in {} ms", System.currentTimeMillis() - startTime);
     }
 
     private void populateAllIndividualData(Workbook workbook, String sheetName, Map<String, IndividualTotal> allRoundScores) {
@@ -330,7 +333,7 @@ public class ReportHelper {
 
         var justValues = new ArrayList<>(allRoundScores.values());
         justValues.sort(Comparator.comparing(IndividualTotal::getTeam));
-        System.out.println("Ran query for all scores " + (System.currentTimeMillis() - start) + "ms");
+        logger.info("Ran query for all scores in {} ms", System.currentTimeMillis() - start);
 
         var rows = sheet.getLastRowNum();
 
@@ -344,7 +347,15 @@ public class ReportHelper {
             cell.setCellValue(rowData.getGender());
         }
         sheet.setAutoFilter(CellRangeAddress.valueOf("A1:F1"));
-        System.out.println("Individual All Scores data populated in " + (System.currentTimeMillis() - trueStart) + "ms");
+        logger.info("Individual All Scores data populated in {} ms", System.currentTimeMillis() - trueStart);
+    }
+
+    private int setStringToZero(String number) {
+        return "".equals(number) ? 0 : Integer.parseInt(number);
+    }
+
+    private String trimString(String s) {
+        return s.trim();
     }
 
 }

@@ -7,6 +7,8 @@ import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import trap.model.IndividualTotal;
 import trap.model.RoundScore;
 
@@ -18,6 +20,9 @@ import java.util.Date;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class ExcelHelper {
+
+    static Logger logger = LoggerFactory.getLogger(ExcelHelper.class);
+
     public static CellStyle setFontForHeaders(Workbook workbook) {
         var font = workbook.createFont();
         font.setFontName("Calibri");
@@ -59,15 +64,15 @@ public final class ExcelHelper {
         var formatter = new SimpleDateFormat("yyyyMMddHHmmss");
         var currentDate = formatter.format(date);
         var filename = "league-data-" + currentDate + ".xlsx";
-        System.out.println("Creating file");
+        logger.info("Creating file");
         FileOutputStream fileOutputStream = new FileOutputStream(filename);
-        System.out.println("Writing file");
+        logger.info("Writing file");
         workbook.write(fileOutputStream);
-        System.out.println("closing output stream");
+        logger.info("closing output stream");
         fileOutputStream.flush();
         fileOutputStream.close();
-        System.out.println("Created file " + filename);
-        System.out.println("Wrote the contents to a file in " + (System.currentTimeMillis() - start) + "ms");
+        logger.info("Created file {}", filename);
+        logger.info("Wrote the contents to a file in {} ms", System.currentTimeMillis() - start);
     }
 
     public static void addCleanData(Row row, RoundScore rowData) {

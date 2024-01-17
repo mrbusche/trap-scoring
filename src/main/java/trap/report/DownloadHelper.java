@@ -1,5 +1,8 @@
 package trap.report;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
@@ -12,27 +15,28 @@ import java.util.Map;
 import static org.apache.commons.io.FileUtils.copyURLToFile;
 
 public class DownloadHelper {
+    Logger logger = LoggerFactory.getLogger(DownloadHelper.class);
 
     public void downloadFiles(String[] trapTypes) throws IOException {
         var start = System.currentTimeMillis();
-        System.out.println("Started downloading files");
+        logger.info("Started downloading files");
 
         var fileUrls = getFileUrls();
 
         var charset = StandardCharsets.UTF_8;
         for (var type : trapTypes) {
-            System.out.println("Downloading " + type + " file");
+            logger.info("Downloading {} file", type);
             copyURLToFile(URI.create(fileUrls.get(type)).toURL(), new File(type + ".csv"), 120000, 120000);
-            System.out.println("Finished downloading " + type + " file");
+            logger.info("Finished downloading {} file", type);
 
-            System.out.println("Replacing double spaces for " + type + " file");
+            logger.info("Replacing double spaces for {} file", type);
             var path = Paths.get(type + ".csv");
             var content = Files.readString(path, charset);
             content = content.replaceAll(" {2}", " ");
             Files.writeString(path, content, charset);
-            System.out.println("Finished replacing double spaces for " + type + " file");
+            logger.info("Finished replacing double spaces for {} file", type);
         }
-        System.out.println("Files downloaded in " + (System.currentTimeMillis() - start) + " ms");
+        logger.info("Files downloaded in {} ms", System.currentTimeMillis() - start);
     }
 
     private static Map<String, String> getFileUrls() {
