@@ -3,18 +3,18 @@
 ## Generating standings on demand
 
 - Download jar file from the [latest release](https://github.com/mrbusche/trap-scoring/releases)
-- You will need [Java 21](https://adoptium.net/) to run the jar file
+- You will need [Java 22](https://adoptium.net/) to run the jar file
 - Open command prompt to directory with downloaded jar file
-- Run `java -jar trap-6.1.1.jar` (make sure you have the correct filename from the release)
+- Run `java -jar trap-6.2.0.jar` (make sure you have the correct filename from the release)
 - There will be output as the process generates the file
 - When finished there will be a file named `leaguedata-${date-string}` generated in the directory you ran the command from
 
 ## Downloading a daily generated report
 
-Every day at 6 AM UTC the report is [generated and uploaded](https://github.com/mrbusche/trap-scoring/actions/workflows/daily-standings.yml). 
+Every day at 6 AM UTC the report is [generated and uploaded](https://github.com/mrbusche/trap-scoring/actions/workflows/daily-standings.yml).
 
 1. Login to GitHub
-2. Click on the top [Daily Standings](https://github.com/mrbusche/trap-scoring/actions/workflows/daily-standings.yml) link 
+2. Click on the top [Daily Standings](https://github.com/mrbusche/trap-scoring/actions/workflows/daily-standings.yml) link
 3. Download `trap-league-standings`
 4. Extract the zip file
 5. Report will be named `league-data-${todays-date}.xlsx`
