@@ -31,8 +31,7 @@ public class DownloadHelper {
 
             logger.info("Replacing double spaces for {} file", type);
             var path = Paths.get(type + ".csv");
-            var content = Files.readString(path, charset);
-            content = content.replaceAll(" {2}", " ");
+            var content = Files.readString(path, charset).replaceAll(" {2}", " ");
             Files.writeString(path, content, charset);
             logger.info("Finished replacing double spaces for {} file", type);
         }

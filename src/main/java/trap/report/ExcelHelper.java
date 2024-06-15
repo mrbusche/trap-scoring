@@ -48,9 +48,8 @@ public final class ExcelHelper {
     }
 
     public static void setCurrentSeasonHeader(Sheet sheet) {
-        var date = new Date();
         var cal = Calendar.getInstance();
-        cal.setTime(date);
+        cal.setTime(new Date());
         var month = cal.get(Calendar.MONTH);
         var year = cal.get(Calendar.YEAR);
         var currentSeason = month > 8 ? year + 1 : year;
@@ -58,11 +57,9 @@ public final class ExcelHelper {
     }
 
     public static void createFile(Workbook workbook) throws IOException {
-        long start;
-        start = System.currentTimeMillis();
-        var date = new Date();
+        long start = System.currentTimeMillis();
         var formatter = new SimpleDateFormat("yyyyMMddHHmmss");
-        var currentDate = formatter.format(date);
+        var currentDate = formatter.format(new Date());
         var filename = "league-data-" + currentDate + ".xlsx";
         logger.info("Creating file");
         FileOutputStream fileOutputStream = new FileOutputStream(filename);
