@@ -50,8 +50,8 @@ public class ReportHelper {
 
     Logger logger = LoggerFactory.getLogger(ReportHelper.class);
 
-    public void doItAll() throws Exception {
-        downloadHelper.downloadFiles(trapTypes);
+    public void generateExcelFile() throws Exception {
+//        downloadHelper.downloadFiles(trapTypes);
 
         var workbook = getWorkbook();
 
@@ -71,6 +71,7 @@ public class ReportHelper {
         var style = ExcelHelper.setFontForHeaders(workbook);
 
         var allRoundScores = generateRoundScores();
+        logger.info("Generated round scores in {} ms", System.currentTimeMillis() - trueStart);
         populateCleanData(workbook.getSheet("Clean Data"), allRoundScores);
 
         var playerRoundTotals = trapHelper.calculatePlayerRoundTotals(allRoundScores);
@@ -128,16 +129,18 @@ public class ReportHelper {
     private void populateCleanData(Sheet sheet, List<RoundScore> allRoundScores) {
         var start = System.currentTimeMillis();
 
-        logger.info("Ran get all data for clean data population {} ms", System.currentTimeMillis() - start);
+        logger.info("Ran get all data for clean data population in {} ms", System.currentTimeMillis() - start);
 
         var rows = sheet.getLastRowNum();
 
         for (var type : trapTypes) {
+            var typeStart = System.currentTimeMillis();
             var typeRoundScores = allRoundScores.stream().filter(t -> t.getType().equals(type)).toList();
             for (var score : typeRoundScores) {
                 var row = sheet.createRow(++rows);
                 ExcelHelper.addCleanData(row, score);
             }
+            logger.info("Clean data for {} {} scores populated in {} ms", typeRoundScores.size(), type, System.currentTimeMillis() - typeStart);
         }
 
         sheet.setAutoFilter(CellRangeAddress.valueOf("A1:S1"));
