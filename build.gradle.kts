@@ -5,10 +5,10 @@ plugins {
 }
 
 group = "com.trap-scoring"
-version = "6.1.1"
+version = "6.2.0"
 
-java.sourceCompatibility = JavaVersion.VERSION_21
-java.targetCompatibility = JavaVersion.VERSION_21
+java.sourceCompatibility = JavaVersion.VERSION_22
+java.targetCompatibility = JavaVersion.VERSION_22
 
 repositories {
     mavenCentral()
