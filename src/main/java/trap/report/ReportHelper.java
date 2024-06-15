@@ -131,18 +131,17 @@ public class ReportHelper {
         logger.info("Ran get all data for clean data population {} ms", System.currentTimeMillis() - start);
 
         var rows = sheet.getLastRowNum();
-        Row row;
 
         for (var type : trapTypes) {
             var typeRoundScores = allRoundScores.stream().filter(t -> t.getType().equals(type)).toList();
             for (var score : typeRoundScores) {
-                row = sheet.createRow(++rows);
+                var row = sheet.createRow(++rows);
                 ExcelHelper.addCleanData(row, score);
             }
         }
 
         sheet.setAutoFilter(CellRangeAddress.valueOf("A1:S1"));
-        logger.info("Clean data populated in in {} ms", System.currentTimeMillis() - start);
+        logger.info("Clean data populated in {} ms", System.currentTimeMillis() - start);
     }
 
     private List<TeamScore> getTeamScores(List<Map.Entry<String, ArrayList<IndividualTotal>>> teamData) {
@@ -269,7 +268,7 @@ public class ReportHelper {
                 updateRow++;
                 start = System.currentTimeMillis();
                 individualData = justValues.stream().filter(f -> f.getGender().equals(gender) && f.getTeamClassification().equals(classification) && f.getType().equals(type)).toList();
-                logger.info("Ran query for {} by {} and {} in {} ms", type, gender, classification,  System.currentTimeMillis() - start);
+                logger.info("Ran query for {} by {} and {} in {} ms", type, gender, classification, System.currentTimeMillis() - start);
                 for (IndividualTotal data : individualData) {
                     row = sheet.getRow(++updateRow);
                     ExcelHelper.addPlayerData(row, column, data.getAthlete(), data.getTotal(), data.getTeam(), mainTextStyle);
@@ -314,7 +313,6 @@ public class ReportHelper {
         logger.info("Ran query for team scores in {} ms", System.currentTimeMillis() - start);
 
         var rows = sheet.getLastRowNum();
-
         var teamScoresThatCount = calculateTeamScores(teamScoresByTotal);
         for (var individualTotalList : teamScoresThatCount.values()) {
             for (var rowData : individualTotalList) {
