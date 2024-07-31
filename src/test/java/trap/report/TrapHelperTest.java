@@ -121,14 +121,14 @@ class TrapHelperTest {
 
         var player1 = playerIndividualTotal.get(roundScoresPlayer1.getFirst().getUniqueName());
         assertEquals(4, player1.size());
-        assertEquals(49, player1.get(0).getTotal());
+        assertEquals(49, player1.getFirst().getTotal());
         assertEquals(48, player1.get(1).getTotal());
         assertEquals(48, player1.get(2).getTotal());
         assertEquals(48, player1.get(3).getTotal());
 
         var player2 = playerIndividualTotal.get(roundScoresPlayer2.getFirst().getUniqueName());
         assertEquals(4, player2.size());
-        assertEquals(49, player2.get(0).getTotal());
+        assertEquals(49, player2.getFirst().getTotal());
         assertEquals(49, player2.get(1).getTotal());
         assertEquals(49, player2.get(2).getTotal());
         assertEquals(40, player2.get(3).getTotal());
