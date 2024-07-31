@@ -8,7 +8,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -30,7 +30,7 @@ public class DownloadHelper {
             logger.info("Finished downloading {} file", type);
 
             logger.info("Replacing double spaces for {} file", type);
-            var path = Paths.get(type + ".csv");
+            var path = Path.of(type + ".csv");
             var content = Files.readString(path, charset).replaceAll(" {2}", " ");
             Files.writeString(path, content, charset);
             logger.info("Finished replacing double spaces for {} file", type);
