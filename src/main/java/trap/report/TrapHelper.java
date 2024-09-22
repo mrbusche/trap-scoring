@@ -49,12 +49,11 @@ public class TrapHelper {
             playerIndividualTotal.put(r.getUniqueName(), new ArrayList<>());
         }
         for (var playerRoundTotal : playerRoundTotals.values()) {
-            // clays, skeet, and fivestand are top 3 scores only, minimum 2 locations
-            var subtractScores = subtractScores(playerRoundTotal.getFirst().getType());
+            var roundsToCount = getRoundsToCount(playerRoundTotal.getFirst().getType());
             var indTotal = new ArrayList<IndividualTotal>();
             playerRoundTotal.sort(Comparator.comparingInt(RoundTotal::getTotal).reversed());
             for (var t : playerRoundTotal) {
-                if (indTotal.size() < (3 - subtractScores)) {
+                if (indTotal.size() < (roundsToCount - 1)) {
                     indTotal.add(new IndividualTotal(t.getLocationId(), t.getTeam(), t.getAthlete(), t.getClassification(), t.getGender(), t.getTotal(), t.getType()));
                 } else {
                     var locationIds = new HashSet<Integer>();
@@ -94,11 +93,23 @@ public class TrapHelper {
         return playerFinalTotal;
     }
 
-    private int subtractScores(String roundType) {
-        return roundType.equals("clays") || roundType.equals("skeet") || roundType.equals("fivestand") || roundType.equals("doublesskeet") ? 1 : 0;
-    }
-
     private boolean singleRound(String roundType) {
         return roundType.equals("clays") || roundType.equals("doubles") || roundType.equals("doublesskeet");
+    }
+
+    private static HashMap determineRoundsToCount() {
+        var roundCounts = new HashMap<>();
+        roundCounts.put("singles", 4);
+        roundCounts.put("doubles", 4);
+        roundCounts.put("handicap", 4);
+        roundCounts.put("skeet", 3);
+        roundCounts.put("clays", 3);
+        roundCounts.put("fivestand", 3);
+        roundCounts.put("doublesskeet", 3);
+        return roundCounts;
+    }
+
+    public static int getRoundsToCount(String type) {
+        return Integer.parseInt(determineRoundsToCount().get(type).toString());
     }
 }
