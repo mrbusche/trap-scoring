@@ -97,8 +97,8 @@ public class TrapHelper {
         return roundType.equals("clays") || roundType.equals("doubles") || roundType.equals("doublesskeet");
     }
 
-    private static HashMap determineRoundsToCount() {
-        var roundCounts = new HashMap<>();
+    private static Map<String, Integer> determineRoundsToCount() {
+        var roundCounts = new HashMap<String, Integer>();
         roundCounts.put("singles", 4);
         roundCounts.put("doubles", 4);
         roundCounts.put("handicap", 4);
