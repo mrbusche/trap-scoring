@@ -737,13 +737,13 @@ class TrapHelperTest {
 
     @Test
     void roundsToCount() {
-        assertEquals(4, trapHelper.getRoundsToCount("singles"));
-        assertEquals(4, trapHelper.getRoundsToCount("doubles"));
-        assertEquals(4, trapHelper.getRoundsToCount("handicap"));
+        assertEquals(4, TrapHelper.getRoundsToCount("singles"));
+        assertEquals(4, TrapHelper.getRoundsToCount("doubles"));
+        assertEquals(4, TrapHelper.getRoundsToCount("handicap"));
 
-        assertEquals(3, trapHelper.getRoundsToCount("skeet"));
-        assertEquals(3, trapHelper.getRoundsToCount("clays"));
-        assertEquals(3, trapHelper.getRoundsToCount("fivestand"));
-        assertEquals(3, trapHelper.getRoundsToCount("doublesskeet"));
+        assertEquals(3, TrapHelper.getRoundsToCount("skeet"));
+        assertEquals(3, TrapHelper.getRoundsToCount("clays"));
+        assertEquals(3, TrapHelper.getRoundsToCount("fivestand"));
+        assertEquals(3, TrapHelper.getRoundsToCount("doublesskeet"));
     }
 }
