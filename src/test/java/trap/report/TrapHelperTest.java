@@ -735,4 +735,15 @@ class TrapHelperTest {
         assertEquals("fivestand", playerFinalTotal.get(player1.getUniqueName()).getType());
     }
 
+    @Test
+    void roundsToCount() {
+        assertEquals(4, trapHelper.getRoundsToCount("singles"));
+        assertEquals(4, trapHelper.getRoundsToCount("doubles"));
+        assertEquals(4, trapHelper.getRoundsToCount("handicap"));
+
+        assertEquals(3, trapHelper.getRoundsToCount("skeet"));
+        assertEquals(3, trapHelper.getRoundsToCount("clays"));
+        assertEquals(3, trapHelper.getRoundsToCount("fivestand"));
+        assertEquals(3, trapHelper.getRoundsToCount("doublesskeet"));
+    }
 }
