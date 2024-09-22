@@ -15,8 +15,8 @@ import java.util.Set;
 public class TrapHelper {
     private static final Map<String, Integer> roundCounts = determineEventsToCount();
 
-    public Map<String, ArrayList<RoundTotal>> calculatePlayerRoundTotals(List<RoundScore> roundScores) {
-        var playerRoundTotals = new HashMap<String, ArrayList<RoundTotal>>();
+    public Map<String, List<RoundTotal>> calculatePlayerRoundTotals(List<RoundScore> roundScores) {
+        var playerRoundTotals = new HashMap<String, List<RoundTotal>>();
         for (var r : roundScores) {
             playerRoundTotals.put(r.getUniqueName(), new ArrayList<>());
         }
@@ -45,40 +45,58 @@ public class TrapHelper {
         return playerRoundTotals;
     }
 
-    public Map<String, ArrayList<IndividualTotal>> calculatePlayerIndividualTotal(List<RoundScore> roundScores, Map<String, ArrayList<RoundTotal>> playerRoundTotals) {
-        var playerIndividualTotal = new HashMap<String, ArrayList<IndividualTotal>>();
-        for (var r : roundScores) {
-            playerIndividualTotal.put(r.getUniqueName(), new ArrayList<>());
-        }
-        for (var playerRoundTotal : playerRoundTotals.values()) {
-            var roundsToCount = getEventsToCount(playerRoundTotal.getFirst().getType());
-            var indTotal = new ArrayList<IndividualTotal>();
+    public Map<String, List<IndividualTotal>> calculatePlayerIndividualTotal(List<RoundScore> roundScores, Map<String, List<RoundTotal>> playerRoundTotals) {
+        Map<String, List<IndividualTotal>> playerIndividualTotal = new HashMap<>();
+
+        // Initialize scores with empty lists
+        roundScores.forEach(r -> playerIndividualTotal.put(r.getUniqueName(), new ArrayList<>()));
+
+        for (List<RoundTotal> playerRoundTotal : playerRoundTotals.values()) {
+            if (playerRoundTotal.isEmpty()) continue;
+
+            String playerName = playerRoundTotal.get(0).getUniqueName();
+            int roundsToCount = getEventsToCount(playerRoundTotal.get(0).getType());
+            List<IndividualTotal> indTotal = new ArrayList<>();
+
+            // Sort in descending order based on total score
             playerRoundTotal.sort(Comparator.comparingInt(RoundTotal::getTotal).reversed());
-            for (var t : playerRoundTotal) {
-                if (indTotal.size() < (roundsToCount - 1)) {
-                    indTotal.add(new IndividualTotal(t.getLocationId(), t.getTeam(), t.getAthlete(), t.getClassification(), t.getGender(), t.getTotal(), t.getType()));
-                } else {
-                    var locationIds = new HashSet<Integer>();
-                    indTotal.forEach(l -> locationIds.add(l.getLocationId()));
-                    // if location doesn't already exist
-                    if (!locationIds.contains(t.getLocationId())) {
-                        indTotal.add(new IndividualTotal(t.getLocationId(), t.getTeam(), t.getAthlete(), t.getClassification(), t.getGender(), t.getTotal(), t.getType()));
-                        break;
-                    }
-                    // if location isn't the same as the other 3
-                    if (locationIds.size() == 2 || locationIds.size() == 3) {
-                        indTotal.add(new IndividualTotal(t.getLocationId(), t.getTeam(), t.getAthlete(), t.getClassification(), t.getGender(), t.getTotal(), t.getType()));
-                        break;
-                    }
+
+            Set<Integer> locationIds = new HashSet<>();
+            for (RoundTotal t : playerRoundTotal) {
+                if (indTotal.size() < roundsToCount - 1) {
+                    // Add round directly until we reach the number of rounds to count
+                    indTotal.add(toIndividualTotal(t));
+                    locationIds.add(t.getLocationId());
+                } else if (shouldAddRound(indTotal, t, locationIds)) {
+                    // Handle special case when location constraints are applied
+                    indTotal.add(toIndividualTotal(t));
+                    break;
                 }
             }
-            playerIndividualTotal.put(playerRoundTotal.getFirst().getUniqueName(), indTotal);
+
+            playerIndividualTotal.put(playerName, indTotal);
         }
 
         return playerIndividualTotal;
     }
 
-    public Map<String, IndividualTotal> calculatePlayerFinalTotal(Map<String, ArrayList<IndividualTotal>> playerIndividualTotals) {
+    private IndividualTotal toIndividualTotal(RoundTotal t) {
+        return new IndividualTotal(t.getLocationId(), t.getTeam(), t.getAthlete(), t.getClassification(), t.getGender(), t.getTotal(), t.getType());
+    }
+
+    // Method to determine if a round should be added based on location constraints
+    private boolean shouldAddRound(List<IndividualTotal> indTotal, RoundTotal t, Set<Integer> locationIds) {
+        int locationId = t.getLocationId();
+        // Check if the location doesn't already exist
+        if (!locationIds.contains(locationId)) {
+            locationIds.add(locationId);
+            return true;
+        }
+        // If there are already 2 or 3 unique locations, consider adding the round
+        return locationIds.size() == 2 || locationIds.size() == 3;
+    }
+
+    public Map<String, IndividualTotal> calculatePlayerFinalTotal(Map<String, List<IndividualTotal>> playerIndividualTotals) {
         var playerFinalTotals = new HashMap<String, IndividualTotal>();
         playerIndividualTotals.forEach((key, totals) -> {
             if (!totals.isEmpty()) {
