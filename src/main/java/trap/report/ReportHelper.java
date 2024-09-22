@@ -27,6 +27,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Service
 public class ReportHelper {
@@ -99,16 +100,18 @@ public class ReportHelper {
     }
 
     private List<RoundScore> generateRoundScores() {
-        List<RoundScore> allRoundScores;
         try {
-            allRoundScores = new ArrayList<>();
-            for (var type : trapTypes) {
-                allRoundScores.addAll(generateRoundScores(type));
-            }
-
-            return allRoundScores;
-        } catch (IOException | CsvException e) {
-            throw new RuntimeException(e);
+            return Arrays.stream(trapTypes)
+                    .flatMap(type -> {
+                        try {
+                            return generateRoundScores(type).stream();
+                        } catch (IOException | CsvException e) {
+                            throw new RuntimeException("Error generating round scores for type: " + type, e);
+                        }
+                    })
+                    .toList();
+        } catch (RuntimeException e) {
+            throw new RuntimeException("Error generating round scores", e);
         }
     }
 
@@ -118,12 +121,41 @@ public class ReportHelper {
     }
 
     private List<RoundScore> generateRoundScores(String type) throws IOException, CsvException {
-        var reader = new CSVReader(new FileReader(type + ".csv"));
-        var roundScores = reader.readAll();
-        roundScores.removeFirst();
-        var roundScoresList = new ArrayList<RoundScore>();
-        roundScores.forEach(s -> roundScoresList.add(new RoundScore(Integer.parseInt(s[1]), trimString(s[2]), Integer.parseInt(s[3]), trimString(s[4]), trimString(s[5]), trimString(s[6]), trimString(s[7]).replace("Club", "Team"), trimString(s[8]), trimString(s[10]), trimString(s[11]), setStringToZero(s[12]), setStringToZero(s[13]), setStringToZero(s[14]), setStringToZero(s[15]), setStringToZero(s[16]), setStringToZero(s[17]), setStringToZero(s[18]), setStringToZero(s[19]), type)));
-        return roundScoresList;
+        try (var reader = new CSVReader(new FileReader(type + ".csv"))) {
+            var roundScores = reader.readAll();
+            if (roundScores.isEmpty()) {
+                return new ArrayList<>(); // or handle as appropriate
+            }
+            roundScores.removeFirst(); // Remove the header row
+
+            return roundScores.stream()
+                    .map(s -> createRoundScore(s, type))
+                    .toList();
+        }
+    }
+
+    private RoundScore createRoundScore(String[] data, String type) {
+        return new RoundScore(
+                parseInteger(data[1]),
+                trimString(data[2]),
+                parseInteger(data[3]),
+                trimString(data[4]),
+                trimString(data[5]),
+                trimString(data[6]),
+                trimString(data[7]).replace("Club", "Team"),
+                trimString(data[8]),
+                trimString(data[10]),
+                trimString(data[11]),
+                setStringToZero(data[12]),
+                setStringToZero(data[13]),
+                setStringToZero(data[14]),
+                setStringToZero(data[15]),
+                setStringToZero(data[16]),
+                setStringToZero(data[17]),
+                setStringToZero(data[18]),
+                setStringToZero(data[19]),
+                type
+        );
     }
 
     private void populateCleanData(Sheet sheet, List<RoundScore> allRoundScores) {
@@ -309,6 +341,7 @@ public class ReportHelper {
         return teamScoresByTotal;
     }
 
+    // Team-Individual-Scores tab
     private void populateTeamIndividualData(Workbook workbook, String sheetName, List<IndividualTotal> teamScoresByTotal) {
         var sheet = workbook.getSheet(sheetName);
         var startTime = System.currentTimeMillis();
@@ -351,8 +384,16 @@ public class ReportHelper {
         logger.info("Individual All Scores data populated in {} ms", System.currentTimeMillis() - trueStart);
     }
 
+    private int parseInteger(String number) {
+        try {
+            return Integer.parseInt(number);
+        } catch (NumberFormatException e) {
+            return 0;
+        }
+    }
+
     private int setStringToZero(String number) {
-        return "".equals(number) ? 0 : Integer.parseInt(number);
+        return number.isEmpty() ? 0 : parseInteger(number);
     }
 
     private String trimString(String s) {

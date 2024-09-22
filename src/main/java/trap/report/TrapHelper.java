@@ -16,33 +16,47 @@ public class TrapHelper {
     private static final Map<String, Integer> roundCounts = determineEventsToCount();
 
     public Map<String, List<RoundTotal>> calculatePlayerRoundTotals(List<RoundScore> roundScores) {
-        var playerRoundTotals = new HashMap<String, List<RoundTotal>>();
-        for (var r : roundScores) {
-            playerRoundTotals.put(r.getUniqueName(), new ArrayList<>());
-        }
-        for (var r : roundScores) {
-            var currentPlayerRoundTotal = playerRoundTotals.get(r.getUniqueName());
+        Map<String, List<RoundTotal>> playerRoundTotals = new HashMap<>();
+
+        // Initialize map with empty lists for each unique player
+        roundScores.forEach(r -> playerRoundTotals.put(r.getUniqueName(), new ArrayList<>()));
+
+        // Process each round score
+        for (RoundScore r : roundScores) {
+            List<RoundTotal> currentPlayerRoundTotal = playerRoundTotals.get(r.getUniqueName());
+
+            // If it's a single round, process round 1 and optionally round 2
             if (singleRound(r.getType())) {
-                currentPlayerRoundTotal.add(new RoundTotal(r.getEventId(), r.getLocationId(), r.getTeam(), r.getAthlete(), r.getClassification(), r.getGender(), r.getRound1(), r.getType()));
+                addRound(currentPlayerRoundTotal, r, r.getRound1());
                 if (r.getRound2() > 0) {
-                    currentPlayerRoundTotal.add(new RoundTotal(r.getEventId(), r.getLocationId(), r.getTeam(), r.getAthlete(), r.getClassification(), r.getGender(), r.getRound2(), r.getType()));
+                    addRound(currentPlayerRoundTotal, r, r.getRound2());
                 }
             } else {
-                currentPlayerRoundTotal.add(new RoundTotal(r.getEventId(), r.getLocationId(), r.getTeam(), r.getAthlete(), r.getClassification(), r.getGender(), r.getRound1() + r.getRound2(), r.getType()));
-                if (r.getRound3() + r.getRound4() > 0) {
-                    currentPlayerRoundTotal.add(new RoundTotal(r.getEventId(), r.getLocationId(), r.getTeam(), r.getAthlete(), r.getClassification(), r.getGender(), r.getRound3() + r.getRound4(), r.getType()));
-                    if (r.getRound5() + r.getRound6() > 0) {
-                        currentPlayerRoundTotal.add(new RoundTotal(r.getEventId(), r.getLocationId(), r.getTeam(), r.getAthlete(), r.getClassification(), r.getGender(), r.getRound5() + r.getRound6(), r.getType()));
-                        if (r.getRound7() + r.getRound8() > 0) {
-                            currentPlayerRoundTotal.add(new RoundTotal(r.getEventId(), r.getLocationId(), r.getTeam(), r.getAthlete(), r.getClassification(), r.getGender(), r.getRound7() + r.getRound8(), r.getType()));
-                        }
-                    }
-                }
+                addRound(currentPlayerRoundTotal, r, r.getRound1() + r.getRound2());
+                addMultipleRounds(currentPlayerRoundTotal, r);
             }
-            playerRoundTotals.put(r.getUniqueName(), currentPlayerRoundTotal);
         }
 
         return playerRoundTotals;
+    }
+
+    // Helper method to add individual rounds
+    private void addRound(List<RoundTotal> totals, RoundScore r, int total) {
+        totals.add(new RoundTotal(r.getEventId(), r.getLocationId(), r.getTeam(), r.getAthlete(),
+                r.getClassification(), r.getGender(), total, r.getType()));
+    }
+
+    // Helper method to add rounds 3 to 8 if applicable
+    private void addMultipleRounds(List<RoundTotal> totals, RoundScore r) {
+        int[] additionalRounds = {r.getRound3() + r.getRound4(), r.getRound5() + r.getRound6(), r.getRound7() + r.getRound8()};
+
+        for (int round : additionalRounds) {
+            if (round > 0) {
+                addRound(totals, r, round);
+            } else {
+                break; // Stop processing once a round with zero total is found
+            }
+        }
     }
 
     public Map<String, List<IndividualTotal>> calculatePlayerIndividualTotal(List<RoundScore> roundScores, Map<String, List<RoundTotal>> playerRoundTotals) {
@@ -54,8 +68,8 @@ public class TrapHelper {
         for (List<RoundTotal> playerRoundTotal : playerRoundTotals.values()) {
             if (playerRoundTotal.isEmpty()) continue;
 
-            String playerName = playerRoundTotal.get(0).getUniqueName();
-            int roundsToCount = getEventsToCount(playerRoundTotal.get(0).getType());
+            String playerName = playerRoundTotal.getFirst().getUniqueName();
+            int roundsToCount = getEventsToCount(playerRoundTotal.getFirst().getType());
             List<IndividualTotal> indTotal = new ArrayList<>();
 
             // Sort in descending order based on total score
@@ -67,7 +81,7 @@ public class TrapHelper {
                     // Add round directly until we reach the number of rounds to count
                     indTotal.add(toIndividualTotal(t));
                     locationIds.add(t.getLocationId());
-                } else if (shouldAddRound(indTotal, t, locationIds)) {
+                } else if (shouldAddRound(t, locationIds)) {
                     // Handle special case when location constraints are applied
                     indTotal.add(toIndividualTotal(t));
                     break;
@@ -85,7 +99,7 @@ public class TrapHelper {
     }
 
     // Method to determine if a round should be added based on location constraints
-    private boolean shouldAddRound(List<IndividualTotal> indTotal, RoundTotal t, Set<Integer> locationIds) {
+    private boolean shouldAddRound( RoundTotal t, Set<Integer> locationIds) {
         int locationId = t.getLocationId();
         // Check if the location doesn't already exist
         if (!locationIds.contains(locationId)) {
@@ -100,7 +114,7 @@ public class TrapHelper {
         var playerFinalTotals = new HashMap<String, IndividualTotal>();
         playerIndividualTotals.forEach((key, totals) -> {
             if (!totals.isEmpty()) {
-                var firstTotal = totals.get(0);
+                var firstTotal = totals.getFirst();
                 int totalScore = totals.stream().mapToInt(IndividualTotal::getTotal).sum();
 
                 playerFinalTotals.put(key, new IndividualTotal(
