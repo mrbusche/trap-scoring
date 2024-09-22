@@ -10,8 +10,10 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class TrapHelper {
+    private static final Map<String, Integer> roundCounts = determineEventsToCount();
 
     public Map<String, ArrayList<RoundTotal>> calculatePlayerRoundTotals(List<RoundScore> roundScores) {
         var playerRoundTotals = new HashMap<String, ArrayList<RoundTotal>>();
@@ -76,25 +78,31 @@ public class TrapHelper {
         return playerIndividualTotal;
     }
 
-    public Map<String, IndividualTotal> calculatePlayerFinalTotal(Map<String, ArrayList<IndividualTotal>> playerIndividualTotal) {
-        var playerFinalTotal = new HashMap<String, IndividualTotal>();
-        for (Map.Entry<String, ArrayList<IndividualTotal>> entry : playerIndividualTotal.entrySet()) {
-            var key = entry.getKey();
-            ArrayList<IndividualTotal> value = entry.getValue();
-            if (!value.isEmpty()) {
-                int total = 0;
-                for (var t : value) {
-                    total += t.getTotal();
-                }
-                playerFinalTotal.put(key, new IndividualTotal(0, value.getFirst().getTeam(), value.getFirst().getAthlete(), value.getFirst().getClassification(), value.getFirst().getGender(), total, value.getFirst().getType()));
-            }
-        }
+    public Map<String, IndividualTotal> calculatePlayerFinalTotal(Map<String, ArrayList<IndividualTotal>> playerIndividualTotals) {
+        var playerFinalTotals = new HashMap<String, IndividualTotal>();
+        playerIndividualTotals.forEach((key, totals) -> {
+            if (!totals.isEmpty()) {
+                var firstTotal = totals.get(0);
+                int totalScore = totals.stream().mapToInt(IndividualTotal::getTotal).sum();
 
-        return playerFinalTotal;
+                playerFinalTotals.put(key, new IndividualTotal(
+                        0,
+                        firstTotal.getTeam(),
+                        firstTotal.getAthlete(),
+                        firstTotal.getClassification(),
+                        firstTotal.getGender(),
+                        totalScore,
+                        firstTotal.getType()
+                ));
+            }
+        });
+
+        return playerFinalTotals;
     }
 
     public boolean singleRound(String roundType) {
-        return roundType.equals("clays") || roundType.equals("doubles") || roundType.equals("doublesskeet") || roundType.equals("fivestand");
+        Set<String> validRounds = Set.of("clays", "doubles", "doublesskeet", "fivestand");
+        return validRounds.contains(roundType);
     }
 
     private static Map<String, Integer> determineEventsToCount() {
@@ -110,6 +118,6 @@ public class TrapHelper {
     }
 
     public static int getEventsToCount(String type) {
-        return Integer.parseInt(determineEventsToCount().get(type).toString());
+        return roundCounts.getOrDefault(type, 0); // Default to 0 if type not found
     }
 }
