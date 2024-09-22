@@ -94,7 +94,7 @@ class TrapHelperTest {
     }
 
     @Test
-    void testPlayerRoundTotals() {
+    void playerRoundTotals() {
         var roundScoresPlayer1 = getRoundScoresPlayer1();
         var roundScoresPlayer2 = getRoundScoresPlayer2();
         var roundScores = new ArrayList<RoundScore>();
@@ -109,7 +109,7 @@ class TrapHelperTest {
     }
 
     @Test
-    void testPlayerIndividualTotals() {
+    void playerIndividualTotals() {
         var roundScoresPlayer1 = getRoundScoresPlayer1();
         var roundScoresPlayer2 = getRoundScoresPlayer2();
         var roundScores = new ArrayList<RoundScore>();
@@ -135,7 +135,7 @@ class TrapHelperTest {
     }
 
     @Test
-    void testPlayerFinalTotal() {
+    void playerFinalTotal() {
         var roundScoresPlayer1 = getRoundScoresPlayer1();
         var roundScoresPlayer2 = getRoundScoresPlayer2();
         var roundScores = new ArrayList<RoundScore>();
@@ -153,8 +153,6 @@ class TrapHelperTest {
         assertEquals("M", playerFinalTotal.get(player1.getUniqueName()).getGender());
         assertEquals(193, playerFinalTotal.get(player1.getUniqueName()).getTotal());
         assertEquals("singles", playerFinalTotal.get(player1.getUniqueName()).getType());
-
-        var player2 = roundScoresPlayer2.getFirst();
 
         assertEquals(4, playerFinalTotal.size());
 
@@ -187,7 +185,7 @@ class TrapHelperTest {
     }
 
     @Test
-    void testPlayerFinalTotal2() {
+    void playerFinalTotal2() {
         var roundScores = getRoundScoresPlayer3();
         var playerRoundTotals = trapHelper.calculatePlayerRoundTotals(roundScores);
         var playerIndividualTotal = trapHelper.calculatePlayerIndividualTotal(roundScores, playerRoundTotals);
@@ -204,7 +202,7 @@ class TrapHelperTest {
     }
 
     @Test
-    void testClaysScoring() {
+    void claysScoring() {
         var roundScores = getRoundScoresPlayer4();
         var playerRoundTotals = trapHelper.calculatePlayerRoundTotals(roundScores);
         var playerIndividualTotal = trapHelper.calculatePlayerIndividualTotal(roundScores, playerRoundTotals);
@@ -221,7 +219,7 @@ class TrapHelperTest {
     }
 
     @Test
-    void testPlayerFinalTotal5() {
+    void playerFinalTotal5() {
         var roundScores = getRoundScoresPlayer5();
         var playerRoundTotals = trapHelper.calculatePlayerRoundTotals(roundScores);
         var playerIndividualTotal = trapHelper.calculatePlayerIndividualTotal(roundScores, playerRoundTotals);
@@ -235,6 +233,506 @@ class TrapHelperTest {
         assertEquals("M", playerFinalTotal.get(player1.getUniqueName()).getGender());
         assertEquals(186, playerFinalTotal.get(player1.getUniqueName()).getTotal());
         assertEquals("singles", playerFinalTotal.get(player1.getUniqueName()).getType());
+    }
+
+    @Test
+    void singlesScoring4Locations() {
+        var roundScores = new ArrayList<RoundScore>();
+
+        roundScores.add(new RoundScore(16933, "Event 1", 986, "Location 1", "2022-09-03", "Squad Name", "Team Name", "Sam LaPorta", "Senior/Varsity", "M", 24, 24, 0, 0, 0, 0, 0, 0, "singles"));
+        roundScores.add(new RoundScore(16940, "Event 2", 50, "Location 2", "2022-09-11", "Squad Name", "Team Name", "Sam LaPorta", "Senior/Varsity", "M", 23, 22, 0, 0, 0, 0, 0, 0, "singles"));
+        roundScores.add(new RoundScore(17159, "Event 4", 983, "Location 4", "2022-09-24", "Squad Name", "Team Name", "Sam LaPorta", "Senior/Varsity", "M", 21, 23, 0, 0, 0, 0, 0, 0, "singles"));
+        roundScores.add(new RoundScore(18168, "Event 6", 21, "Location 6", "2023-04-09", "Squad Name", "Team Name", "Sam LaPorta", "Senior/Varsity", "M", 21, 23, 0, 0, 0, 0, 0, 0, "singles"));
+
+        var playerRoundTotals = trapHelper.calculatePlayerRoundTotals(roundScores);
+        var playerIndividualTotal = trapHelper.calculatePlayerIndividualTotal(roundScores, playerRoundTotals);
+        var playerFinalTotal = trapHelper.calculatePlayerFinalTotal(playerIndividualTotal);
+
+        var player1 = roundScores.getFirst();
+        assertEquals(0, playerFinalTotal.get(player1.getUniqueName()).getLocationId());
+        assertEquals("Team Name", playerFinalTotal.get(player1.getUniqueName()).getTeam());
+        assertEquals("Sam LaPorta", playerFinalTotal.get(player1.getUniqueName()).getAthlete());
+        assertEquals("Senior/Varsity", playerFinalTotal.get(player1.getUniqueName()).getClassification());
+        assertEquals("M", playerFinalTotal.get(player1.getUniqueName()).getGender());
+        assertEquals(181, playerFinalTotal.get(player1.getUniqueName()).getTotal());
+        assertEquals("singles", playerFinalTotal.get(player1.getUniqueName()).getType());
+    }
+
+    @Test
+    void singlesScoring3Locations() {
+        var roundScores = new ArrayList<RoundScore>();
+
+        roundScores.add(new RoundScore(16933, "Event 1", 986, "Location 1", "2022-09-03", "Squad Name", "Team Name", "Sam LaPorta", "Senior/Varsity", "M", 24, 24, 0, 0, 0, 0, 0, 0, "singles"));
+        roundScores.add(new RoundScore(16940, "Event 2", 50, "Location 2", "2022-09-11", "Squad Name", "Team Name", "Sam LaPorta", "Senior/Varsity", "M", 23, 22, 0, 0, 0, 0, 0, 0, "singles"));
+        roundScores.add(new RoundScore(17159, "Event 4", 986, "Location 4", "2022-09-24", "Squad Name", "Team Name", "Sam LaPorta", "Senior/Varsity", "M", 21, 23, 0, 0, 0, 0, 0, 0, "singles"));
+        roundScores.add(new RoundScore(18168, "Event 6", 21, "Location 6", "2023-04-09", "Squad Name", "Team Name", "Sam LaPorta", "Senior/Varsity", "M", 21, 23, 0, 0, 0, 0, 0, 0, "singles"));
+
+        var playerRoundTotals = trapHelper.calculatePlayerRoundTotals(roundScores);
+        var playerIndividualTotal = trapHelper.calculatePlayerIndividualTotal(roundScores, playerRoundTotals);
+        var playerFinalTotal = trapHelper.calculatePlayerFinalTotal(playerIndividualTotal);
+
+        var player1 = roundScores.getFirst();
+        assertEquals(0, playerFinalTotal.get(player1.getUniqueName()).getLocationId());
+        assertEquals("Team Name", playerFinalTotal.get(player1.getUniqueName()).getTeam());
+        assertEquals("Sam LaPorta", playerFinalTotal.get(player1.getUniqueName()).getAthlete());
+        assertEquals("Senior/Varsity", playerFinalTotal.get(player1.getUniqueName()).getClassification());
+        assertEquals("M", playerFinalTotal.get(player1.getUniqueName()).getGender());
+        assertEquals(181, playerFinalTotal.get(player1.getUniqueName()).getTotal());
+        assertEquals("singles", playerFinalTotal.get(player1.getUniqueName()).getType());
+    }
+
+    @Test
+    void singlesScoring2Locations() {
+        var roundScores = new ArrayList<RoundScore>();
+
+        roundScores.add(new RoundScore(16933, "Event 1", 986, "Location 1", "2022-09-03", "Squad Name", "Team Name", "Sam LaPorta", "Senior/Varsity", "M", 24, 24, 24, 24, 0, 0, 0, 0, "singles"));
+        roundScores.add(new RoundScore(16940, "Event 2", 50, "Location 2", "2022-09-11", "Squad Name", "Team Name", "Sam LaPorta", "Senior/Varsity", "M", 23, 22, 0, 0, 0, 0, 0, 0, "singles"));
+        roundScores.add(new RoundScore(17159, "Event 4", 986, "Location 4", "2022-09-24", "Squad Name", "Team Name", "Sam LaPorta", "Senior/Varsity", "M", 21, 23, 0, 0, 0, 0, 0, 0, "singles"));
+        roundScores.add(new RoundScore(18168, "Event 6", 50, "Location 6", "2023-04-09", "Squad Name", "Team Name", "Sam LaPorta", "Senior/Varsity", "M", 21, 21, 0, 0, 0, 0, 0, 0, "singles"));
+
+        var playerRoundTotals = trapHelper.calculatePlayerRoundTotals(roundScores);
+        var playerIndividualTotal = trapHelper.calculatePlayerIndividualTotal(roundScores, playerRoundTotals);
+        var playerFinalTotal = trapHelper.calculatePlayerFinalTotal(playerIndividualTotal);
+
+        var player1 = roundScores.getFirst();
+        assertEquals(0, playerFinalTotal.get(player1.getUniqueName()).getLocationId());
+        assertEquals("Team Name", playerFinalTotal.get(player1.getUniqueName()).getTeam());
+        assertEquals("Sam LaPorta", playerFinalTotal.get(player1.getUniqueName()).getAthlete());
+        assertEquals("Senior/Varsity", playerFinalTotal.get(player1.getUniqueName()).getClassification());
+        assertEquals("M", playerFinalTotal.get(player1.getUniqueName()).getGender());
+        assertEquals(185, playerFinalTotal.get(player1.getUniqueName()).getTotal());
+        assertEquals("singles", playerFinalTotal.get(player1.getUniqueName()).getType());
+    }
+
+    @Test
+    void singlesScoring2LocationsWithHigherScoresInOneLocation() {
+        var roundScores = new ArrayList<RoundScore>();
+
+        roundScores.add(new RoundScore(16933, "Event 1", 986, "Location 1", "2022-09-03", "Squad Name", "Team Name", "Sam LaPorta", "Senior/Varsity", "M", 24, 24, 0, 0, 0, 0, 0, 0, "singles"));
+        roundScores.add(new RoundScore(16943, "Event 2", 986, "Location 1", "2022-09-03", "Squad Name", "Team Name", "Sam LaPorta", "Senior/Varsity", "M", 24, 24, 0, 0, 0, 0, 0, 0, "singles"));
+        roundScores.add(new RoundScore(16953, "Event 3", 986, "Location 1", "2022-09-03", "Squad Name", "Team Name", "Sam LaPorta", "Senior/Varsity", "M", 24, 24, 0, 0, 0, 0, 0, 0, "singles"));
+        roundScores.add(new RoundScore(16963, "Event 4", 986, "Location 1", "2022-09-03", "Squad Name", "Team Name", "Sam LaPorta", "Senior/Varsity", "M", 24, 24, 0, 0, 0, 0, 0, 0, "singles"));
+        roundScores.add(new RoundScore(16973, "Event 5", 986, "Location 1", "2022-09-03", "Squad Name", "Team Name", "Sam LaPorta", "Senior/Varsity", "M", 24, 24, 0, 0, 0, 0, 0, 0, "singles"));
+        roundScores.add(new RoundScore(16940, "Event 6", 50, "Location 2", "2022-09-11", "Squad Name", "Team Name", "Sam LaPorta", "Senior/Varsity", "M", 23, 22, 0, 0, 0, 0, 0, 0, "singles"));
+        roundScores.add(new RoundScore(18168, "Event 7", 50, "Location 6", "2023-04-09", "Squad Name", "Team Name", "Sam LaPorta", "Senior/Varsity", "M", 21, 23, 0, 0, 0, 0, 0, 0, "singles"));
+
+        var playerRoundTotals = trapHelper.calculatePlayerRoundTotals(roundScores);
+        var playerIndividualTotal = trapHelper.calculatePlayerIndividualTotal(roundScores, playerRoundTotals);
+        var playerFinalTotal = trapHelper.calculatePlayerFinalTotal(playerIndividualTotal);
+
+        var player1 = roundScores.getFirst();
+        assertEquals(0, playerFinalTotal.get(player1.getUniqueName()).getLocationId());
+        assertEquals("Team Name", playerFinalTotal.get(player1.getUniqueName()).getTeam());
+        assertEquals("Sam LaPorta", playerFinalTotal.get(player1.getUniqueName()).getAthlete());
+        assertEquals("Senior/Varsity", playerFinalTotal.get(player1.getUniqueName()).getClassification());
+        assertEquals("M", playerFinalTotal.get(player1.getUniqueName()).getGender());
+        assertEquals(189, playerFinalTotal.get(player1.getUniqueName()).getTotal());
+        assertEquals("singles", playerFinalTotal.get(player1.getUniqueName()).getType());
+    }
+
+    @Test
+    void doublesScoring4Locations() {
+        var roundScores = new ArrayList<RoundScore>();
+
+        roundScores.add(new RoundScore(16933, "Event 1", 986, "Location 1", "2022-09-03", "Squad Name", "Team Name", "Sam LaPorta", "Senior/Varsity", "M", 48, 24, 0, 0, 0, 0, 0, 0, "doubles"));
+        roundScores.add(new RoundScore(16940, "Event 2", 50, "Location 2", "2022-09-11", "Squad Name", "Team Name", "Sam LaPorta", "Senior/Varsity", "M", 23, 45, 0, 0, 0, 0, 0, 0, "doubles"));
+        roundScores.add(new RoundScore(17159, "Event 4", 983, "Location 4", "2022-09-24", "Squad Name", "Team Name", "Sam LaPorta", "Senior/Varsity", "M", 21, 44, 0, 0, 0, 0, 0, 0, "doubles"));
+        roundScores.add(new RoundScore(18168, "Event 6", 21, "Location 6", "2023-04-09", "Squad Name", "Team Name", "Sam LaPorta", "Senior/Varsity", "M", 44, 23, 0, 0, 0, 0, 0, 0, "doubles"));
+
+        var playerRoundTotals = trapHelper.calculatePlayerRoundTotals(roundScores);
+        var playerIndividualTotal = trapHelper.calculatePlayerIndividualTotal(roundScores, playerRoundTotals);
+        var playerFinalTotal = trapHelper.calculatePlayerFinalTotal(playerIndividualTotal);
+
+        var player1 = roundScores.getFirst();
+        assertEquals(0, playerFinalTotal.get(player1.getUniqueName()).getLocationId());
+        assertEquals("Team Name", playerFinalTotal.get(player1.getUniqueName()).getTeam());
+        assertEquals("Sam LaPorta", playerFinalTotal.get(player1.getUniqueName()).getAthlete());
+        assertEquals("Senior/Varsity", playerFinalTotal.get(player1.getUniqueName()).getClassification());
+        assertEquals("M", playerFinalTotal.get(player1.getUniqueName()).getGender());
+        assertEquals(181, playerFinalTotal.get(player1.getUniqueName()).getTotal());
+        assertEquals("doubles", playerFinalTotal.get(player1.getUniqueName()).getType());
+    }
+
+    @Test
+    void doublesScoring3Locations() {
+        var roundScores = new ArrayList<RoundScore>();
+
+        roundScores.add(new RoundScore(16933, "Event 1", 986, "Location 1", "2022-09-03", "Squad Name", "Team Name", "Sam LaPorta", "Senior/Varsity", "M", 48, 24, 0, 0, 0, 0, 0, 0, "doubles"));
+        roundScores.add(new RoundScore(16940, "Event 2", 50, "Location 2", "2022-09-11", "Squad Name", "Team Name", "Sam LaPorta", "Senior/Varsity", "M", 45, 22, 0, 0, 0, 0, 0, 0, "doubles"));
+        roundScores.add(new RoundScore(17159, "Event 4", 986, "Location 4", "2022-09-24", "Squad Name", "Team Name", "Sam LaPorta", "Senior/Varsity", "M", 44, 23, 0, 0, 0, 0, 0, 0, "doubles"));
+        roundScores.add(new RoundScore(18168, "Event 6", 21, "Location 6", "2023-04-09", "Squad Name", "Team Name", "Sam LaPorta", "Senior/Varsity", "M", 44, 23, 0, 0, 0, 0, 0, 0, "doubles"));
+
+        var playerRoundTotals = trapHelper.calculatePlayerRoundTotals(roundScores);
+        var playerIndividualTotal = trapHelper.calculatePlayerIndividualTotal(roundScores, playerRoundTotals);
+        var playerFinalTotal = trapHelper.calculatePlayerFinalTotal(playerIndividualTotal);
+
+        var player1 = roundScores.getFirst();
+        assertEquals(0, playerFinalTotal.get(player1.getUniqueName()).getLocationId());
+        assertEquals("Team Name", playerFinalTotal.get(player1.getUniqueName()).getTeam());
+        assertEquals("Sam LaPorta", playerFinalTotal.get(player1.getUniqueName()).getAthlete());
+        assertEquals("Senior/Varsity", playerFinalTotal.get(player1.getUniqueName()).getClassification());
+        assertEquals("M", playerFinalTotal.get(player1.getUniqueName()).getGender());
+        assertEquals(181, playerFinalTotal.get(player1.getUniqueName()).getTotal());
+        assertEquals("doubles", playerFinalTotal.get(player1.getUniqueName()).getType());
+    }
+
+    @Test
+    void doublesScoring2Locations() {
+        var roundScores = new ArrayList<RoundScore>();
+
+        roundScores.add(new RoundScore(16933, "Event 1", 986, "Location 1", "2022-09-03", "Squad Name", "Team Name", "Sam LaPorta", "Senior/Varsity", "M", 48, 48, 48, 48, 0, 0, 0, 0, "doubles"));
+        roundScores.add(new RoundScore(16940, "Event 2", 50, "Location 2", "2022-09-11", "Squad Name", "Team Name", "Sam LaPorta", "Senior/Varsity", "M", 23, 45, 0, 0, 0, 0, 0, 0, "doubles"));
+        roundScores.add(new RoundScore(17159, "Event 4", 986, "Location 4", "2022-09-24", "Squad Name", "Team Name", "Sam LaPorta", "Senior/Varsity", "M", 21, 44, 0, 0, 0, 0, 0, 0, "doubles"));
+        roundScores.add(new RoundScore(18168, "Event 6", 50, "Location 6", "2023-04-09", "Squad Name", "Team Name", "Sam LaPorta", "Senior/Varsity", "M", 21, 42, 0, 0, 0, 0, 0, 0, "doubles"));
+
+        var playerRoundTotals = trapHelper.calculatePlayerRoundTotals(roundScores);
+        var playerIndividualTotal = trapHelper.calculatePlayerIndividualTotal(roundScores, playerRoundTotals);
+        var playerFinalTotal = trapHelper.calculatePlayerFinalTotal(playerIndividualTotal);
+
+        var player1 = roundScores.getFirst();
+        assertEquals(0, playerFinalTotal.get(player1.getUniqueName()).getLocationId());
+        assertEquals("Team Name", playerFinalTotal.get(player1.getUniqueName()).getTeam());
+        assertEquals("Sam LaPorta", playerFinalTotal.get(player1.getUniqueName()).getAthlete());
+        assertEquals("Senior/Varsity", playerFinalTotal.get(player1.getUniqueName()).getClassification());
+        assertEquals("M", playerFinalTotal.get(player1.getUniqueName()).getGender());
+        assertEquals(185, playerFinalTotal.get(player1.getUniqueName()).getTotal());
+        assertEquals("doubles", playerFinalTotal.get(player1.getUniqueName()).getType());
+    }
+
+    @Test
+    void doublesScoring2LocationsWithHigherScoresInOneLocation() {
+        var roundScores = new ArrayList<RoundScore>();
+
+        roundScores.add(new RoundScore(16933, "Event 1", 986, "Location 1", "2022-09-03", "Squad Name", "Team Name", "Sam LaPorta", "Senior/Varsity", "M", 24, 48, 0, 0, 0, 0, 0, 0, "doubles"));
+        roundScores.add(new RoundScore(16943, "Event 2", 986, "Location 1", "2022-09-03", "Squad Name", "Team Name", "Sam LaPorta", "Senior/Varsity", "M", 48, 24, 0, 0, 0, 0, 0, 0, "doubles"));
+        roundScores.add(new RoundScore(16953, "Event 3", 986, "Location 1", "2022-09-03", "Squad Name", "Team Name", "Sam LaPorta", "Senior/Varsity", "M", 48, 24, 0, 0, 0, 0, 0, 0, "doubles"));
+        roundScores.add(new RoundScore(16963, "Event 4", 986, "Location 1", "2022-09-03", "Squad Name", "Team Name", "Sam LaPorta", "Senior/Varsity", "M", 24, 48, 0, 0, 0, 0, 0, 0, "doubles"));
+        roundScores.add(new RoundScore(16973, "Event 5", 986, "Location 1", "2022-09-03", "Squad Name", "Team Name", "Sam LaPorta", "Senior/Varsity", "M", 48, 24, 0, 0, 0, 0, 0, 0, "doubles"));
+        roundScores.add(new RoundScore(16940, "Event 6", 50, "Location 2", "2022-09-11", "Squad Name", "Team Name", "Sam LaPorta", "Senior/Varsity", "M", 45, 22, 0, 0, 0, 0, 0, 0, "doubles"));
+        roundScores.add(new RoundScore(18168, "Event 7", 50, "Location 6", "2023-04-09", "Squad Name", "Team Name", "Sam LaPorta", "Senior/Varsity", "M", 44, 23, 0, 0, 0, 0, 0, 0, "doubles"));
+
+        var playerRoundTotals = trapHelper.calculatePlayerRoundTotals(roundScores);
+        var playerIndividualTotal = trapHelper.calculatePlayerIndividualTotal(roundScores, playerRoundTotals);
+        var playerFinalTotal = trapHelper.calculatePlayerFinalTotal(playerIndividualTotal);
+
+        var player1 = roundScores.getFirst();
+        assertEquals(0, playerFinalTotal.get(player1.getUniqueName()).getLocationId());
+        assertEquals("Team Name", playerFinalTotal.get(player1.getUniqueName()).getTeam());
+        assertEquals("Sam LaPorta", playerFinalTotal.get(player1.getUniqueName()).getAthlete());
+        assertEquals("Senior/Varsity", playerFinalTotal.get(player1.getUniqueName()).getClassification());
+        assertEquals("M", playerFinalTotal.get(player1.getUniqueName()).getGender());
+        assertEquals(189, playerFinalTotal.get(player1.getUniqueName()).getTotal());
+        assertEquals("doubles", playerFinalTotal.get(player1.getUniqueName()).getType());
+    }
+
+    @Test
+    void handicapScoring4Locations() {
+        var roundScores = new ArrayList<RoundScore>();
+
+        roundScores.add(new RoundScore(16933, "Event 1", 986, "Location 1", "2022-09-03", "Squad Name", "Team Name", "Sam LaPorta", "Senior/Varsity", "M", 24, 24, 0, 0, 0, 0, 0, 0, "handicap"));
+        roundScores.add(new RoundScore(16940, "Event 2", 50, "Location 2", "2022-09-11", "Squad Name", "Team Name", "Sam LaPorta", "Senior/Varsity", "M", 23, 22, 0, 0, 0, 0, 0, 0, "handicap"));
+        roundScores.add(new RoundScore(17159, "Event 4", 983, "Location 4", "2022-09-24", "Squad Name", "Team Name", "Sam LaPorta", "Senior/Varsity", "M", 21, 23, 0, 0, 0, 0, 0, 0, "handicap"));
+        roundScores.add(new RoundScore(18168, "Event 6", 21, "Location 6", "2023-04-09", "Squad Name", "Team Name", "Sam LaPorta", "Senior/Varsity", "M", 21, 23, 0, 0, 0, 0, 0, 0, "handicap"));
+
+        var playerRoundTotals = trapHelper.calculatePlayerRoundTotals(roundScores);
+        var playerIndividualTotal = trapHelper.calculatePlayerIndividualTotal(roundScores, playerRoundTotals);
+        var playerFinalTotal = trapHelper.calculatePlayerFinalTotal(playerIndividualTotal);
+
+        var player1 = roundScores.getFirst();
+        assertEquals(0, playerFinalTotal.get(player1.getUniqueName()).getLocationId());
+        assertEquals("Team Name", playerFinalTotal.get(player1.getUniqueName()).getTeam());
+        assertEquals("Sam LaPorta", playerFinalTotal.get(player1.getUniqueName()).getAthlete());
+        assertEquals("Senior/Varsity", playerFinalTotal.get(player1.getUniqueName()).getClassification());
+        assertEquals("M", playerFinalTotal.get(player1.getUniqueName()).getGender());
+        assertEquals(181, playerFinalTotal.get(player1.getUniqueName()).getTotal());
+        assertEquals("handicap", playerFinalTotal.get(player1.getUniqueName()).getType());
+    }
+
+    @Test
+    void handicapScoring3Locations() {
+        var roundScores = new ArrayList<RoundScore>();
+
+        roundScores.add(new RoundScore(16933, "Event 1", 986, "Location 1", "2022-09-03", "Squad Name", "Team Name", "Sam LaPorta", "Senior/Varsity", "M", 24, 24, 0, 0, 0, 0, 0, 0, "handicap"));
+        roundScores.add(new RoundScore(16940, "Event 2", 50, "Location 2", "2022-09-11", "Squad Name", "Team Name", "Sam LaPorta", "Senior/Varsity", "M", 23, 22, 0, 0, 0, 0, 0, 0, "handicap"));
+        roundScores.add(new RoundScore(17159, "Event 4", 986, "Location 4", "2022-09-24", "Squad Name", "Team Name", "Sam LaPorta", "Senior/Varsity", "M", 21, 23, 0, 0, 0, 0, 0, 0, "handicap"));
+        roundScores.add(new RoundScore(18168, "Event 6", 21, "Location 6", "2023-04-09", "Squad Name", "Team Name", "Sam LaPorta", "Senior/Varsity", "M", 21, 23, 0, 0, 0, 0, 0, 0, "handicap"));
+
+        var playerRoundTotals = trapHelper.calculatePlayerRoundTotals(roundScores);
+        var playerIndividualTotal = trapHelper.calculatePlayerIndividualTotal(roundScores, playerRoundTotals);
+        var playerFinalTotal = trapHelper.calculatePlayerFinalTotal(playerIndividualTotal);
+
+        var player1 = roundScores.getFirst();
+        assertEquals(0, playerFinalTotal.get(player1.getUniqueName()).getLocationId());
+        assertEquals("Team Name", playerFinalTotal.get(player1.getUniqueName()).getTeam());
+        assertEquals("Sam LaPorta", playerFinalTotal.get(player1.getUniqueName()).getAthlete());
+        assertEquals("Senior/Varsity", playerFinalTotal.get(player1.getUniqueName()).getClassification());
+        assertEquals("M", playerFinalTotal.get(player1.getUniqueName()).getGender());
+        assertEquals(181, playerFinalTotal.get(player1.getUniqueName()).getTotal());
+        assertEquals("handicap", playerFinalTotal.get(player1.getUniqueName()).getType());
+    }
+
+    @Test
+    void handicapScoring2Locations() {
+        var roundScores = new ArrayList<RoundScore>();
+
+        roundScores.add(new RoundScore(16933, "Event 1", 986, "Location 1", "2022-09-03", "Squad Name", "Team Name", "Sam LaPorta", "Senior/Varsity", "M", 20, 20, 24, 24, 0, 0, 0, 0, "handicap"));
+        roundScores.add(new RoundScore(16940, "Event 2", 50, "Location 2", "2022-09-11", "Squad Name", "Team Name", "Sam LaPorta", "Senior/Varsity", "M", 23, 22, 0, 0, 0, 0, 0, 0, "handicap"));
+        roundScores.add(new RoundScore(17159, "Event 4", 986, "Location 4", "2022-09-24", "Squad Name", "Team Name", "Sam LaPorta", "Senior/Varsity", "M", 21, 23, 0, 0, 0, 0, 0, 0, "handicap"));
+        roundScores.add(new RoundScore(18168, "Event 6", 50, "Location 6", "2023-04-09", "Squad Name", "Team Name", "Sam LaPorta", "Senior/Varsity", "M", 21, 21, 0, 0, 0, 0, 0, 0, "handicap"));
+
+        var playerRoundTotals = trapHelper.calculatePlayerRoundTotals(roundScores);
+        var playerIndividualTotal = trapHelper.calculatePlayerIndividualTotal(roundScores, playerRoundTotals);
+        var playerFinalTotal = trapHelper.calculatePlayerFinalTotal(playerIndividualTotal);
+
+        var player1 = roundScores.getFirst();
+        assertEquals(0, playerFinalTotal.get(player1.getUniqueName()).getLocationId());
+        assertEquals("Team Name", playerFinalTotal.get(player1.getUniqueName()).getTeam());
+        assertEquals("Sam LaPorta", playerFinalTotal.get(player1.getUniqueName()).getAthlete());
+        assertEquals("Senior/Varsity", playerFinalTotal.get(player1.getUniqueName()).getClassification());
+        assertEquals("M", playerFinalTotal.get(player1.getUniqueName()).getGender());
+        assertEquals(179, playerFinalTotal.get(player1.getUniqueName()).getTotal());
+        assertEquals("handicap", playerFinalTotal.get(player1.getUniqueName()).getType());
+    }
+
+    @Test
+    void handicapScoring2LocationsWithHigherScoresInOneLocation() {
+        var roundScores = new ArrayList<RoundScore>();
+
+        roundScores.add(new RoundScore(16933, "Event 1", 986, "Location 1", "2022-09-03", "Squad Name", "Team Name", "Sam LaPorta", "Senior/Varsity", "M", 24, 24, 0, 0, 0, 0, 0, 0, "handicap"));
+        roundScores.add(new RoundScore(16943, "Event 2", 986, "Location 1", "2022-09-03", "Squad Name", "Team Name", "Sam LaPorta", "Senior/Varsity", "M", 24, 24, 0, 0, 0, 0, 0, 0, "handicap"));
+        roundScores.add(new RoundScore(16953, "Event 3", 986, "Location 1", "2022-09-03", "Squad Name", "Team Name", "Sam LaPorta", "Senior/Varsity", "M", 24, 24, 0, 0, 0, 0, 0, 0, "handicap"));
+        roundScores.add(new RoundScore(16963, "Event 4", 986, "Location 1", "2022-09-03", "Squad Name", "Team Name", "Sam LaPorta", "Senior/Varsity", "M", 24, 24, 0, 0, 0, 0, 0, 0, "handicap"));
+        roundScores.add(new RoundScore(16973, "Event 5", 986, "Location 1", "2022-09-03", "Squad Name", "Team Name", "Sam LaPorta", "Senior/Varsity", "M", 24, 24, 0, 0, 0, 0, 0, 0, "handicap"));
+        roundScores.add(new RoundScore(16940, "Event 6", 50, "Location 2", "2022-09-11", "Squad Name", "Team Name", "Sam LaPorta", "Senior/Varsity", "M", 23, 22, 0, 0, 0, 0, 0, 0, "handicap"));
+        roundScores.add(new RoundScore(18168, "Event 7", 50, "Location 6", "2023-04-09", "Squad Name", "Team Name", "Sam LaPorta", "Senior/Varsity", "M", 21, 23, 0, 0, 0, 0, 0, 0, "handicap"));
+
+        var playerRoundTotals = trapHelper.calculatePlayerRoundTotals(roundScores);
+        var playerIndividualTotal = trapHelper.calculatePlayerIndividualTotal(roundScores, playerRoundTotals);
+        var playerFinalTotal = trapHelper.calculatePlayerFinalTotal(playerIndividualTotal);
+
+        var player1 = roundScores.getFirst();
+        assertEquals(0, playerFinalTotal.get(player1.getUniqueName()).getLocationId());
+        assertEquals("Team Name", playerFinalTotal.get(player1.getUniqueName()).getTeam());
+        assertEquals("Sam LaPorta", playerFinalTotal.get(player1.getUniqueName()).getAthlete());
+        assertEquals("Senior/Varsity", playerFinalTotal.get(player1.getUniqueName()).getClassification());
+        assertEquals("M", playerFinalTotal.get(player1.getUniqueName()).getGender());
+        assertEquals(189, playerFinalTotal.get(player1.getUniqueName()).getTotal());
+        assertEquals("handicap", playerFinalTotal.get(player1.getUniqueName()).getType());
+    }
+
+    @Test
+    void skeetScoring3Locations() {
+        var roundScores = new ArrayList<RoundScore>();
+
+        roundScores.add(new RoundScore(16933, "Event 1", 986, "Location 1", "2022-09-03", "Squad Name", "Team Name", "Sam LaPorta", "Senior/Varsity", "M", 24, 24, 0, 0, 0, 0, 0, 0, "skeet"));
+        roundScores.add(new RoundScore(16940, "Event 2", 50, "Location 2", "2022-09-11", "Squad Name", "Team Name", "Sam LaPorta", "Senior/Varsity", "M", 23, 22, 0, 0, 0, 0, 0, 0, "skeet"));
+        roundScores.add(new RoundScore(17159, "Event 4", 986, "Location 4", "2022-09-24", "Squad Name", "Team Name", "Sam LaPorta", "Senior/Varsity", "M", 21, 23, 0, 0, 0, 0, 0, 0, "skeet"));
+
+        var playerRoundTotals = trapHelper.calculatePlayerRoundTotals(roundScores);
+        var playerIndividualTotal = trapHelper.calculatePlayerIndividualTotal(roundScores, playerRoundTotals);
+        var playerFinalTotal = trapHelper.calculatePlayerFinalTotal(playerIndividualTotal);
+
+        var player1 = roundScores.getFirst();
+        assertEquals(0, playerFinalTotal.get(player1.getUniqueName()).getLocationId());
+        assertEquals("Team Name", playerFinalTotal.get(player1.getUniqueName()).getTeam());
+        assertEquals("Sam LaPorta", playerFinalTotal.get(player1.getUniqueName()).getAthlete());
+        assertEquals("Senior/Varsity", playerFinalTotal.get(player1.getUniqueName()).getClassification());
+        assertEquals("M", playerFinalTotal.get(player1.getUniqueName()).getGender());
+        assertEquals(137, playerFinalTotal.get(player1.getUniqueName()).getTotal());
+        assertEquals("skeet", playerFinalTotal.get(player1.getUniqueName()).getType());
+    }
+
+    @Test
+    void skeetScoring2Locations() {
+        var roundScores = new ArrayList<RoundScore>();
+
+        roundScores.add(new RoundScore(16933, "Event 1", 986, "Location 1", "2022-09-03", "Squad Name", "Team Name", "Sam LaPorta", "Senior/Varsity", "M", 20, 20, 24, 24, 0, 0, 0, 0, "skeet"));
+        roundScores.add(new RoundScore(16940, "Event 2", 50, "Location 2", "2022-09-11", "Squad Name", "Team Name", "Sam LaPorta", "Senior/Varsity", "M", 23, 22, 0, 0, 0, 0, 0, 0, "skeet"));
+        roundScores.add(new RoundScore(17159, "Event 4", 986, "Location 4", "2022-09-24", "Squad Name", "Team Name", "Sam LaPorta", "Senior/Varsity", "M", 21, 23, 0, 0, 0, 0, 0, 0, "skeet"));
+        roundScores.add(new RoundScore(18168, "Event 6", 50, "Location 6", "2023-04-09", "Squad Name", "Team Name", "Sam LaPorta", "Senior/Varsity", "M", 21, 21, 0, 0, 0, 0, 0, 0, "skeet"));
+
+        var playerRoundTotals = trapHelper.calculatePlayerRoundTotals(roundScores);
+        var playerIndividualTotal = trapHelper.calculatePlayerIndividualTotal(roundScores, playerRoundTotals);
+        var playerFinalTotal = trapHelper.calculatePlayerFinalTotal(playerIndividualTotal);
+
+        var player1 = roundScores.getFirst();
+        assertEquals(0, playerFinalTotal.get(player1.getUniqueName()).getLocationId());
+        assertEquals("Team Name", playerFinalTotal.get(player1.getUniqueName()).getTeam());
+        assertEquals("Sam LaPorta", playerFinalTotal.get(player1.getUniqueName()).getAthlete());
+        assertEquals("Senior/Varsity", playerFinalTotal.get(player1.getUniqueName()).getClassification());
+        assertEquals("M", playerFinalTotal.get(player1.getUniqueName()).getGender());
+        assertEquals(137, playerFinalTotal.get(player1.getUniqueName()).getTotal());
+        assertEquals("skeet", playerFinalTotal.get(player1.getUniqueName()).getType());
+    }
+
+    @Test
+    void skeetScoring2LocationsWithHigherScoresInOneLocation() {
+        var roundScores = new ArrayList<RoundScore>();
+
+        roundScores.add(new RoundScore(16933, "Event 1", 986, "Location 1", "2022-09-03", "Squad Name", "Team Name", "Sam LaPorta", "Senior/Varsity", "M", 24, 24, 0, 0, 0, 0, 0, 0, "skeet"));
+        roundScores.add(new RoundScore(16943, "Event 2", 986, "Location 1", "2022-09-03", "Squad Name", "Team Name", "Sam LaPorta", "Senior/Varsity", "M", 24, 24, 0, 0, 0, 0, 0, 0, "skeet"));
+        roundScores.add(new RoundScore(16953, "Event 3", 986, "Location 1", "2022-09-03", "Squad Name", "Team Name", "Sam LaPorta", "Senior/Varsity", "M", 24, 24, 0, 0, 0, 0, 0, 0, "skeet"));
+        roundScores.add(new RoundScore(16963, "Event 4", 986, "Location 1", "2022-09-03", "Squad Name", "Team Name", "Sam LaPorta", "Senior/Varsity", "M", 24, 24, 0, 0, 0, 0, 0, 0, "skeet"));
+        roundScores.add(new RoundScore(16973, "Event 5", 986, "Location 1", "2022-09-03", "Squad Name", "Team Name", "Sam LaPorta", "Senior/Varsity", "M", 24, 24, 0, 0, 0, 0, 0, 0, "skeet"));
+        roundScores.add(new RoundScore(16940, "Event 6", 50, "Location 2", "2022-09-11", "Squad Name", "Team Name", "Sam LaPorta", "Senior/Varsity", "M", 23, 22, 0, 0, 0, 0, 0, 0, "skeet"));
+        roundScores.add(new RoundScore(18168, "Event 7", 50, "Location 6", "2023-04-09", "Squad Name", "Team Name", "Sam LaPorta", "Senior/Varsity", "M", 21, 23, 0, 0, 0, 0, 0, 0, "skeet"));
+
+        var playerRoundTotals = trapHelper.calculatePlayerRoundTotals(roundScores);
+        var playerIndividualTotal = trapHelper.calculatePlayerIndividualTotal(roundScores, playerRoundTotals);
+        var playerFinalTotal = trapHelper.calculatePlayerFinalTotal(playerIndividualTotal);
+
+        var player1 = roundScores.getFirst();
+        assertEquals(0, playerFinalTotal.get(player1.getUniqueName()).getLocationId());
+        assertEquals("Team Name", playerFinalTotal.get(player1.getUniqueName()).getTeam());
+        assertEquals("Sam LaPorta", playerFinalTotal.get(player1.getUniqueName()).getAthlete());
+        assertEquals("Senior/Varsity", playerFinalTotal.get(player1.getUniqueName()).getClassification());
+        assertEquals("M", playerFinalTotal.get(player1.getUniqueName()).getGender());
+        assertEquals(141, playerFinalTotal.get(player1.getUniqueName()).getTotal());
+        assertEquals("skeet", playerFinalTotal.get(player1.getUniqueName()).getType());
+    }
+
+    @Test
+    void claysScoring3Locations() {
+        var roundScores = new ArrayList<RoundScore>();
+
+        roundScores.add(new RoundScore(16933, "Event 1", 986, "Location 1", "2022-09-03", "Squad Name", "Team Name", "Sam LaPorta", "Senior/Varsity", "M", 48, 23, 0, 0, 0, 0, 0, 0, "clays"));
+        roundScores.add(new RoundScore(16940, "Event 2", 50, "Location 2", "2022-09-11", "Squad Name", "Team Name", "Sam LaPorta", "Senior/Varsity", "M", 45, 22, 0, 0, 0, 0, 0, 0, "clays"));
+        roundScores.add(new RoundScore(17159, "Event 4", 123, "Location 4", "2022-09-24", "Squad Name", "Team Name", "Sam LaPorta", "Senior/Varsity", "M", 44, 23, 0, 0, 0, 0, 0, 0, "clays"));
+
+        var playerRoundTotals = trapHelper.calculatePlayerRoundTotals(roundScores);
+        var playerIndividualTotal = trapHelper.calculatePlayerIndividualTotal(roundScores, playerRoundTotals);
+        var playerFinalTotal = trapHelper.calculatePlayerFinalTotal(playerIndividualTotal);
+
+        var player1 = roundScores.getFirst();
+        assertEquals(0, playerFinalTotal.get(player1.getUniqueName()).getLocationId());
+        assertEquals("Team Name", playerFinalTotal.get(player1.getUniqueName()).getTeam());
+        assertEquals("Sam LaPorta", playerFinalTotal.get(player1.getUniqueName()).getAthlete());
+        assertEquals("Senior/Varsity", playerFinalTotal.get(player1.getUniqueName()).getClassification());
+        assertEquals("M", playerFinalTotal.get(player1.getUniqueName()).getGender());
+        assertEquals(137, playerFinalTotal.get(player1.getUniqueName()).getTotal());
+        assertEquals("clays", playerFinalTotal.get(player1.getUniqueName()).getType());
+    }
+
+    @Test
+    void claysScoring3LocationsWithHigherScoresInOneLocation() {
+        var roundScores = new ArrayList<RoundScore>();
+
+        roundScores.add(new RoundScore(16933, "Event 1", 986, "Location 1", "2022-09-03", "Squad Name", "Team Name", "Sam LaPorta", "Senior/Varsity", "M", 48, 44, 0, 0, 0, 0, 0, 0, "clays"));
+        roundScores.add(new RoundScore(16943, "Event 2", 986, "Location 1", "2022-09-03", "Squad Name", "Team Name", "Sam LaPorta", "Senior/Varsity", "M", 48, 44, 0, 0, 0, 0, 0, 0, "clays"));
+        roundScores.add(new RoundScore(16953, "Event 3", 986, "Location 1", "2022-09-03", "Squad Name", "Team Name", "Sam LaPorta", "Senior/Varsity", "M", 48, 44, 0, 0, 0, 0, 0, 0, "clays"));
+        roundScores.add(new RoundScore(16963, "Event 4", 986, "Location 1", "2022-09-03", "Squad Name", "Team Name", "Sam LaPorta", "Senior/Varsity", "M", 48, 44, 0, 0, 0, 0, 0, 0, "clays"));
+        roundScores.add(new RoundScore(16973, "Event 5", 986, "Location 1", "2022-09-03", "Squad Name", "Team Name", "Sam LaPorta", "Senior/Varsity", "M", 48, 44, 0, 0, 0, 0, 0, 0, "clays"));
+        roundScores.add(new RoundScore(16940, "Event 6", 50, "Location 2", "2022-09-11", "Squad Name", "Team Name", "Sam LaPorta", "Senior/Varsity", "M", 45, 22, 0, 0, 0, 0, 0, 0, "clays"));
+        roundScores.add(new RoundScore(18168, "Event 7", 12, "Location 6", "2023-04-09", "Squad Name", "Team Name", "Sam LaPorta", "Senior/Varsity", "M", 44, 23, 0, 0, 0, 0, 0, 0, "clays"));
+
+        var playerRoundTotals = trapHelper.calculatePlayerRoundTotals(roundScores);
+        var playerIndividualTotal = trapHelper.calculatePlayerIndividualTotal(roundScores, playerRoundTotals);
+        var playerFinalTotal = trapHelper.calculatePlayerFinalTotal(playerIndividualTotal);
+
+        var player1 = roundScores.getFirst();
+        assertEquals(0, playerFinalTotal.get(player1.getUniqueName()).getLocationId());
+        assertEquals("Team Name", playerFinalTotal.get(player1.getUniqueName()).getTeam());
+        assertEquals("Sam LaPorta", playerFinalTotal.get(player1.getUniqueName()).getAthlete());
+        assertEquals("Senior/Varsity", playerFinalTotal.get(player1.getUniqueName()).getClassification());
+        assertEquals("M", playerFinalTotal.get(player1.getUniqueName()).getGender());
+        assertEquals(141, playerFinalTotal.get(player1.getUniqueName()).getTotal());
+        assertEquals("clays", playerFinalTotal.get(player1.getUniqueName()).getType());
+    }
+
+    @Test
+    void doublesskeetScoring3Locations() {
+        var roundScores = new ArrayList<RoundScore>();
+
+        roundScores.add(new RoundScore(16933, "Event 1", 986, "Location 1", "2022-09-03", "Squad Name", "Team Name", "Sam LaPorta", "Senior/Varsity", "M", 48, 23, 0, 0, 0, 0, 0, 0, "doublesskeet"));
+        roundScores.add(new RoundScore(16940, "Event 2", 50, "Location 2", "2022-09-11", "Squad Name", "Team Name", "Sam LaPorta", "Senior/Varsity", "M", 45, 22, 0, 0, 0, 0, 0, 0, "doublesskeet"));
+        roundScores.add(new RoundScore(17159, "Event 4", 123, "Location 4", "2022-09-24", "Squad Name", "Team Name", "Sam LaPorta", "Senior/Varsity", "M", 44, 23, 0, 0, 0, 0, 0, 0, "doublesskeet"));
+
+        var playerRoundTotals = trapHelper.calculatePlayerRoundTotals(roundScores);
+        var playerIndividualTotal = trapHelper.calculatePlayerIndividualTotal(roundScores, playerRoundTotals);
+        var playerFinalTotal = trapHelper.calculatePlayerFinalTotal(playerIndividualTotal);
+
+        var player1 = roundScores.getFirst();
+        assertEquals(0, playerFinalTotal.get(player1.getUniqueName()).getLocationId());
+        assertEquals("Team Name", playerFinalTotal.get(player1.getUniqueName()).getTeam());
+        assertEquals("Sam LaPorta", playerFinalTotal.get(player1.getUniqueName()).getAthlete());
+        assertEquals("Senior/Varsity", playerFinalTotal.get(player1.getUniqueName()).getClassification());
+        assertEquals("M", playerFinalTotal.get(player1.getUniqueName()).getGender());
+        assertEquals(137, playerFinalTotal.get(player1.getUniqueName()).getTotal());
+        assertEquals("doublesskeet", playerFinalTotal.get(player1.getUniqueName()).getType());
+    }
+
+    @Test
+    void doublesskeetScoring3LocationsWithHigherScoresInOneLocation() {
+        var roundScores = new ArrayList<RoundScore>();
+
+        roundScores.add(new RoundScore(16933, "Event 1", 986, "Location 1", "2022-09-03", "Squad Name", "Team Name", "Sam LaPorta", "Senior/Varsity", "M", 48, 44, 0, 0, 0, 0, 0, 0, "doublesskeet"));
+        roundScores.add(new RoundScore(16943, "Event 2", 986, "Location 1", "2022-09-03", "Squad Name", "Team Name", "Sam LaPorta", "Senior/Varsity", "M", 48, 44, 0, 0, 0, 0, 0, 0, "doublesskeet"));
+        roundScores.add(new RoundScore(16953, "Event 3", 986, "Location 1", "2022-09-03", "Squad Name", "Team Name", "Sam LaPorta", "Senior/Varsity", "M", 48, 44, 0, 0, 0, 0, 0, 0, "doublesskeet"));
+        roundScores.add(new RoundScore(16963, "Event 4", 986, "Location 1", "2022-09-03", "Squad Name", "Team Name", "Sam LaPorta", "Senior/Varsity", "M", 48, 44, 0, 0, 0, 0, 0, 0, "doublesskeet"));
+        roundScores.add(new RoundScore(16973, "Event 5", 986, "Location 1", "2022-09-03", "Squad Name", "Team Name", "Sam LaPorta", "Senior/Varsity", "M", 48, 44, 0, 0, 0, 0, 0, 0, "doublesskeet"));
+        roundScores.add(new RoundScore(16940, "Event 6", 50, "Location 2", "2022-09-11", "Squad Name", "Team Name", "Sam LaPorta", "Senior/Varsity", "M", 45, 22, 0, 0, 0, 0, 0, 0, "doublesskeet"));
+        roundScores.add(new RoundScore(18168, "Event 7", 12, "Location 6", "2023-04-09", "Squad Name", "Team Name", "Sam LaPorta", "Senior/Varsity", "M", 44, 23, 0, 0, 0, 0, 0, 0, "doublesskeet"));
+
+        var playerRoundTotals = trapHelper.calculatePlayerRoundTotals(roundScores);
+        var playerIndividualTotal = trapHelper.calculatePlayerIndividualTotal(roundScores, playerRoundTotals);
+        var playerFinalTotal = trapHelper.calculatePlayerFinalTotal(playerIndividualTotal);
+
+        var player1 = roundScores.getFirst();
+        assertEquals(0, playerFinalTotal.get(player1.getUniqueName()).getLocationId());
+        assertEquals("Team Name", playerFinalTotal.get(player1.getUniqueName()).getTeam());
+        assertEquals("Sam LaPorta", playerFinalTotal.get(player1.getUniqueName()).getAthlete());
+        assertEquals("Senior/Varsity", playerFinalTotal.get(player1.getUniqueName()).getClassification());
+        assertEquals("M", playerFinalTotal.get(player1.getUniqueName()).getGender());
+        assertEquals(141, playerFinalTotal.get(player1.getUniqueName()).getTotal());
+        assertEquals("doublesskeet", playerFinalTotal.get(player1.getUniqueName()).getType());
+    }
+
+    @Test
+    void fivestandScoring3Locations() {
+        var roundScores = new ArrayList<RoundScore>();
+
+        roundScores.add(new RoundScore(16933, "Event 1", 986, "Location 1", "2022-09-03", "Squad Name", "Team Name", "Sam LaPorta", "Senior/Varsity", "M", 25, 23, 0, 0, 0, 0, 0, 0, "fivestand"));
+        roundScores.add(new RoundScore(16940, "Event 2", 50, "Location 2", "2022-09-11", "Squad Name", "Team Name", "Sam LaPorta", "Senior/Varsity", "M", 23, 22, 0, 0, 0, 0, 0, 0, "fivestand"));
+        roundScores.add(new RoundScore(17159, "Event 4", 123, "Location 4", "2022-09-24", "Squad Name", "Team Name", "Sam LaPorta", "Senior/Varsity", "M", 21, 23, 0, 0, 0, 0, 0, 0, "fivestand"));
+
+        var playerRoundTotals = trapHelper.calculatePlayerRoundTotals(roundScores);
+        var playerIndividualTotal = trapHelper.calculatePlayerIndividualTotal(roundScores, playerRoundTotals);
+        var playerFinalTotal = trapHelper.calculatePlayerFinalTotal(playerIndividualTotal);
+
+        var player1 = roundScores.getFirst();
+        assertEquals(0, playerFinalTotal.get(player1.getUniqueName()).getLocationId());
+        assertEquals("Team Name", playerFinalTotal.get(player1.getUniqueName()).getTeam());
+        assertEquals("Sam LaPorta", playerFinalTotal.get(player1.getUniqueName()).getAthlete());
+        assertEquals("Senior/Varsity", playerFinalTotal.get(player1.getUniqueName()).getClassification());
+        assertEquals("M", playerFinalTotal.get(player1.getUniqueName()).getGender());
+        assertEquals(137, playerFinalTotal.get(player1.getUniqueName()).getTotal());
+        assertEquals("fivestand", playerFinalTotal.get(player1.getUniqueName()).getType());
+    }
+
+    @Test
+    void fivestandScoring3LocationsWithHigherScoresInOneLocation() {
+        var roundScores = new ArrayList<RoundScore>();
+
+        roundScores.add(new RoundScore(16933, "Event 1", 986, "Location 1", "2022-09-03", "Squad Name", "Team Name", "Sam LaPorta", "Senior/Varsity", "M", 24, 24, 0, 0, 0, 0, 0, 0, "fivestand"));
+        roundScores.add(new RoundScore(16943, "Event 2", 986, "Location 1", "2022-09-03", "Squad Name", "Team Name", "Sam LaPorta", "Senior/Varsity", "M", 24, 24, 0, 0, 0, 0, 0, 0, "fivestand"));
+        roundScores.add(new RoundScore(16953, "Event 3", 986, "Location 1", "2022-09-03", "Squad Name", "Team Name", "Sam LaPorta", "Senior/Varsity", "M", 24, 24, 0, 0, 0, 0, 0, 0, "fivestand"));
+        roundScores.add(new RoundScore(16963, "Event 4", 986, "Location 1", "2022-09-03", "Squad Name", "Team Name", "Sam LaPorta", "Senior/Varsity", "M", 24, 24, 0, 0, 0, 0, 0, 0, "fivestand"));
+        roundScores.add(new RoundScore(16973, "Event 5", 986, "Location 1", "2022-09-03", "Squad Name", "Team Name", "Sam LaPorta", "Senior/Varsity", "M", 24, 24, 0, 0, 0, 0, 0, 0, "fivestand"));
+        roundScores.add(new RoundScore(16940, "Event 6", 50, "Location 2", "2022-09-11", "Squad Name", "Team Name", "Sam LaPorta", "Senior/Varsity", "M", 23, 22, 0, 0, 0, 0, 0, 0, "fivestand"));
+        roundScores.add(new RoundScore(18168, "Event 7", 12, "Location 6", "2023-04-09", "Squad Name", "Team Name", "Sam LaPorta", "Senior/Varsity", "M", 21, 23, 0, 0, 0, 0, 0, 0, "fivestand"));
+
+        var playerRoundTotals = trapHelper.calculatePlayerRoundTotals(roundScores);
+        var playerIndividualTotal = trapHelper.calculatePlayerIndividualTotal(roundScores, playerRoundTotals);
+        var playerFinalTotal = trapHelper.calculatePlayerFinalTotal(playerIndividualTotal);
+
+        var player1 = roundScores.getFirst();
+        assertEquals(0, playerFinalTotal.get(player1.getUniqueName()).getLocationId());
+        assertEquals("Team Name", playerFinalTotal.get(player1.getUniqueName()).getTeam());
+        assertEquals("Sam LaPorta", playerFinalTotal.get(player1.getUniqueName()).getAthlete());
+        assertEquals("Senior/Varsity", playerFinalTotal.get(player1.getUniqueName()).getClassification());
+        assertEquals("M", playerFinalTotal.get(player1.getUniqueName()).getGender());
+        assertEquals(141, playerFinalTotal.get(player1.getUniqueName()).getTotal());
+        assertEquals("fivestand", playerFinalTotal.get(player1.getUniqueName()).getType());
     }
 
 }
