@@ -102,10 +102,10 @@ public class TrapHelper {
         roundCounts.put("singles", 4);
         roundCounts.put("doubles", 4);
         roundCounts.put("handicap", 4);
-        roundCounts.put("skeet", 3);
+        roundCounts.put("skeet", 4);
         roundCounts.put("clays", 3);
         roundCounts.put("fivestand", 3);
-        roundCounts.put("doublesskeet", 3);
+        roundCounts.put("doublesskeet", 4);
         return roundCounts;
     }
 
