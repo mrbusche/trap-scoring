@@ -49,7 +49,7 @@ public class TrapHelper {
             playerIndividualTotal.put(r.getUniqueName(), new ArrayList<>());
         }
         for (var playerRoundTotal : playerRoundTotals.values()) {
-            var roundsToCount = getRoundsToCount(playerRoundTotal.getFirst().getType());
+            var roundsToCount = getEventsToCount(playerRoundTotal.getFirst().getType());
             var indTotal = new ArrayList<IndividualTotal>();
             playerRoundTotal.sort(Comparator.comparingInt(RoundTotal::getTotal).reversed());
             for (var t : playerRoundTotal) {
@@ -93,23 +93,23 @@ public class TrapHelper {
         return playerFinalTotal;
     }
 
-    private boolean singleRound(String roundType) {
-        return roundType.equals("clays") || roundType.equals("doubles") || roundType.equals("doublesskeet");
+    public boolean singleRound(String roundType) {
+        return roundType.equals("clays") || roundType.equals("doubles") || roundType.equals("doublesskeet") || roundType.equals("fivestand");
     }
 
-    private static Map<String, Integer> determineRoundsToCount() {
+    private static Map<String, Integer> determineEventsToCount() {
         var roundCounts = new HashMap<String, Integer>();
         roundCounts.put("singles", 4);
         roundCounts.put("doubles", 4);
         roundCounts.put("handicap", 4);
         roundCounts.put("skeet", 4);
         roundCounts.put("clays", 3);
-        roundCounts.put("fivestand", 3);
+        roundCounts.put("fivestand", 4);
         roundCounts.put("doublesskeet", 4);
         return roundCounts;
     }
 
-    public static int getRoundsToCount(String type) {
-        return Integer.parseInt(determineRoundsToCount().get(type).toString());
+    public static int getEventsToCount(String type) {
+        return Integer.parseInt(determineEventsToCount().get(type).toString());
     }
 }
