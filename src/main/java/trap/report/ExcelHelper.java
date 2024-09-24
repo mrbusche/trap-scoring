@@ -58,18 +58,25 @@ public final class ExcelHelper {
 
     public static void createFile(Workbook workbook) throws IOException {
         long start = System.currentTimeMillis();
+        String filename = generateFilename();
+
+        logger.info("Creating file: {}", filename);
+        try (FileOutputStream fileOutputStream = new FileOutputStream(filename)) {
+            logger.info("Writing file...");
+            workbook.write(fileOutputStream);
+            logger.info("File written successfully.");
+        } catch (IOException e) {
+            logger.error("Error writing file: {}", e.getMessage());
+            throw e;
+        }
+
+        logger.info("Created file in {} ms", System.currentTimeMillis() - start);
+    }
+
+    private static String generateFilename() {
         var formatter = new SimpleDateFormat("yyyyMMddHHmmss");
         var currentDate = formatter.format(new Date());
-        var filename = "league-data-" + currentDate + ".xlsx";
-        logger.info("Creating file");
-        FileOutputStream fileOutputStream = new FileOutputStream(filename);
-        logger.info("Writing file");
-        workbook.write(fileOutputStream);
-        logger.info("closing output stream");
-        fileOutputStream.flush();
-        fileOutputStream.close();
-        logger.info("Created file {}", filename);
-        logger.info("Wrote the contents to a file in {} ms", System.currentTimeMillis() - start);
+        return "league-data-" + currentDate + ".xlsx";
     }
 
     public static void addCleanData(Row row, RoundScore rowData) {
