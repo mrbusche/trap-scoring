@@ -187,10 +187,17 @@ public class ReportHelper {
 
         for (Map.Entry<String, ArrayList<IndividualTotal>> total : teamData) {
             var teamTotal = teamScoresThatCount.get(total.getValue().getFirst().getTeam());
+            var scoresCounted = 0;
+            int scoresToCount = total.getValue().getFirst().getType().equals(SINGLES) || total.getValue().getFirst().getType().equals(HANDICAP) || total.getValue().getFirst().getType().equals(DOUBLES) ? 5 : 3;
+            ;
             for (var indTotal : total.getValue()) {
                 int currentTotal = teamTotal.getTotal();
                 teamTotal.setTotal(currentTotal + indTotal.getTotal());
                 teamScoresThatCount.put(indTotal.getTeam(), teamTotal);
+                scoresCounted++;
+                if (scoresCounted >= scoresToCount) {
+                    break;
+                }
             }
         }
 
@@ -318,16 +325,38 @@ public class ReportHelper {
 
     private HashMap<String, ArrayList<IndividualTotal>> calculateTeamScores(List<IndividualTotal> justValues) {
         var teamScoresThatCount = new HashMap<String, ArrayList<IndividualTotal>>();
+
+        // Group scores by team
         for (var total : justValues) {
-            teamScoresThatCount.put(total.getTeamForScores(), new ArrayList<>());
+            teamScoresThatCount.putIfAbsent(total.getTeamForScores(), new ArrayList<>());
         }
 
+        // Add totals to respective teams
         for (var total : justValues) {
             var currentTeam = teamScoresThatCount.get(total.getTeamForScores());
-            var scoresToCount = total.getType().equals(SINGLES) || total.getType().equals(HANDICAP) || total.getType().equals(DOUBLES) ? 5 : 3;
-            if (currentTeam.size() < scoresToCount) {
-                currentTeam.add(total);
-                teamScoresThatCount.put(total.getTeamForScores(), currentTeam);
+            currentTeam.add(total);
+        }
+
+        // Process each team to handle ties for 5th place
+        for (var team : teamScoresThatCount.keySet()) {
+            var currentTeam = teamScoresThatCount.get(team);
+
+            // Sort the team scores in descending order based on the 'total' field
+            currentTeam.sort((a, b) -> Integer.compare(b.getTotal(), a.getTotal()));
+
+            // Handle ties at 5th place
+            int scoresToCount = currentTeam.getFirst().getType().equals(SINGLES) || currentTeam.getFirst().getType().equals(HANDICAP) || currentTeam.getFirst().getType().equals(DOUBLES) ? 5 : 3;
+            ;
+            if (currentTeam.size() > scoresToCount) {
+                int fifthScore = currentTeam.get(scoresToCount - 1).getTotal();
+
+                // Include all individuals tied with the 5th score
+                for (int i = scoresToCount; i < currentTeam.size(); i++) {
+                    if (currentTeam.get(i).getTotal() != fifthScore) {
+                        currentTeam.subList(i, currentTeam.size()).clear(); // Remove the rest
+                        break;
+                    }
+                }
             }
         }
 
