@@ -381,8 +381,8 @@ public class ReportHelper {
     private void populateTeamIndividualData(Workbook workbook, String sheetName, List<IndividualTotal> teamScoresByTotal) {
         var sheet = workbook.getSheet(sheetName);
         var startTime = System.currentTimeMillis();
-        var start = System.currentTimeMillis();
-        logger.info("Ran query for team scores in {} ms", System.currentTimeMillis() - start);
+
+        logger.info("Ran query for team scores in {} ms", System.currentTimeMillis() - startTime);
 
         var rows = sheet.getLastRowNum();
         var teamScoresThatCount = calculateTeamScores(teamScoresByTotal);
@@ -393,6 +393,7 @@ public class ReportHelper {
         }
 
         sheet.setAutoFilter(CellRangeAddress.valueOf("A1:E1"));
+
         logger.info("Team Individual Scores data populated in {} ms", System.currentTimeMillis() - startTime);
     }
 
