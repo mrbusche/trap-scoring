@@ -56,7 +56,7 @@ public class ReportHelper {
     Logger logger = LoggerFactory.getLogger(ReportHelper.class);
 
     public void generateExcelFile() throws Exception {
-//        downloadHelper.downloadFiles(trapTypes);
+        downloadHelper.downloadFiles(trapTypes);
 
         var workbook = getWorkbook();
 
@@ -399,25 +399,23 @@ public class ReportHelper {
 
     private void populateAllIndividualData(Workbook workbook, String sheetName, Map<String, IndividualTotal> allRoundScores) {
         var sheet = workbook.getSheet(sheetName);
-        var trueStart = System.currentTimeMillis();
         var start = System.currentTimeMillis();
 
-        var justValues = new ArrayList<>(allRoundScores.values());
-        justValues.sort(Comparator.comparing(IndividualTotal::getTeam));
+        var sortedValues = allRoundScores.values()
+                .stream()
+                .sorted(Comparator.comparing(IndividualTotal::getTeam))
+                .toList();
         logger.info("Ran query for all scores in {} ms", System.currentTimeMillis() - start);
 
         var rows = sheet.getLastRowNum();
 
-        Cell cell;
-        Row row;
-        for (var rowData : justValues) {
-            row = sheet.createRow(++rows);
-            cell = row.createCell(0);
+        for (var rowData : sortedValues) {
+            Row row = sheet.createRow(++rows);
+            Cell cell = row.createCell(0);
             ExcelHelper.generateTeamRows(rowData, row, cell);
-            cell = row.createCell(5);
-            cell.setCellValue(rowData.getGender());
+            row.createCell(5).setCellValue(rowData.getGender());
         }
         sheet.setAutoFilter(CellRangeAddress.valueOf("A1:F1"));
-        logger.info("Individual All Scores data populated in {} ms", System.currentTimeMillis() - trueStart);
+        logger.info("Individual All Scores data populated in {} ms", System.currentTimeMillis() - start);
     }
 }
