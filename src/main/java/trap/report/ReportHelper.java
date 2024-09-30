@@ -371,9 +371,10 @@ public class ReportHelper {
     }
 
     private List<IndividualTotal> getTeamScoresByTotal(Map<String, IndividualTotal> allRoundScores) {
-        var teamScoresByTotal = new ArrayList<>(allRoundScores.values());
-        teamScoresByTotal.sort(Comparator.comparingInt(IndividualTotal::getTotal).reversed());
-        return teamScoresByTotal;
+        return allRoundScores.values()
+                .stream()
+                .sorted(Comparator.comparingInt(IndividualTotal::getTotal).reversed())
+                .toList();
     }
 
     // Team-Individual-Scores tab
