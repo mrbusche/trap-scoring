@@ -28,6 +28,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import static trap.report.TrapHelper.getRoundsToCount;
+import static trap.report.TrapHelper.parseInteger;
+import static trap.report.TrapHelper.setStringToZero;
+import static trap.report.TrapHelper.trimString;
+
 @Service
 public class ReportHelper {
     private static final String SINGLES = "singles";
@@ -51,7 +56,7 @@ public class ReportHelper {
     Logger logger = LoggerFactory.getLogger(ReportHelper.class);
 
     public void generateExcelFile() throws Exception {
-        downloadHelper.downloadFiles(trapTypes);
+//        downloadHelper.downloadFiles(trapTypes);
 
         var workbook = getWorkbook();
 
@@ -181,25 +186,28 @@ public class ReportHelper {
     private List<TeamScore> getTeamScores(List<Map.Entry<String, ArrayList<IndividualTotal>>> teamData) {
         var teamScoresThatCount = new HashMap<String, TeamScore>();
         for (Map.Entry<String, ArrayList<IndividualTotal>> total : teamData) {
-            var details = new TeamScore(total.getValue().getFirst().getTeam(), 0);
-            teamScoresThatCount.put(total.getValue().getFirst().getTeam(), details);
+            var team = total.getValue().getFirst().getTeam();
+            teamScoresThatCount.putIfAbsent(team, new TeamScore(team, 0));
         }
 
-        for (Map.Entry<String, ArrayList<IndividualTotal>> total : teamData) {
-            var teamTotal = teamScoresThatCount.get(total.getValue().getFirst().getTeam());
-            var scoresCounted = 0;
-            int scoresToCount = total.getValue().getFirst().getType().equals(SINGLES) || total.getValue().getFirst().getType().equals(HANDICAP) || total.getValue().getFirst().getType().equals(DOUBLES) ? 5 : 3;
-            ;
-            for (var indTotal : total.getValue()) {
-                int currentTotal = teamTotal.getTotal();
-                teamTotal.setTotal(currentTotal + indTotal.getTotal());
-                teamScoresThatCount.put(indTotal.getTeam(), teamTotal);
-                scoresCounted++;
-                if (scoresCounted >= scoresToCount) {
-                    break;
-                }
-            }
+        for (Map.Entry<String, ArrayList<IndividualTotal>> entry : teamData) {
+            // Get the first individual's team and type
+            IndividualTotal firstIndividual = entry.getValue().getFirst();
+            TeamScore teamTotal = teamScoresThatCount.get(firstIndividual.getTeam());
+
+            // Determine the number of scores to count based on the type
+            int scoresToCount = getRoundsToCount(firstIndividual.getType());
+
+            // Sum the top scores up to the limit (scoresToCount)
+            int scoreSum = entry.getValue().stream()
+                    .limit(scoresToCount)
+                    .mapToInt(IndividualTotal::getTotal)
+                    .sum();
+
+            // Update the team's total score
+            teamTotal.setTotal(teamTotal.getTotal() + scoreSum);
         }
+
 
         return teamScoresThatCount.values().stream().sorted(Comparator.comparingInt(TeamScore::getTotal).reversed()).toList();
     }
@@ -345,8 +353,7 @@ public class ReportHelper {
             currentTeam.sort((a, b) -> Integer.compare(b.getTotal(), a.getTotal()));
 
             // Handle ties at 5th place
-            int scoresToCount = currentTeam.getFirst().getType().equals(SINGLES) || currentTeam.getFirst().getType().equals(HANDICAP) || currentTeam.getFirst().getType().equals(DOUBLES) ? 5 : 3;
-            ;
+            int scoresToCount = getRoundsToCount(currentTeam.getFirst().getType());
             if (currentTeam.size() > scoresToCount) {
                 int fifthScore = currentTeam.get(scoresToCount - 1).getTotal();
 
@@ -411,21 +418,4 @@ public class ReportHelper {
         sheet.setAutoFilter(CellRangeAddress.valueOf("A1:F1"));
         logger.info("Individual All Scores data populated in {} ms", System.currentTimeMillis() - trueStart);
     }
-
-    private int parseInteger(String number) {
-        try {
-            return Integer.parseInt(number);
-        } catch (NumberFormatException e) {
-            return 0;
-        }
-    }
-
-    private int setStringToZero(String number) {
-        return number.isEmpty() ? 0 : parseInteger(number);
-    }
-
-    private String trimString(String s) {
-        return s.trim();
-    }
-
 }
