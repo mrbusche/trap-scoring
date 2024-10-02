@@ -56,7 +56,7 @@ public class ReportHelper {
     Logger logger = LoggerFactory.getLogger(ReportHelper.class);
 
     public void generateExcelFile() throws Exception {
-//        downloadHelper.downloadFiles(trapTypes);
+        downloadHelper.downloadFiles(trapTypes);
 
         var workbook = getWorkbook();
 
