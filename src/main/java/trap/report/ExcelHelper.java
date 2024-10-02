@@ -80,67 +80,52 @@ public final class ExcelHelper {
     }
 
     public static void addCleanData(Row row, RoundScore rowData) {
-        var cell = row.createCell(0);
-        cell.setCellValue(rowData.getEventId());
-        cell = row.createCell(1);
-        cell.setCellValue(rowData.getEvent());
-        cell = row.createCell(2);
-        cell.setCellValue(rowData.getLocationId());
-        cell = row.createCell(3);
-        cell.setCellValue(rowData.getLocation());
-        cell = row.createCell(4);
-        cell.setCellValue(rowData.getEventDate());
-        cell = row.createCell(5);
-        cell.setCellValue(rowData.getSquadName());
-        cell = row.createCell(6);
-        cell.setCellValue(rowData.getTeam());
-        cell = row.createCell(7);
-        cell.setCellValue(rowData.getAthlete());
-        cell = row.createCell(8);
-        cell.setCellValue(rowData.getClassification());
-        cell = row.createCell(9);
-        cell.setCellValue(rowData.getGender());
-        cell = row.createCell(10);
-        cell.setCellValue(rowData.getRound1());
-        cell = row.createCell(11);
-        cell.setCellValue(rowData.getRound2());
-        cell = row.createCell(12);
-        cell.setCellValue(rowData.getRound3());
-        cell = row.createCell(13);
-        cell.setCellValue(rowData.getRound4());
-        cell = row.createCell(14);
-        cell.setCellValue(rowData.getRound5());
-        cell = row.createCell(15);
-        cell.setCellValue(rowData.getRound6());
-        cell = row.createCell(16);
-        cell.setCellValue(rowData.getRound7());
-        cell = row.createCell(17);
-        cell.setCellValue(rowData.getRound8());
-        cell = row.createCell(18);
-        cell.setCellValue(rowData.getType());
+        row.createCell(0).setCellValue(rowData.getEventId());
+        row.createCell(1).setCellValue(rowData.getEvent());
+        row.createCell(2).setCellValue(rowData.getLocationId());
+        row.createCell(3).setCellValue(rowData.getLocation());
+        row.createCell(4).setCellValue(rowData.getEventDate());
+        row.createCell(5).setCellValue(rowData.getSquadName());
+        row.createCell(6).setCellValue(rowData.getTeam());
+        row.createCell(7).setCellValue(rowData.getAthlete());
+        row.createCell(8).setCellValue(rowData.getClassification());
+        row.createCell(9).setCellValue(rowData.getGender());
+        row.createCell(10).setCellValue(rowData.getRound1());
+        row.createCell(11).setCellValue(rowData.getRound2());
+        row.createCell(12).setCellValue(rowData.getRound3());
+        row.createCell(13).setCellValue(rowData.getRound4());
+        row.createCell(14).setCellValue(rowData.getRound5());
+        row.createCell(15).setCellValue(rowData.getRound6());
+        row.createCell(16).setCellValue(rowData.getRound7());
+        row.createCell(17).setCellValue(rowData.getRound8());
+        row.createCell(18).setCellValue(rowData.getType());
     }
 
     public static void addTeamData(Row row, int startColumn, String team, int total, CellStyle mainTextStyle) {
-        var cell = row.createCell(startColumn);
-        cell.setCellValue(team);
-        cell.setCellStyle(mainTextStyle);
-        cell = row.createCell(startColumn + 1);
-        cell.setCellValue(total);
-        cell.setCellStyle(mainTextStyle);
+        createAndStyleCell(row, startColumn, team, mainTextStyle);
+        createAndStyleCell(row, startColumn + 1, total, mainTextStyle);
+    }
+
+    private static void createAndStyleCell(Row row, int column, Object value, CellStyle style) {
+        Cell cell = row.createCell(column);
+
+        if (value instanceof String s) {
+            cell.setCellValue(s);
+        } else if (value instanceof Integer i) {
+            cell.setCellValue(i);
+        }
+
+        cell.setCellStyle(style);
     }
 
     public static void addPlayerData(Row row, int column, String athlete, int total, String team, CellStyle mainTextStyle) {
-        if (row != null) {
-            var cell = row.createCell(column);
-            cell.setCellValue(athlete);
-            cell.setCellStyle(mainTextStyle);
-            cell = row.createCell(column + 1);
-            cell.setCellValue(total);
-            cell.setCellStyle(mainTextStyle);
-            cell = row.createCell(column + 2);
-            cell.setCellValue(team);
-            cell.setCellStyle(mainTextStyle);
+        if (row == null) {
+            throw new IllegalArgumentException("Row cannot be null");
         }
+
+        createAndStyleCell(row, column, athlete, mainTextStyle);
+        createAndStyleCell(row, column + 1, total, mainTextStyle);
+        createAndStyleCell(row, column + 2, team, mainTextStyle);
     }
 
     public static int getRows(Sheet sheet, int rows, IndividualTotal rowData) {

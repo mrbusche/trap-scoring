@@ -12,8 +12,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import static trap.report.ReportHelper.CLAYS;
+import static trap.report.ReportHelper.DOUBLES;
+import static trap.report.ReportHelper.DOUBLESKEET;
+import static trap.report.ReportHelper.FIVESTAND;
+import static trap.report.ReportHelper.HANDICAP;
+import static trap.report.ReportHelper.SINGLES;
+import static trap.report.ReportHelper.SKEET;
+
 public class TrapHelper {
-    private static final Map<String, Integer> roundCounts = determineEventsToCount();
+    private static final Map<String, Integer> eventCounts = determineEventsToCount();
+    protected static final Map<String, Integer> roundCounts = determineRoundsToCount();
 
     public Map<String, List<RoundTotal>> calculatePlayerRoundTotals(List<RoundScore> roundScores) {
         Map<String, List<RoundTotal>> playerRoundTotals = new HashMap<>();
@@ -133,23 +142,56 @@ public class TrapHelper {
     }
 
     public boolean singleRound(String roundType) {
-        Set<String> validRounds = Set.of("clays", "doubles", "doublesskeet", "fivestand");
+        Set<String> validRounds = Set.of(CLAYS, DOUBLES, DOUBLESKEET, FIVESTAND);
         return validRounds.contains(roundType);
     }
 
     private static Map<String, Integer> determineEventsToCount() {
-        var roundCounts = new HashMap<String, Integer>();
-        roundCounts.put("singles", 4);
-        roundCounts.put("doubles", 4);
-        roundCounts.put("handicap", 4);
-        roundCounts.put("skeet", 4);
-        roundCounts.put("clays", 3);
-        roundCounts.put("fivestand", 4);
-        roundCounts.put("doublesskeet", 4);
-        return roundCounts;
+        var eventCounts = new HashMap<String, Integer>();
+        eventCounts.put(SINGLES, 4);
+        eventCounts.put(DOUBLES, 4);
+        eventCounts.put(HANDICAP, 4);
+        eventCounts.put(SKEET, 4);
+        eventCounts.put(CLAYS, 3);
+        eventCounts.put(FIVESTAND, 4);
+        eventCounts.put(DOUBLESKEET, 4);
+        return eventCounts;
     }
 
     public static int getEventsToCount(String type) {
+        return eventCounts.getOrDefault(type, 0); // Default to 0 if type not found
+    }
+
+    public static String trimString(String s) {
+        return s.trim();
+    }
+
+    private static Map<String, Integer> determineRoundsToCount() {
+        var roundCounts = new HashMap<String, Integer>();
+        roundCounts.put(SINGLES, 5);
+        roundCounts.put(DOUBLES, 5);
+        roundCounts.put(HANDICAP, 5);
+
+        roundCounts.put(SKEET, 3);
+        roundCounts.put(CLAYS, 3);
+        roundCounts.put(FIVESTAND, 3);
+        roundCounts.put(DOUBLESKEET, 3);
+        return roundCounts;
+    }
+
+    public static int getRoundsToCount(String type) {
         return roundCounts.getOrDefault(type, 0); // Default to 0 if type not found
+    }
+
+    public static int parseInteger(String number) {
+        try {
+            return Integer.parseInt(number);
+        } catch (NumberFormatException e) {
+            return 0;
+        }
+    }
+
+    public static int setStringToZero(String number) {
+        return number.isEmpty() ? 0 : parseInteger(number);
     }
 }

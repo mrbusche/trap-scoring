@@ -28,15 +28,20 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import static trap.report.TrapHelper.getRoundsToCount;
+import static trap.report.TrapHelper.parseInteger;
+import static trap.report.TrapHelper.setStringToZero;
+import static trap.report.TrapHelper.trimString;
+
 @Service
 public class ReportHelper {
-    private static final String SINGLES = "singles";
-    private static final String DOUBLES = "doubles";
-    private static final String HANDICAP = "handicap";
-    private static final String SKEET = "skeet";
-    private static final String CLAYS = "clays";
-    private static final String FIVESTAND = "fivestand";
-    private static final String DOUBLESKEET = "doublesskeet";
+    public static final String SINGLES = "singles";
+    public static final String DOUBLES = "doubles";
+    public static final String HANDICAP = "handicap";
+    public static final String SKEET = "skeet";
+    public static final String CLAYS = "clays";
+    public static final String FIVESTAND = "fivestand";
+    public static final String DOUBLESKEET = "doublesskeet";
     private static final String ROOKIE = "Rookie";
     private static final String VARSITY = "Varsity";
     private static final String INTERMEDIATE_ENTRY = "Intermediate Entry";
@@ -181,18 +186,28 @@ public class ReportHelper {
     private List<TeamScore> getTeamScores(List<Map.Entry<String, ArrayList<IndividualTotal>>> teamData) {
         var teamScoresThatCount = new HashMap<String, TeamScore>();
         for (Map.Entry<String, ArrayList<IndividualTotal>> total : teamData) {
-            var details = new TeamScore(total.getValue().getFirst().getTeam(), 0);
-            teamScoresThatCount.put(total.getValue().getFirst().getTeam(), details);
+            var team = total.getValue().getFirst().getTeam();
+            teamScoresThatCount.putIfAbsent(team, new TeamScore(team, 0));
         }
 
-        for (Map.Entry<String, ArrayList<IndividualTotal>> total : teamData) {
-            var teamTotal = teamScoresThatCount.get(total.getValue().getFirst().getTeam());
-            for (var indTotal : total.getValue()) {
-                int currentTotal = teamTotal.getTotal();
-                teamTotal.setTotal(currentTotal + indTotal.getTotal());
-                teamScoresThatCount.put(indTotal.getTeam(), teamTotal);
-            }
+        for (Map.Entry<String, ArrayList<IndividualTotal>> entry : teamData) {
+            // Get the first individual's team and type
+            IndividualTotal firstIndividual = entry.getValue().getFirst();
+            TeamScore teamTotal = teamScoresThatCount.get(firstIndividual.getTeam());
+
+            // Determine the number of scores to count based on the type
+            int scoresToCount = getRoundsToCount(firstIndividual.getType());
+
+            // Sum the top scores up to the limit (scoresToCount)
+            int scoreSum = entry.getValue().stream()
+                    .limit(scoresToCount)
+                    .mapToInt(IndividualTotal::getTotal)
+                    .sum();
+
+            // Update the team's total score
+            teamTotal.setTotal(teamTotal.getTotal() + scoreSum);
         }
+
 
         return teamScoresThatCount.values().stream().sorted(Comparator.comparingInt(TeamScore::getTotal).reversed()).toList();
     }
@@ -318,16 +333,37 @@ public class ReportHelper {
 
     private HashMap<String, ArrayList<IndividualTotal>> calculateTeamScores(List<IndividualTotal> justValues) {
         var teamScoresThatCount = new HashMap<String, ArrayList<IndividualTotal>>();
+
+        // Group scores by team
         for (var total : justValues) {
-            teamScoresThatCount.put(total.getTeamForScores(), new ArrayList<>());
+            teamScoresThatCount.putIfAbsent(total.getTeamForScores(), new ArrayList<>());
         }
 
+        // Add totals to respective teams
         for (var total : justValues) {
             var currentTeam = teamScoresThatCount.get(total.getTeamForScores());
-            var scoresToCount = total.getType().equals(SINGLES) || total.getType().equals(HANDICAP) || total.getType().equals(DOUBLES) ? 5 : 3;
-            if (currentTeam.size() < scoresToCount) {
-                currentTeam.add(total);
-                teamScoresThatCount.put(total.getTeamForScores(), currentTeam);
+            currentTeam.add(total);
+        }
+
+        // Process each team to handle ties for 5th place
+        for (var team : teamScoresThatCount.entrySet()) {
+            var currentTeam = team.getValue();
+
+            // Sort the team scores in descending order based on the 'total' field
+            currentTeam.sort((a, b) -> Integer.compare(b.getTotal(), a.getTotal()));
+
+            // Handle ties at 5th place
+            int scoresToCount = getRoundsToCount(currentTeam.getFirst().getType());
+            if (currentTeam.size() > scoresToCount) {
+                int fifthScore = currentTeam.get(scoresToCount - 1).getTotal();
+
+                // Include all individuals tied with the 5th score
+                for (int i = scoresToCount; i < currentTeam.size(); i++) {
+                    if (currentTeam.get(i).getTotal() != fifthScore) {
+                        currentTeam.subList(i, currentTeam.size()).clear(); // Remove the rest
+                        break;
+                    }
+                }
             }
         }
 
@@ -335,17 +371,18 @@ public class ReportHelper {
     }
 
     private List<IndividualTotal> getTeamScoresByTotal(Map<String, IndividualTotal> allRoundScores) {
-        var teamScoresByTotal = new ArrayList<>(allRoundScores.values());
-        teamScoresByTotal.sort(Comparator.comparingInt(IndividualTotal::getTotal).reversed());
-        return teamScoresByTotal;
+        return allRoundScores.values()
+                .stream()
+                .sorted(Comparator.comparingInt(IndividualTotal::getTotal).reversed())
+                .toList();
     }
 
     // Team-Individual-Scores tab
     private void populateTeamIndividualData(Workbook workbook, String sheetName, List<IndividualTotal> teamScoresByTotal) {
         var sheet = workbook.getSheet(sheetName);
         var startTime = System.currentTimeMillis();
-        var start = System.currentTimeMillis();
-        logger.info("Ran query for team scores in {} ms", System.currentTimeMillis() - start);
+
+        logger.info("Ran query for team scores in {} ms", System.currentTimeMillis() - startTime);
 
         var rows = sheet.getLastRowNum();
         var teamScoresThatCount = calculateTeamScores(teamScoresByTotal);
@@ -356,47 +393,29 @@ public class ReportHelper {
         }
 
         sheet.setAutoFilter(CellRangeAddress.valueOf("A1:E1"));
+
         logger.info("Team Individual Scores data populated in {} ms", System.currentTimeMillis() - startTime);
     }
 
     private void populateAllIndividualData(Workbook workbook, String sheetName, Map<String, IndividualTotal> allRoundScores) {
         var sheet = workbook.getSheet(sheetName);
-        var trueStart = System.currentTimeMillis();
         var start = System.currentTimeMillis();
 
-        var justValues = new ArrayList<>(allRoundScores.values());
-        justValues.sort(Comparator.comparing(IndividualTotal::getTeam));
+        var sortedValues = allRoundScores.values()
+                .stream()
+                .sorted(Comparator.comparing(IndividualTotal::getTeam))
+                .toList();
         logger.info("Ran query for all scores in {} ms", System.currentTimeMillis() - start);
 
         var rows = sheet.getLastRowNum();
 
-        Cell cell;
-        Row row;
-        for (var rowData : justValues) {
-            row = sheet.createRow(++rows);
-            cell = row.createCell(0);
+        for (var rowData : sortedValues) {
+            Row row = sheet.createRow(++rows);
+            Cell cell = row.createCell(0);
             ExcelHelper.generateTeamRows(rowData, row, cell);
-            cell = row.createCell(5);
-            cell.setCellValue(rowData.getGender());
+            row.createCell(5).setCellValue(rowData.getGender());
         }
         sheet.setAutoFilter(CellRangeAddress.valueOf("A1:F1"));
-        logger.info("Individual All Scores data populated in {} ms", System.currentTimeMillis() - trueStart);
+        logger.info("Individual All Scores data populated in {} ms", System.currentTimeMillis() - start);
     }
-
-    private int parseInteger(String number) {
-        try {
-            return Integer.parseInt(number);
-        } catch (NumberFormatException e) {
-            return 0;
-        }
-    }
-
-    private int setStringToZero(String number) {
-        return number.isEmpty() ? 0 : parseInteger(number);
-    }
-
-    private String trimString(String s) {
-        return s.trim();
-    }
-
 }
