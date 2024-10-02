@@ -35,13 +35,13 @@ import static trap.report.TrapHelper.trimString;
 
 @Service
 public class ReportHelper {
-    private static final String SINGLES = "singles";
-    private static final String DOUBLES = "doubles";
-    private static final String HANDICAP = "handicap";
-    private static final String SKEET = "skeet";
-    private static final String CLAYS = "clays";
-    private static final String FIVESTAND = "fivestand";
-    private static final String DOUBLESKEET = "doublesskeet";
+    public static final String SINGLES = "singles";
+    public static final String DOUBLES = "doubles";
+    public static final String HANDICAP = "handicap";
+    public static final String SKEET = "skeet";
+    public static final String CLAYS = "clays";
+    public static final String FIVESTAND = "fivestand";
+    public static final String DOUBLESKEET = "doublesskeet";
     private static final String ROOKIE = "Rookie";
     private static final String VARSITY = "Varsity";
     private static final String INTERMEDIATE_ENTRY = "Intermediate Entry";
@@ -56,7 +56,7 @@ public class ReportHelper {
     Logger logger = LoggerFactory.getLogger(ReportHelper.class);
 
     public void generateExcelFile() throws Exception {
-        downloadHelper.downloadFiles(trapTypes);
+//        downloadHelper.downloadFiles(trapTypes);
 
         var workbook = getWorkbook();
 
@@ -346,8 +346,8 @@ public class ReportHelper {
         }
 
         // Process each team to handle ties for 5th place
-        for (var team : teamScoresThatCount.keySet()) {
-            var currentTeam = teamScoresThatCount.get(team);
+        for (var team : teamScoresThatCount.entrySet()) {
+            var currentTeam = team.getValue();
 
             // Sort the team scores in descending order based on the 'total' field
             currentTeam.sort((a, b) -> Integer.compare(b.getTotal(), a.getTotal()));

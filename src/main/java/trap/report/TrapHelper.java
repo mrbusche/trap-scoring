@@ -12,9 +12,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import static trap.report.ReportHelper.CLAYS;
+import static trap.report.ReportHelper.DOUBLES;
+import static trap.report.ReportHelper.DOUBLESKEET;
+import static trap.report.ReportHelper.FIVESTAND;
+import static trap.report.ReportHelper.HANDICAP;
+import static trap.report.ReportHelper.SINGLES;
+import static trap.report.ReportHelper.SKEET;
+
 public class TrapHelper {
     private static final Map<String, Integer> eventCounts = determineEventsToCount();
-    public static final Map<String, Integer> roundCounts = determineRoundsToCount();
+    protected static final Map<String, Integer> roundCounts = determineRoundsToCount();
 
     public Map<String, List<RoundTotal>> calculatePlayerRoundTotals(List<RoundScore> roundScores) {
         Map<String, List<RoundTotal>> playerRoundTotals = new HashMap<>();
@@ -134,19 +142,19 @@ public class TrapHelper {
     }
 
     public boolean singleRound(String roundType) {
-        Set<String> validRounds = Set.of("clays", "doubles", "doublesskeet", "fivestand");
+        Set<String> validRounds = Set.of(CLAYS, DOUBLES, DOUBLESKEET, FIVESTAND);
         return validRounds.contains(roundType);
     }
 
     private static Map<String, Integer> determineEventsToCount() {
         var eventCounts = new HashMap<String, Integer>();
-        eventCounts.put("singles", 4);
-        eventCounts.put("doubles", 4);
-        eventCounts.put("handicap", 4);
-        eventCounts.put("skeet", 4);
-        eventCounts.put("clays", 3);
-        eventCounts.put("fivestand", 4);
-        eventCounts.put("doublesskeet", 4);
+        eventCounts.put(SINGLES, 4);
+        eventCounts.put(DOUBLES, 4);
+        eventCounts.put(HANDICAP, 4);
+        eventCounts.put(SKEET, 4);
+        eventCounts.put(CLAYS, 3);
+        eventCounts.put(FIVESTAND, 4);
+        eventCounts.put(DOUBLESKEET, 4);
         return eventCounts;
     }
 
@@ -160,14 +168,14 @@ public class TrapHelper {
 
     private static Map<String, Integer> determineRoundsToCount() {
         var roundCounts = new HashMap<String, Integer>();
-        roundCounts.put("singles", 5);
-        roundCounts.put("doubles", 5);
-        roundCounts.put("handicap", 5);
+        roundCounts.put(SINGLES, 5);
+        roundCounts.put(DOUBLES, 5);
+        roundCounts.put(HANDICAP, 5);
 
-        roundCounts.put("skeet", 3);
-        roundCounts.put("clays", 3);
-        roundCounts.put("fivestand", 3);
-        roundCounts.put("doublesskeet", 3);
+        roundCounts.put(SKEET, 3);
+        roundCounts.put(CLAYS, 3);
+        roundCounts.put(FIVESTAND, 3);
+        roundCounts.put(DOUBLESKEET, 3);
         return roundCounts;
     }
 
