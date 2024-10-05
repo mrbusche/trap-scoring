@@ -1,5 +1,29 @@
 # Trap Scoring App
 
+## Scoring
+
+| Discipline     | Scoring        | Events | Locations | Birds |
+|----------------|----------------|--------|-----------|-------|
+| Singles        | 2 rounds of 25 | 4      | 2         | 200   |
+| Doubles        | 1 round of 50  | 4      | 2         | 200   |
+| Handicap       | 2 rounds of 25 | 4      | 2         | 200   |
+| American Skeet | 2 rounds of 25 | 4      | 2         | 200   |
+| Doubles Skeet  | 1 round of 50  | 4      | 2         | 200   |
+| Sporting Clay  | 1 round of 100 | 3      | 2         | 300   |
+| 5-Stand        | 1 round of 50  | 4      | 2         | 200   |
+
+## Downloading the daily generated report
+
+Every day at 6 AM UTC the report
+is [generated and uploaded](https://github.com/mrbusche/trap-scoring/actions/workflows/daily-standings.yml).
+
+1. Login to GitHub
+2. Click on the top [Daily Standings](https://github.com/mrbusche/trap-scoring/actions/workflows/daily-standings.yml)
+   link
+3. Download `trap-league-standings`
+4. Extract the zip file
+5. Report will be named `league-data-${todays-date}.xlsx`
+
 ## Generating standings on demand
 
 - Download jar file from the [latest release](https://github.com/mrbusche/trap-scoring/releases)
@@ -7,17 +31,8 @@
 - Open command prompt to directory with downloaded jar file
 - Run `java -jar trap-6.2.0.jar` (make sure you have the correct filename from the release)
 - There will be output as the process generates the file
-- When finished there will be a file named `leaguedata-${date-string}` generated in the directory you ran the command from
-
-## Downloading a daily generated report
-
-Every day at 6 AM UTC the report is [generated and uploaded](https://github.com/mrbusche/trap-scoring/actions/workflows/daily-standings.yml).
-
-1. Login to GitHub
-2. Click on the top [Daily Standings](https://github.com/mrbusche/trap-scoring/actions/workflows/daily-standings.yml) link
-3. Download `trap-league-standings`
-4. Extract the zip file
-5. Report will be named `league-data-${todays-date}.xlsx`
+- When finished there will be a file named `leaguedata-${date-string}` generated in the directory you ran the command
+  from
 
 ## Online metabase links
 
