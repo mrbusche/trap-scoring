@@ -223,7 +223,7 @@ public class ReportHelper {
         int startColumn = 1;
         long start = System.currentTimeMillis();
 
-        List<Map.Entry<String, ArrayList<IndividualTotal>>> teamData = teamScoresByTotal.entrySet().stream().filter(f -> f.getValue().getFirst().getTeamClassificationForTotal().equals(teamType) && f.getValue().getFirst().getType().equals(SINGLES)).toList();
+        List<Map.Entry<String, ArrayList<IndividualTotal>>> teamData = teamScoresByTotal.entrySet().stream().filter(f -> f.getValue().getFirst().getTeamClassification().equals(teamType) && f.getValue().getFirst().getType().equals(SINGLES)).toList();
         List<TeamScore> teamScores = getTeamScores(teamData);
         logger.info("Ran query for singles by {} in {} ms", teamType, System.currentTimeMillis() - start);
         for (var teamScore : teamScores) {
@@ -238,7 +238,7 @@ public class ReportHelper {
             for (var type : types) {
                 updateRow = rows;
                 start = System.currentTimeMillis();
-                teamData = teamScoresByTotal.entrySet().stream().filter(f -> f.getValue().getFirst().getTeamClassificationForTotal().equals(teamType) && f.getValue().getFirst().getType().equals(type)).toList();
+                teamData = teamScoresByTotal.entrySet().stream().filter(f -> f.getValue().getFirst().getTeamClassification().equals(teamType) && f.getValue().getFirst().getType().equals(type)).toList();
                 teamScores = getTeamScores(teamData);
                 logger.info("Ran query for {} by {} in {} ms", type, teamType, System.currentTimeMillis() - start);
                 for (var teamScore : teamScores) {

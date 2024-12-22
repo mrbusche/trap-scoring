@@ -27,10 +27,14 @@ public class RoundScore {
     String type;
 
     public String getUniqueName() {
-        return this.getAthlete() + " " + this.getTeam() + " " + this.getClassification() + " " + this.getType();
+        return String.format("%s %s %s %s", athlete, team, getSimplifiedTeamClassification(), type);
     }
 
-    public String getTeamClassification() {
-        return this.classification.replace("Senior/Varsity", "Varsity").replace("Senior/Jr. Varsity", "Junior Varsity").replace("Intermediate/Advanced", "Intermediate Advanced").replace("Intermediate/Entry Level", "Intermediate Entry");
+    public String getSimplifiedTeamClassification() {
+        return switch (classification) {
+            case "Senior/Varsity", "Senior/Jr. Varsity", "Junior Varsity" -> "Varsity";
+            case "Intermediate/Advanced", "Intermediate/Entry Level" -> "Intermediate Entry";
+            default -> classification;
+        };
     }
 }
