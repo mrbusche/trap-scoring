@@ -136,14 +136,14 @@ public final class ExcelHelper {
     }
 
     public static void generateTeamRows(IndividualTotal rowData, Row row, Cell cell) {
-        cell.setCellValue(rowData.getType());
+        cell.setCellValue(rowData.type());
         cell = row.createCell(1);
-        cell.setCellValue(rowData.getTeam());
+        cell.setCellValue(rowData.team());
         cell = row.createCell(2);
-        cell.setCellValue(rowData.getClassification());
+        cell.setCellValue(rowData.classification());
         cell = row.createCell(3);
-        cell.setCellValue(rowData.getAthlete());
+        cell.setCellValue(rowData.athlete());
         cell = row.createCell(4);
-        cell.setCellValue(rowData.getTotal());
+        cell.setCellValue(rowData.total());
     }
 }

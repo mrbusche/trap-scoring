@@ -31,6 +31,12 @@ public class RoundScore {
     }
 
     public String getTeamClassification() {
-        return this.classification.replace("Senior/Varsity", "Varsity").replace("Senior/Jr. Varsity", "Varsity").replace("Intermediate/Advanced", "Intermediate Advanced").replace("Intermediate/Entry Level", "Intermediate Entry");
+        return switch (classification) {
+            case "Senior/Varsity" -> "Varsity";
+            case "Senior/Jr. Varsity" -> "Senior Varsity";
+            case "Intermediate/Advanced" -> "Intermediate Advanced";
+            case "Intermediate/Entry Level" -> "Intermediate Entry";
+            default -> classification;
+        };
     }
 }
