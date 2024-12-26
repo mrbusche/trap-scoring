@@ -12,6 +12,8 @@ import org.apache.poi.ss.util.CellRangeAddress;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import trap.common.Classifications;
+import trap.common.EventTypes;
 import trap.model.IndividualTotal;
 import trap.model.RoundScore;
 import trap.model.TeamScore;
@@ -35,20 +37,8 @@ import static trap.report.TrapService.trimString;
 
 @Service
 public class ReportService {
-    public static final String SINGLES = "singles";
-    public static final String DOUBLES = "doubles";
-    public static final String HANDICAP = "handicap";
-    public static final String SKEET = "skeet";
-    public static final String CLAYS = "clays";
-    public static final String FIVESTAND = "fivestand";
-    public static final String DOUBLESKEET = "doublesskeet";
-    private static final String ROOKIE = "Rookie";
-    private static final String VARSITY = "Varsity";
-    private static final String INTERMEDIATE_ENTRY = "Intermediate Entry";
-    private static final String JUNIOR_VARSITY = "Junior Varsity";
-    private static final String INTERMEDIATE_ADVANCED = "Intermediate Advanced";
     private final String currentDate = new SimpleDateFormat("MM/dd/yyyy").format(Calendar.getInstance().getTime());
-    private final String[] trapTypes = new String[]{SINGLES, DOUBLES, HANDICAP, SKEET, CLAYS, FIVESTAND, DOUBLESKEET};
+    private final String[] trapTypes = new String[]{EventTypes.SINGLES, EventTypes.DOUBLES, EventTypes.HANDICAP, EventTypes.SKEET, EventTypes.CLAYS, EventTypes.FIVESTAND, EventTypes.DOUBLESKEET};
 
     TrapService trapService = new TrapService();
     DownloadService downloadService = new DownloadService();
@@ -68,9 +58,9 @@ public class ReportService {
         var trueStart = System.currentTimeMillis();
 
         var types = new HashMap<String, String>();
-        types.put("Team-Senior", VARSITY);
-        types.put("Team-Intermediate", INTERMEDIATE_ENTRY);
-        types.put("Team-Rookie", ROOKIE);
+        types.put("Team-Senior", Classifications.VARSITY);
+        types.put("Team-Intermediate", Classifications.INTERMEDIATE_ENTRY);
+        types.put("Team-Rookie", Classifications.ROOKIE);
 
         var mainTextStyle = ExcelHelper.getCellStyle(workbook);
         var style = ExcelHelper.setFontForHeaders(workbook);
@@ -204,8 +194,7 @@ public class ReportService {
                     .sum();
 
             // Update the team's total score by creating a new TeamScore instance
-            TeamScore currentTeamScore = teamScoresThatCount.get(teamName);
-            teamScoresThatCount.put(teamName, new TeamScore(teamName, currentTeamScore.total() + scoreSum));
+            teamScoresThatCount.computeIfPresent(teamName, (k, currentTeamScore) -> new TeamScore(teamName, currentTeamScore.total() + scoreSum));
         }
 
         return teamScoresThatCount.values().stream()
@@ -224,7 +213,7 @@ public class ReportService {
         int startColumn = 1;
         long start = System.currentTimeMillis();
 
-        List<Map.Entry<String, ArrayList<IndividualTotal>>> teamData = teamScoresByTotal.entrySet().stream().filter(f -> f.getValue().getFirst().teamClassificationForTotal().equals(teamType) && f.getValue().getFirst().type().equals(SINGLES)).toList();
+        List<Map.Entry<String, ArrayList<IndividualTotal>>> teamData = teamScoresByTotal.entrySet().stream().filter(f -> f.getValue().getFirst().teamClassificationForTotal().equals(teamType) && f.getValue().getFirst().type().equals(EventTypes.SINGLES)).toList();
         List<TeamScore> teamScores = getTeamScores(teamData);
         logger.info("Ran query for singles by {} in {} ms", teamType, System.currentTimeMillis() - start);
         for (var teamScore : teamScores) {
@@ -232,10 +221,10 @@ public class ReportService {
             ExcelHelper.addTeamData(row, startColumn, teamScore.name(), teamScore.total(), mainTextStyle);
         }
 
-        if (!ROOKIE.equals(teamType)) {
+        if (!Classifications.ROOKIE.equals(teamType)) {
             startColumn += 3;
 
-            var types = new String[]{HANDICAP, DOUBLES, SKEET, CLAYS, FIVESTAND, DOUBLESKEET};
+            var types = new String[]{EventTypes.HANDICAP, EventTypes.DOUBLES, EventTypes.SKEET, EventTypes.CLAYS, EventTypes.FIVESTAND, EventTypes.DOUBLESKEET};
             for (var type : types) {
                 updateRow = rows;
                 start = System.currentTimeMillis();
@@ -266,7 +255,7 @@ public class ReportService {
         int maxRow = rows;
         int classificationStartRow;
         var addBlankRowForHeader = false;
-        var classificationList = Arrays.asList(VARSITY, JUNIOR_VARSITY, INTERMEDIATE_ADVANCED, INTERMEDIATE_ENTRY, ROOKIE);
+        var classificationList = Arrays.asList(Classifications.VARSITY, Classifications.JUNIOR_VARSITY, Classifications.INTERMEDIATE_ADVANCED, Classifications.INTERMEDIATE_ENTRY, Classifications.ROOKIE);
         long start;
         for (var classification : classificationList) {
             int column = 1;
@@ -302,7 +291,7 @@ public class ReportService {
             List<IndividualTotal> justValues = new ArrayList<>(allRoundScores.values());
             justValues.sort(Comparator.comparingInt(IndividualTotal::total).reversed());
 
-            var individualData = justValues.stream().filter(f -> f.gender().equals(gender) && f.teamClassification().equals(classification) && f.type().equals(SINGLES)).toList();
+            var individualData = justValues.stream().filter(f -> f.gender().equals(gender) && f.teamClassification().equals(classification) && f.type().equals(EventTypes.SINGLES)).toList();
             logger.info("Ran query for singles by {} and {} in {} ms", gender, classification, System.currentTimeMillis() - start);
 
             for (IndividualTotal singlesRowData : individualData) {
@@ -312,7 +301,7 @@ public class ReportService {
             column += 4;
             maxRow = Math.max(maxRow, updateRow);
 
-            String[] types = new String[]{HANDICAP, DOUBLES, SKEET, CLAYS, FIVESTAND, DOUBLESKEET};
+            String[] types = new String[]{EventTypes.HANDICAP, EventTypes.DOUBLES, EventTypes.SKEET, EventTypes.CLAYS, EventTypes.FIVESTAND, EventTypes.DOUBLESKEET};
             for (String type : types) {
                 updateRow = classificationStartRow;
                 updateRow++;
