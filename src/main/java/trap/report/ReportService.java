@@ -28,13 +28,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import static trap.report.TrapHelper.getRoundsToCount;
-import static trap.report.TrapHelper.parseInteger;
-import static trap.report.TrapHelper.setStringToZero;
-import static trap.report.TrapHelper.trimString;
+import static trap.report.TrapService.getRoundsToCount;
+import static trap.report.TrapService.parseInteger;
+import static trap.report.TrapService.setStringToZero;
+import static trap.report.TrapService.trimString;
 
 @Service
-public class ReportHelper {
+public class ReportService {
     public static final String SINGLES = "singles";
     public static final String DOUBLES = "doubles";
     public static final String HANDICAP = "handicap";
@@ -50,13 +50,13 @@ public class ReportHelper {
     private final String currentDate = new SimpleDateFormat("MM/dd/yyyy").format(Calendar.getInstance().getTime());
     private final String[] trapTypes = new String[]{SINGLES, DOUBLES, HANDICAP, SKEET, CLAYS, FIVESTAND, DOUBLESKEET};
 
-    TrapHelper trapHelper = new TrapHelper();
-    DownloadHelper downloadHelper = new DownloadHelper();
+    TrapService trapService = new TrapService();
+    DownloadService downloadService = new DownloadService();
 
-    Logger logger = LoggerFactory.getLogger(ReportHelper.class);
+    Logger logger = LoggerFactory.getLogger(ReportService.class);
 
     public void generateExcelFile() throws Exception {
-        downloadHelper.downloadFiles(trapTypes);
+        downloadService.downloadFiles(trapTypes);
 
         var workbook = getWorkbook();
 
@@ -79,9 +79,9 @@ public class ReportHelper {
         logger.info("Generated round scores in {} ms", System.currentTimeMillis() - trueStart);
         populateCleanData(workbook.getSheet("Clean Data"), allRoundScores);
 
-        var playerRoundTotals = trapHelper.calculatePlayerRoundTotals(allRoundScores);
-        var playerIndividualTotal = trapHelper.calculatePlayerIndividualTotal(allRoundScores, playerRoundTotals);
-        var playerFinalTotal = trapHelper.calculatePlayerFinalTotal(playerIndividualTotal);
+        var playerRoundTotals = trapService.calculatePlayerRoundTotals(allRoundScores);
+        var playerIndividualTotal = trapService.calculatePlayerIndividualTotal(allRoundScores, playerRoundTotals);
+        var playerFinalTotal = trapService.calculatePlayerFinalTotal(playerIndividualTotal);
         var teamScoresByTotal = getTeamScoresByTotal(playerFinalTotal);
         var teamScoresThatCount = calculateTeamScores(teamScoresByTotal);
 
@@ -185,15 +185,14 @@ public class ReportHelper {
 
     private List<TeamScore> getTeamScores(List<Map.Entry<String, ArrayList<IndividualTotal>>> teamData) {
         var teamScoresThatCount = new HashMap<String, TeamScore>();
-        for (Map.Entry<String, ArrayList<IndividualTotal>> total : teamData) {
-            var team = total.getValue().getFirst().getTeam();
-            teamScoresThatCount.putIfAbsent(team, new TeamScore(team, 0));
-        }
 
         for (Map.Entry<String, ArrayList<IndividualTotal>> entry : teamData) {
+            var team = entry.getValue().getFirst().getTeam();
+            teamScoresThatCount.putIfAbsent(team, new TeamScore(team, 0));
+
             // Get the first individual's team and type
             IndividualTotal firstIndividual = entry.getValue().getFirst();
-            TeamScore teamTotal = teamScoresThatCount.get(firstIndividual.getTeam());
+            var teamName = firstIndividual.getTeam();
 
             // Determine the number of scores to count based on the type
             int scoresToCount = getRoundsToCount(firstIndividual.getType());
@@ -204,12 +203,14 @@ public class ReportHelper {
                     .mapToInt(IndividualTotal::getTotal)
                     .sum();
 
-            // Update the team's total score
-            teamTotal.setTotal(teamTotal.getTotal() + scoreSum);
+            // Update the team's total score by creating a new TeamScore instance
+            TeamScore currentTeamScore = teamScoresThatCount.get(teamName);
+            teamScoresThatCount.put(teamName, new TeamScore(teamName, currentTeamScore.total() + scoreSum));
         }
 
-
-        return teamScoresThatCount.values().stream().sorted(Comparator.comparingInt(TeamScore::getTotal).reversed()).toList();
+        return teamScoresThatCount.values().stream()
+                .sorted(Comparator.comparingInt(TeamScore::total).reversed())
+                .toList();
     }
 
     private void populateTeamData(Sheet sheet, String teamType, CellStyle mainTextStyle, HashMap<String, ArrayList<IndividualTotal>> teamScoresByTotal) {
@@ -228,7 +229,7 @@ public class ReportHelper {
         logger.info("Ran query for singles by {} in {} ms", teamType, System.currentTimeMillis() - start);
         for (var teamScore : teamScores) {
             row = sheet.createRow(++updateRow);
-            ExcelHelper.addTeamData(row, startColumn, teamScore.getName(), teamScore.getTotal(), mainTextStyle);
+            ExcelHelper.addTeamData(row, startColumn, teamScore.name(), teamScore.total(), mainTextStyle);
         }
 
         if (!ROOKIE.equals(teamType)) {
@@ -243,7 +244,7 @@ public class ReportHelper {
                 logger.info("Ran query for {} by {} in {} ms", type, teamType, System.currentTimeMillis() - start);
                 for (var teamScore : teamScores) {
                     row = sheet.getRow(++updateRow);
-                    ExcelHelper.addTeamData(row, startColumn, teamScore.getName(), teamScore.getTotal(), mainTextStyle);
+                    ExcelHelper.addTeamData(row, startColumn, teamScore.name(), teamScore.total(), mainTextStyle);
                 }
                 startColumn += 3;
             }

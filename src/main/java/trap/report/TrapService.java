@@ -12,15 +12,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static trap.report.ReportHelper.CLAYS;
-import static trap.report.ReportHelper.DOUBLES;
-import static trap.report.ReportHelper.DOUBLESKEET;
-import static trap.report.ReportHelper.FIVESTAND;
-import static trap.report.ReportHelper.HANDICAP;
-import static trap.report.ReportHelper.SINGLES;
-import static trap.report.ReportHelper.SKEET;
+import static trap.report.ReportService.CLAYS;
+import static trap.report.ReportService.DOUBLES;
+import static trap.report.ReportService.DOUBLESKEET;
+import static trap.report.ReportService.FIVESTAND;
+import static trap.report.ReportService.HANDICAP;
+import static trap.report.ReportService.SINGLES;
+import static trap.report.ReportService.SKEET;
 
-public class TrapHelper {
+public class TrapService {
     protected static final Map<String, Integer> roundCounts = determineRoundsToCount();
     private static final Map<String, Integer> eventCounts = determineEventsToCount();
 
