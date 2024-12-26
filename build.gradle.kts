@@ -5,7 +5,7 @@ plugins {
 }
 
 group = "com.trap-scoring"
-version = "7.0.0"
+version = "8.0.0"
 
 java {
     toolchain {
@@ -18,13 +18,15 @@ repositories {
     maven { url = uri("https://repo.spring.io/milestone") }
 }
 
+val poiOoxmlVersion = "5.3.0"
+val openCsvVersion = "5.9"
+
 dependencies {
+    implementation("org.apache.poi:poi-ooxml:$poiOoxmlVersion")
+    implementation("com.opencsv:opencsv:$openCsvVersion")
     implementation("org.springframework.boot:spring-boot-starter-test")
+
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
-
-    implementation("org.apache.poi:poi-ooxml:5.3.0")
-
-    implementation("com.opencsv:opencsv:5.9")
 }
 
 tasks.withType<Test> {
