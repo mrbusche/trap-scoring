@@ -1,7 +1,5 @@
 package trap.report;
 
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.Row;
@@ -18,10 +16,13 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class ExcelHelper {
 
     static Logger logger = LoggerFactory.getLogger(ExcelHelper.class);
+
+    private ExcelHelper() {
+        throw new UnsupportedOperationException("This is a utility class and cannot be instantiated");
+    }
 
     public static CellStyle setFontForHeaders(Workbook workbook) {
         var font = workbook.createFont();
