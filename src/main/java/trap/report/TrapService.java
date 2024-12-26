@@ -1,5 +1,6 @@
 package trap.report;
 
+import trap.common.EventTypes;
 import trap.model.IndividualTotal;
 import trap.model.RoundScore;
 import trap.model.RoundTotal;
@@ -12,13 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static trap.report.ReportService.CLAYS;
-import static trap.report.ReportService.DOUBLES;
-import static trap.report.ReportService.DOUBLESKEET;
-import static trap.report.ReportService.FIVESTAND;
-import static trap.report.ReportService.HANDICAP;
-import static trap.report.ReportService.SINGLES;
-import static trap.report.ReportService.SKEET;
+
 
 public class TrapService {
     protected static final Map<String, Integer> roundCounts = determineRoundsToCount();
@@ -26,13 +21,13 @@ public class TrapService {
 
     private static Map<String, Integer> determineEventsToCount() {
         var eventCounts = new HashMap<String, Integer>();
-        eventCounts.put(SINGLES, 4);
-        eventCounts.put(DOUBLES, 4);
-        eventCounts.put(HANDICAP, 4);
-        eventCounts.put(SKEET, 4);
-        eventCounts.put(CLAYS, 3);
-        eventCounts.put(FIVESTAND, 4);
-        eventCounts.put(DOUBLESKEET, 4);
+        eventCounts.put(EventTypes.SINGLES, 4);
+        eventCounts.put(EventTypes.DOUBLES, 4);
+        eventCounts.put(EventTypes.HANDICAP, 4);
+        eventCounts.put(EventTypes.SKEET, 4);
+        eventCounts.put(EventTypes.CLAYS, 3);
+        eventCounts.put(EventTypes.FIVESTAND, 4);
+        eventCounts.put(EventTypes.DOUBLESKEET, 4);
         return eventCounts;
     }
 
@@ -46,14 +41,14 @@ public class TrapService {
 
     private static Map<String, Integer> determineRoundsToCount() {
         var roundCounts = new HashMap<String, Integer>();
-        roundCounts.put(SINGLES, 5);
-        roundCounts.put(DOUBLES, 5);
-        roundCounts.put(HANDICAP, 5);
+        roundCounts.put(EventTypes.SINGLES, 5);
+        roundCounts.put(EventTypes.DOUBLES, 5);
+        roundCounts.put(EventTypes.HANDICAP, 5);
 
-        roundCounts.put(SKEET, 3);
-        roundCounts.put(CLAYS, 3);
-        roundCounts.put(FIVESTAND, 3);
-        roundCounts.put(DOUBLESKEET, 3);
+        roundCounts.put(EventTypes.SKEET, 3);
+        roundCounts.put(EventTypes.CLAYS, 3);
+        roundCounts.put(EventTypes.FIVESTAND, 3);
+        roundCounts.put(EventTypes.DOUBLESKEET, 3);
         return roundCounts;
     }
 
@@ -191,7 +186,7 @@ public class TrapService {
     }
 
     public boolean singleRound(String roundType) {
-        Set<String> validRounds = Set.of(CLAYS, DOUBLES, DOUBLESKEET, FIVESTAND);
+        Set<String> validRounds = Set.of(EventTypes.CLAYS, EventTypes.DOUBLES, EventTypes.DOUBLESKEET, EventTypes.FIVESTAND);
         return validRounds.contains(roundType);
     }
 }
