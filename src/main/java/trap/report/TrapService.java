@@ -173,16 +173,16 @@ public class TrapService {
         playerIndividualTotals.forEach((key, totals) -> {
             if (!totals.isEmpty()) {
                 var firstTotal = totals.getFirst();
-                int totalScore = totals.stream().mapToInt(IndividualTotal::getTotal).sum();
+                int totalScore = totals.stream().mapToInt(IndividualTotal::total).sum();
 
                 playerFinalTotals.put(key, new IndividualTotal(
                         0,
-                        firstTotal.getTeam(),
-                        firstTotal.getAthlete(),
-                        firstTotal.getClassification(),
-                        firstTotal.getGender(),
+                        firstTotal.team(),
+                        firstTotal.athlete(),
+                        firstTotal.classification(),
+                        firstTotal.gender(),
                         totalScore,
-                        firstTotal.getType()
+                        firstTotal.type()
                 ));
             }
         });

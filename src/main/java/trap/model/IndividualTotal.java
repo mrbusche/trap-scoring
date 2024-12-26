@@ -1,30 +1,34 @@
 package trap.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.Setter;
+public record IndividualTotal(
+        int locationId,
+        String team,
+        String athlete,
+        String classification,
+        String gender,
+        int total,
+        String type
+) {
 
-@AllArgsConstructor
-@Data
-public class IndividualTotal {
-    int locationId;
-    @Setter
-    String team;
-    String athlete;
-    String classification;
-    String gender;
-    int total;
-    String type;
-
-    public String getTeamForScores() {
-        return this.type + " " + this.team + " " + this.getTeamClassificationForTotal();
+    public String teamForScores() {
+        return type + " " + team + " " + teamClassificationForTotal();
     }
 
-    public String getTeamClassification() {
-        return this.classification.replace("Senior/Varsity", "Varsity").replace("Senior/Jr. Varsity", "Varsity").replace("Intermediate/Advanced", "Intermediate Advanced").replace("Intermediate/Entry Level", "Intermediate Entry");
+    public String teamClassification() {
+        return switch (classification) {
+            case "Senior/Varsity" -> "Varsity";
+            case "Senior/Jr. Varsity", "Junior Varsity" -> "Junior Varsity";
+            case "Intermediate/Advanced" -> "Intermediate Advanced";
+            case "Intermediate/Entry Level" -> "Intermediate Entry";
+            default -> classification;
+        };
     }
 
-    public String getTeamClassificationForTotal() {
-        return this.getTeamClassification().replace("Senior/Jr. Varsity", "Varsity").replace("Senior/Varsity", "Varsity").replace("Junior Varsity", "Varsity").replace("Intermediate Advanced", "Intermediate Entry");
+    public String teamClassificationForTotal() {
+        return switch (teamClassification()) {
+            case "Senior/Varsity", "Senior/Jr. Varsity", "Varsity", "Junior Varsity" -> "Varsity";
+            case "Intermediate Advanced" -> "Intermediate Entry";
+            default -> teamClassification();
+        };
     }
 }

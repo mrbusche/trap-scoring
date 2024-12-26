@@ -187,20 +187,20 @@ public class ReportService {
         var teamScoresThatCount = new HashMap<String, TeamScore>();
 
         for (Map.Entry<String, ArrayList<IndividualTotal>> entry : teamData) {
-            var team = entry.getValue().getFirst().getTeam();
+            var team = entry.getValue().getFirst().team();
             teamScoresThatCount.putIfAbsent(team, new TeamScore(team, 0));
 
             // Get the first individual's team and type
             IndividualTotal firstIndividual = entry.getValue().getFirst();
-            var teamName = firstIndividual.getTeam();
+            var teamName = firstIndividual.team();
 
             // Determine the number of scores to count based on the type
-            int scoresToCount = getRoundsToCount(firstIndividual.getType());
+            int scoresToCount = getRoundsToCount(firstIndividual.type());
 
             // Sum the top scores up to the limit (scoresToCount)
             int scoreSum = entry.getValue().stream()
                     .limit(scoresToCount)
-                    .mapToInt(IndividualTotal::getTotal)
+                    .mapToInt(IndividualTotal::total)
                     .sum();
 
             // Update the team's total score by creating a new TeamScore instance
@@ -224,7 +224,7 @@ public class ReportService {
         int startColumn = 1;
         long start = System.currentTimeMillis();
 
-        List<Map.Entry<String, ArrayList<IndividualTotal>>> teamData = teamScoresByTotal.entrySet().stream().filter(f -> f.getValue().getFirst().getTeamClassificationForTotal().equals(teamType) && f.getValue().getFirst().getType().equals(SINGLES)).toList();
+        List<Map.Entry<String, ArrayList<IndividualTotal>>> teamData = teamScoresByTotal.entrySet().stream().filter(f -> f.getValue().getFirst().teamClassificationForTotal().equals(teamType) && f.getValue().getFirst().type().equals(SINGLES)).toList();
         List<TeamScore> teamScores = getTeamScores(teamData);
         logger.info("Ran query for singles by {} in {} ms", teamType, System.currentTimeMillis() - start);
         for (var teamScore : teamScores) {
@@ -239,7 +239,7 @@ public class ReportService {
             for (var type : types) {
                 updateRow = rows;
                 start = System.currentTimeMillis();
-                teamData = teamScoresByTotal.entrySet().stream().filter(f -> f.getValue().getFirst().getTeamClassificationForTotal().equals(teamType) && f.getValue().getFirst().getType().equals(type)).toList();
+                teamData = teamScoresByTotal.entrySet().stream().filter(f -> f.getValue().getFirst().teamClassificationForTotal().equals(teamType) && f.getValue().getFirst().type().equals(type)).toList();
                 teamScores = getTeamScores(teamData);
                 logger.info("Ran query for {} by {} in {} ms", type, teamType, System.currentTimeMillis() - start);
                 for (var teamScore : teamScores) {
@@ -300,14 +300,14 @@ public class ReportService {
             start = System.currentTimeMillis();
 
             List<IndividualTotal> justValues = new ArrayList<>(allRoundScores.values());
-            justValues.sort(Comparator.comparingInt(IndividualTotal::getTotal).reversed());
+            justValues.sort(Comparator.comparingInt(IndividualTotal::total).reversed());
 
-            var individualData = justValues.stream().filter(f -> f.getGender().equals(gender) && f.getTeamClassification().equals(classification) && f.getType().equals(SINGLES)).toList();
+            var individualData = justValues.stream().filter(f -> f.gender().equals(gender) && f.teamClassification().equals(classification) && f.type().equals(SINGLES)).toList();
             logger.info("Ran query for singles by {} and {} in {} ms", gender, classification, System.currentTimeMillis() - start);
 
             for (IndividualTotal singlesRowData : individualData) {
                 row = sheet.createRow(++updateRow);
-                ExcelHelper.addPlayerData(row, column, singlesRowData.getAthlete(), singlesRowData.getTotal(), singlesRowData.getTeam(), mainTextStyle);
+                ExcelHelper.addPlayerData(row, column, singlesRowData.athlete(), singlesRowData.total(), singlesRowData.team(), mainTextStyle);
             }
             column += 4;
             maxRow = Math.max(maxRow, updateRow);
@@ -317,11 +317,11 @@ public class ReportService {
                 updateRow = classificationStartRow;
                 updateRow++;
                 start = System.currentTimeMillis();
-                individualData = justValues.stream().filter(f -> f.getGender().equals(gender) && f.getTeamClassification().equals(classification) && f.getType().equals(type)).toList();
+                individualData = justValues.stream().filter(f -> f.gender().equals(gender) && f.teamClassification().equals(classification) && f.type().equals(type)).toList();
                 logger.info("Ran query for {} by {} and {} in {} ms", type, gender, classification, System.currentTimeMillis() - start);
                 for (IndividualTotal data : individualData) {
                     row = sheet.getRow(++updateRow);
-                    ExcelHelper.addPlayerData(row, column, data.getAthlete(), data.getTotal(), data.getTeam(), mainTextStyle);
+                    ExcelHelper.addPlayerData(row, column, data.athlete(), data.total(), data.team(), mainTextStyle);
                 }
                 maxRow = Math.max(maxRow, updateRow);
                 column += 4;
@@ -337,12 +337,12 @@ public class ReportService {
 
         // Group scores by team
         for (var total : justValues) {
-            teamScoresThatCount.putIfAbsent(total.getTeamForScores(), new ArrayList<>());
+            teamScoresThatCount.putIfAbsent(total.teamForScores(), new ArrayList<>());
         }
 
         // Add totals to respective teams
         for (var total : justValues) {
-            var currentTeam = teamScoresThatCount.get(total.getTeamForScores());
+            var currentTeam = teamScoresThatCount.get(total.teamForScores());
             currentTeam.add(total);
         }
 
@@ -351,16 +351,16 @@ public class ReportService {
             var currentTeam = team.getValue();
 
             // Sort the team scores in descending order based on the 'total' field
-            currentTeam.sort((a, b) -> Integer.compare(b.getTotal(), a.getTotal()));
+            currentTeam.sort((a, b) -> Integer.compare(b.total(), a.total()));
 
             // Handle ties at 5th place
-            int scoresToCount = getRoundsToCount(currentTeam.getFirst().getType());
+            int scoresToCount = getRoundsToCount(currentTeam.getFirst().type());
             if (currentTeam.size() > scoresToCount) {
-                int fifthScore = currentTeam.get(scoresToCount - 1).getTotal();
+                int fifthScore = currentTeam.get(scoresToCount - 1).total();
 
                 // Include all individuals tied with the 5th score
                 for (int i = scoresToCount; i < currentTeam.size(); i++) {
-                    if (currentTeam.get(i).getTotal() != fifthScore) {
+                    if (currentTeam.get(i).total() != fifthScore) {
                         currentTeam.subList(i, currentTeam.size()).clear(); // Remove the rest
                         break;
                     }
@@ -374,7 +374,7 @@ public class ReportService {
     private List<IndividualTotal> getTeamScoresByTotal(Map<String, IndividualTotal> allRoundScores) {
         return allRoundScores.values()
                 .stream()
-                .sorted(Comparator.comparingInt(IndividualTotal::getTotal).reversed())
+                .sorted(Comparator.comparingInt(IndividualTotal::total).reversed())
                 .toList();
     }
 
@@ -404,7 +404,7 @@ public class ReportService {
 
         var sortedValues = allRoundScores.values()
                 .stream()
-                .sorted(Comparator.comparing(IndividualTotal::getTeam))
+                .sorted(Comparator.comparing(IndividualTotal::team))
                 .toList();
         logger.info("Ran query for all scores in {} ms", System.currentTimeMillis() - start);
 
@@ -414,7 +414,7 @@ public class ReportService {
             Row row = sheet.createRow(++rows);
             Cell cell = row.createCell(0);
             ExcelHelper.generateTeamRows(rowData, row, cell);
-            row.createCell(5).setCellValue(rowData.getGender());
+            row.createCell(5).setCellValue(rowData.gender());
         }
         sheet.setAutoFilter(CellRangeAddress.valueOf("A1:F1"));
         logger.info("Individual All Scores data populated in {} ms", System.currentTimeMillis() - start);
