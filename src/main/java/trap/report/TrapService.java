@@ -126,19 +126,19 @@ public class TrapService {
         for (List<RoundTotal> playerRoundTotal : playerRoundTotals.values()) {
             if (playerRoundTotal.isEmpty()) continue;
 
-            String playerName = playerRoundTotal.getFirst().getUniqueName();
-            int roundsToCount = getEventsToCount(playerRoundTotal.getFirst().getType());
+            String playerName = playerRoundTotal.getFirst().uniqueName();
+            int roundsToCount = getEventsToCount(playerRoundTotal.getFirst().type());
             List<IndividualTotal> indTotal = new ArrayList<>();
 
             // Sort in descending order based on total score
-            playerRoundTotal.sort(Comparator.comparingInt(RoundTotal::getTotal).reversed());
+            playerRoundTotal.sort(Comparator.comparingInt(RoundTotal::total).reversed());
 
             Set<Integer> locationIds = new HashSet<>();
             for (RoundTotal t : playerRoundTotal) {
                 if (indTotal.size() < roundsToCount - 1) {
                     // Add round directly until we reach the number of rounds to count
                     indTotal.add(toIndividualTotal(t));
-                    locationIds.add(t.getLocationId());
+                    locationIds.add(t.locationId());
                 } else if (shouldAddRound(t, locationIds)) {
                     // Handle special case when location constraints are applied
                     indTotal.add(toIndividualTotal(t));
@@ -153,12 +153,12 @@ public class TrapService {
     }
 
     private IndividualTotal toIndividualTotal(RoundTotal t) {
-        return new IndividualTotal(t.getLocationId(), t.getTeam(), t.getAthlete(), t.getClassification(), t.getGender(), t.getTotal(), t.getType());
+        return new IndividualTotal(t.locationId(), t.team(), t.athlete(), t.classification(), t.gender(), t.total(), t.type());
     }
 
     // Method to determine if a round should be added based on location constraints
     private boolean shouldAddRound(RoundTotal t, Set<Integer> locationIds) {
-        int locationId = t.getLocationId();
+        int locationId = t.locationId();
         // Check if the location doesn't already exist
         if (!locationIds.contains(locationId)) {
             locationIds.add(locationId);
