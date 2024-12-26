@@ -53,7 +53,7 @@ public class ReportService {
     TrapService trapService = new TrapService();
     DownloadService downloadService = new DownloadService();
 
-    Logger logger = LoggerFactory.getLogger(ReportService.class);
+    private static final Logger logger = LoggerFactory.getLogger(ReportService.class);
 
     public void generateExcelFile() throws Exception {
         downloadService.downloadFiles(trapTypes);
@@ -412,8 +412,7 @@ public class ReportService {
 
         for (var rowData : sortedValues) {
             Row row = sheet.createRow(++rows);
-            Cell cell = row.createCell(0);
-            ExcelHelper.generateTeamRows(rowData, row, cell);
+            ExcelHelper.generateTeamRows(rowData, row);
             row.createCell(5).setCellValue(rowData.gender());
         }
         sheet.setAutoFilter(CellRangeAddress.valueOf("A1:F1"));

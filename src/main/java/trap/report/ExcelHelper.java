@@ -12,13 +12,16 @@ import trap.model.RoundScore;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
 import java.util.Date;
 
 public final class ExcelHelper {
 
-    static Logger logger = LoggerFactory.getLogger(ExcelHelper.class);
+    private static final Logger logger = LoggerFactory.getLogger(ExcelHelper.class);
+    private static final DateTimeFormatter FILE_NAME_DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
+    private static final String DEFAULT_FONT_NAME = "Calibri";
 
     private ExcelHelper() {
         throw new UnsupportedOperationException("This is a utility class and cannot be instantiated");
@@ -26,10 +29,11 @@ public final class ExcelHelper {
 
     public static CellStyle setFontForHeaders(Workbook workbook) {
         var font = workbook.createFont();
-        font.setFontName("Calibri");
+        font.setFontName(DEFAULT_FONT_NAME);
         font.setItalic(true);
         font.setBold(true);
         font.setFontHeightInPoints((short) 14);
+
         var style = workbook.createCellStyle();
         style.setFont(font);
         return style;
@@ -37,8 +41,9 @@ public final class ExcelHelper {
 
     public static CellStyle getCellStyle(Workbook workbook) {
         var mainText = workbook.createFont();
-        mainText.setFontName("Calibri");
+        mainText.setFontName(DEFAULT_FONT_NAME);
         mainText.setFontHeightInPoints((short) 12);
+
         var mainTextStyle = workbook.createCellStyle();
         mainTextStyle.setFont(mainText);
         return mainTextStyle;
@@ -75,9 +80,8 @@ public final class ExcelHelper {
     }
 
     private static String generateFilename() {
-        var formatter = new SimpleDateFormat("yyyyMMddHHmmss");
-        var currentDate = formatter.format(new Date());
-        return "league-data-" + currentDate + ".xlsx";
+        var currentDate = LocalDateTime.now();
+        return "league-data-" + currentDate.format(FILE_NAME_DATE_FORMATTER) + ".xlsx";
     }
 
     public static void addCleanData(Row row, RoundScore rowData) {
@@ -130,21 +134,16 @@ public final class ExcelHelper {
     }
 
     public static int getRows(Sheet sheet, int rows, IndividualTotal rowData) {
-        var row = sheet.createRow(++rows);
-        var cell = row.createCell(0);
-        generateTeamRows(rowData, row, cell);
+        var row = sheet.createRow(++rows); // Pre-increment to update 'rows' before creating the row
+        generateTeamRows(rowData, row);
         return rows;
     }
 
-    public static void generateTeamRows(IndividualTotal rowData, Row row, Cell cell) {
-        cell.setCellValue(rowData.type());
-        cell = row.createCell(1);
-        cell.setCellValue(rowData.team());
-        cell = row.createCell(2);
-        cell.setCellValue(rowData.classification());
-        cell = row.createCell(3);
-        cell.setCellValue(rowData.athlete());
-        cell = row.createCell(4);
-        cell.setCellValue(rowData.total());
+    public static void generateTeamRows(IndividualTotal rowData, Row row) {
+        row.createCell(0).setCellValue(rowData.type());
+        row.createCell(1).setCellValue(rowData.team());
+        row.createCell(2).setCellValue(rowData.classification());
+        row.createCell(3).setCellValue(rowData.athlete());
+        row.createCell(4).setCellValue(rowData.total());
     }
 }

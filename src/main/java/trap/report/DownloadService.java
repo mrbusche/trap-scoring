@@ -14,7 +14,7 @@ import java.util.Map;
 import static org.apache.commons.io.FileUtils.copyURLToFile;
 
 public class DownloadService {
-    Logger logger = LoggerFactory.getLogger(DownloadService.class);
+    private static final Logger logger = LoggerFactory.getLogger(DownloadService.class);
 
     private static final Map<String, String> FILE_URLS = Map.of(
             "singles", "https://metabase.sssfonline.com/public/question/8648faf9-42e8-4a9c-b55d-2f251349de7f.csv",
