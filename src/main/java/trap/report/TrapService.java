@@ -77,20 +77,20 @@ public class TrapService {
         Map<String, List<RoundTotal>> playerRoundTotals = new HashMap<>();
 
         // Initialize map with empty lists for each unique player
-        roundScores.forEach(r -> playerRoundTotals.put(r.getUniqueName(), new ArrayList<>()));
+        roundScores.forEach(r -> playerRoundTotals.put(r.uniqueName(), new ArrayList<>()));
 
         // Process each round score
         for (RoundScore r : roundScores) {
-            List<RoundTotal> currentPlayerRoundTotal = playerRoundTotals.get(r.getUniqueName());
+            List<RoundTotal> currentPlayerRoundTotal = playerRoundTotals.get(r.uniqueName());
 
             // If it's a single round, process round 1 and optionally round 2
-            if (singleRound(r.getType())) {
-                addRound(currentPlayerRoundTotal, r, r.getRound1());
-                if (r.getRound2() > 0) {
-                    addRound(currentPlayerRoundTotal, r, r.getRound2());
+            if (singleRound(r.type())) {
+                addRound(currentPlayerRoundTotal, r, r.round1());
+                if (r.round2() > 0) {
+                    addRound(currentPlayerRoundTotal, r, r.round2());
                 }
             } else {
-                addRound(currentPlayerRoundTotal, r, r.getRound1() + r.getRound2());
+                addRound(currentPlayerRoundTotal, r, r.round1() + r.round2());
                 addMultipleRounds(currentPlayerRoundTotal, r);
             }
         }
@@ -100,13 +100,13 @@ public class TrapService {
 
     // Helper method to add individual rounds
     private void addRound(List<RoundTotal> totals, RoundScore r, int total) {
-        totals.add(new RoundTotal(r.getEventId(), r.getLocationId(), r.getTeam(), r.getAthlete(),
-                r.getClassification(), r.getGender(), total, r.getType()));
+        totals.add(new RoundTotal(r.eventId(), r.locationId(), r.team(), r.athlete(),
+                r.classification(), r.gender(), total, r.type()));
     }
 
     // Helper method to add rounds 3 to 8 if applicable
     private void addMultipleRounds(List<RoundTotal> totals, RoundScore r) {
-        int[] additionalRounds = {r.getRound3() + r.getRound4(), r.getRound5() + r.getRound6(), r.getRound7() + r.getRound8()};
+        int[] additionalRounds = {r.round3() + r.round4(), r.round5() + r.round6(), r.round7() + r.round8()};
 
         for (int round : additionalRounds) {
             if (round > 0) {
@@ -121,7 +121,7 @@ public class TrapService {
         Map<String, List<IndividualTotal>> playerIndividualTotal = new HashMap<>();
 
         // Initialize scores with empty lists
-        roundScores.forEach(r -> playerIndividualTotal.put(r.getUniqueName(), new ArrayList<>()));
+        roundScores.forEach(r -> playerIndividualTotal.put(r.uniqueName(), new ArrayList<>()));
 
         for (List<RoundTotal> playerRoundTotal : playerRoundTotals.values()) {
             if (playerRoundTotal.isEmpty()) continue;
