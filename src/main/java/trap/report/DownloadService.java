@@ -14,8 +14,8 @@ import java.util.Map;
 
 import static org.apache.commons.io.FileUtils.copyURLToFile;
 
-public class DownloadHelper {
-    Logger logger = LoggerFactory.getLogger(DownloadHelper.class);
+public class DownloadService {
+    Logger logger = LoggerFactory.getLogger(DownloadService.class);
 
     private static Map<String, String> getFileUrls() {
         var fileUrls = new HashMap<String, String>();

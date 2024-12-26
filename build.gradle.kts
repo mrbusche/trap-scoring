@@ -7,8 +7,11 @@ plugins {
 group = "com.trap-scoring"
 version = "7.0.0"
 
-java.sourceCompatibility = JavaVersion.VERSION_23
-java.targetCompatibility = JavaVersion.VERSION_23
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(23)
+    }
+}
 
 repositories {
     mavenCentral()
@@ -29,8 +32,4 @@ dependencies {
 
 tasks.withType<Test> {
     useJUnitPlatform()
-}
-
-tasks.getByName<Jar>("jar") {
-    enabled = false
 }

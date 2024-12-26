@@ -9,10 +9,10 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 public class CommandLineAppStartupRunner implements CommandLineRunner {
-    private final ReportHelper reportHelper;
+    private final ReportService reportService;
 
     @Override
     public void run(String... args) throws Exception {
-        reportHelper.generateExcelFile();
+        reportService.generateExcelFile();
     }
 }

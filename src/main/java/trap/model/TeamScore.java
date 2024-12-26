@@ -1,11 +1,3 @@
 package trap.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-
-@Data
-@AllArgsConstructor
-public class TeamScore {
-    String name;
-    int total;
-}
+public record TeamScore(String name, int total) {}
