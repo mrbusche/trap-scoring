@@ -1,5 +1,7 @@
 package trap.model;
 
+import trap.common.Classifications;
+
 public record IndividualTotal(
         int locationId,
         String team,
@@ -16,8 +18,8 @@ public record IndividualTotal(
 
     public String teamClassification() {
         return switch (classification) {
-            case "Senior/Varsity" -> "Varsity";
-            case "Senior/Jr. Varsity", "Junior Varsity" -> "Junior Varsity";
+            case "Senior/Varsity" -> Classifications.VARSITY;
+            case "Senior/Jr. Varsity", Classifications.JUNIOR_VARSITY -> Classifications.JUNIOR_VARSITY;
             case "Intermediate/Advanced" -> "Intermediate Advanced";
             case "Intermediate/Entry Level" -> "Intermediate Entry";
             default -> classification;
@@ -26,7 +28,7 @@ public record IndividualTotal(
 
     public String teamClassificationForTotal() {
         return switch (teamClassification()) {
-            case "Senior/Varsity", "Senior/Jr. Varsity", "Varsity", "Junior Varsity" -> "Varsity";
+            case "Senior/Varsity", "Senior/Jr. Varsity", Classifications.VARSITY, Classifications.JUNIOR_VARSITY -> Classifications.VARSITY;
             case "Intermediate Advanced" -> "Intermediate Entry";
             default -> teamClassification();
         };
