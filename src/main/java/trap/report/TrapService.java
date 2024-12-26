@@ -14,7 +14,6 @@ import java.util.Map;
 import java.util.Set;
 
 
-
 public class TrapService {
     protected static final Map<String, Integer> roundCounts = determineRoundsToCount();
     private static final Map<String, Integer> eventCounts = determineEventsToCount();

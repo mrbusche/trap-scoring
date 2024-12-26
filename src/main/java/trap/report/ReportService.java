@@ -37,13 +37,11 @@ import static trap.report.TrapService.trimString;
 
 @Service
 public class ReportService {
+    private static final Logger logger = LoggerFactory.getLogger(ReportService.class);
     private final String currentDate = new SimpleDateFormat("MM/dd/yyyy").format(Calendar.getInstance().getTime());
     private final String[] trapTypes = new String[]{EventTypes.SINGLES, EventTypes.DOUBLES, EventTypes.HANDICAP, EventTypes.SKEET, EventTypes.CLAYS, EventTypes.FIVESTAND, EventTypes.DOUBLESKEET};
-
     TrapService trapService = new TrapService();
     DownloadService downloadService = new DownloadService();
-
-    private static final Logger logger = LoggerFactory.getLogger(ReportService.class);
 
     public void generateExcelFile() throws Exception {
         downloadService.downloadFiles(trapTypes);
