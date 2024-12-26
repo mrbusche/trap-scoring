@@ -171,7 +171,7 @@ public class ReportService {
 
         for (var type : trapTypes) {
             var typeStart = System.currentTimeMillis();
-            var typeRoundScores = allRoundScores.stream().filter(t -> t.getType().equals(type)).toList();
+            var typeRoundScores = allRoundScores.stream().filter(t -> t.type().equals(type)).toList();
             for (var score : typeRoundScores) {
                 var row = sheet.createRow(++rows);
                 ExcelHelper.addCleanData(row, score);

@@ -80,25 +80,25 @@ public final class ExcelHelper {
     }
 
     public static void addCleanData(Row row, RoundScore rowData) {
-        row.createCell(0).setCellValue(rowData.getEventId());
-        row.createCell(1).setCellValue(rowData.getEvent());
-        row.createCell(2).setCellValue(rowData.getLocationId());
-        row.createCell(3).setCellValue(rowData.getLocation());
-        row.createCell(4).setCellValue(rowData.getEventDate());
-        row.createCell(5).setCellValue(rowData.getSquadName());
-        row.createCell(6).setCellValue(rowData.getTeam());
-        row.createCell(7).setCellValue(rowData.getAthlete());
-        row.createCell(8).setCellValue(rowData.getClassification());
-        row.createCell(9).setCellValue(rowData.getGender());
-        row.createCell(10).setCellValue(rowData.getRound1());
-        row.createCell(11).setCellValue(rowData.getRound2());
-        row.createCell(12).setCellValue(rowData.getRound3());
-        row.createCell(13).setCellValue(rowData.getRound4());
-        row.createCell(14).setCellValue(rowData.getRound5());
-        row.createCell(15).setCellValue(rowData.getRound6());
-        row.createCell(16).setCellValue(rowData.getRound7());
-        row.createCell(17).setCellValue(rowData.getRound8());
-        row.createCell(18).setCellValue(rowData.getType());
+        row.createCell(0).setCellValue(rowData.eventId());
+        row.createCell(1).setCellValue(rowData.event());
+        row.createCell(2).setCellValue(rowData.locationId());
+        row.createCell(3).setCellValue(rowData.location());
+        row.createCell(4).setCellValue(rowData.eventDate());
+        row.createCell(5).setCellValue(rowData.squadName());
+        row.createCell(6).setCellValue(rowData.team());
+        row.createCell(7).setCellValue(rowData.athlete());
+        row.createCell(8).setCellValue(rowData.classification());
+        row.createCell(9).setCellValue(rowData.gender());
+        row.createCell(10).setCellValue(rowData.round1());
+        row.createCell(11).setCellValue(rowData.round2());
+        row.createCell(12).setCellValue(rowData.round3());
+        row.createCell(13).setCellValue(rowData.round4());
+        row.createCell(14).setCellValue(rowData.round5());
+        row.createCell(15).setCellValue(rowData.round6());
+        row.createCell(16).setCellValue(rowData.round7());
+        row.createCell(17).setCellValue(rowData.round8());
+        row.createCell(18).setCellValue(rowData.type());
     }
 
     public static void addTeamData(Row row, int startColumn, String team, int total, CellStyle mainTextStyle) {
