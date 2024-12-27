@@ -1,4 +1,4 @@
-package trap.common; // Or an appropriate package for your project
+package trap.common;
 
 public final class EventTypes {
 
