@@ -128,8 +128,7 @@ public final class ExcelHelper {
             throw new IllegalArgumentException("Row cannot be null");
         }
 
-        createAndStyleCell(row, column, athlete, mainTextStyle);
-        createAndStyleCell(row, column + 1, total, mainTextStyle);
+        addTeamData(row, column, athlete, total, mainTextStyle);
         createAndStyleCell(row, column + 2, team, mainTextStyle);
     }
 
