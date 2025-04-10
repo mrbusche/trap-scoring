@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        java-version: [ 23 ]
+        java-version: [ 24 ]
         os: [ ubuntu-latest, macos-latest, windows-latest ]
 
     steps:
@@ -43,7 +43,7 @@ jobs:
           cd build/libs/
           test -f league-data-*.xlsx || exit 1
 
-      - name: Test file was generate properly
+      - name: Test file was generated properly
         run: |
           cd build/libs/
           file1size=$(stat -c %s league-data-*.xlsx)
