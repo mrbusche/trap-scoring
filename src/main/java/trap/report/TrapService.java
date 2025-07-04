@@ -15,23 +15,23 @@ import java.util.Set;
 
 
 public class TrapService {
-    protected static final Map<String, Integer> roundCounts = determineRoundsToCount();
-    private static final Map<String, Integer> eventCounts = determineEventsToCount();
+    protected static final Map<String, Integer> ROUND_COUNTS = determineRoundsToCount();
+    private static final Map<String, Integer> EVENT_COUNTS = determineEventsToCount();
 
     private static Map<String, Integer> determineEventsToCount() {
-        var eventCounts = new HashMap<String, Integer>();
-        eventCounts.put(EventTypes.SINGLES, 4);
-        eventCounts.put(EventTypes.DOUBLES, 4);
-        eventCounts.put(EventTypes.HANDICAP, 4);
-        eventCounts.put(EventTypes.SKEET, 4);
-        eventCounts.put(EventTypes.CLAYS, 3);
-        eventCounts.put(EventTypes.FIVESTAND, 4);
-        eventCounts.put(EventTypes.DOUBLESKEET, 4);
-        return eventCounts;
+        var EVENT_COUNTS = new HashMap<String, Integer>();
+        EVENT_COUNTS.put(EventTypes.SINGLES, 4);
+        EVENT_COUNTS.put(EventTypes.DOUBLES, 4);
+        EVENT_COUNTS.put(EventTypes.HANDICAP, 4);
+        EVENT_COUNTS.put(EventTypes.SKEET, 4);
+        EVENT_COUNTS.put(EventTypes.CLAYS, 3);
+        EVENT_COUNTS.put(EventTypes.FIVESTAND, 4);
+        EVENT_COUNTS.put(EventTypes.DOUBLESKEET, 4);
+        return EVENT_COUNTS;
     }
 
     public static int getEventsToCount(String type) {
-        return eventCounts.getOrDefault(type, 0); // Default to 0 if type not found
+        return EVENT_COUNTS.getOrDefault(type, 0); // Default to 0 if type not found
     }
 
     public static String trimString(String s) {
@@ -39,20 +39,20 @@ public class TrapService {
     }
 
     private static Map<String, Integer> determineRoundsToCount() {
-        var roundCounts = new HashMap<String, Integer>();
-        roundCounts.put(EventTypes.SINGLES, 5);
-        roundCounts.put(EventTypes.DOUBLES, 5);
-        roundCounts.put(EventTypes.HANDICAP, 5);
+        var ROUND_CONTS = new HashMap<String, Integer>();
+        ROUND_CONTS.put(EventTypes.SINGLES, 5);
+        ROUND_CONTS.put(EventTypes.DOUBLES, 5);
+        ROUND_CONTS.put(EventTypes.HANDICAP, 5);
 
-        roundCounts.put(EventTypes.SKEET, 3);
-        roundCounts.put(EventTypes.CLAYS, 3);
-        roundCounts.put(EventTypes.FIVESTAND, 3);
-        roundCounts.put(EventTypes.DOUBLESKEET, 3);
-        return roundCounts;
+        ROUND_CONTS.put(EventTypes.SKEET, 3);
+        ROUND_CONTS.put(EventTypes.CLAYS, 3);
+        ROUND_CONTS.put(EventTypes.FIVESTAND, 3);
+        ROUND_CONTS.put(EventTypes.DOUBLESKEET, 3);
+        return ROUND_CONTS;
     }
 
     public static int getRoundsToCount(String type) {
-        return roundCounts.getOrDefault(type, 0); // Default to 0 if type not found
+        return ROUND_COUNTS.getOrDefault(type, 0); // Default to 0 if type not found
     }
 
     public static int parseInteger(String number) {

@@ -10,11 +10,14 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Map;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import static org.apache.commons.io.FileUtils.copyURLToFile;
 
 public class DownloadService {
-    private static final Logger logger = LoggerFactory.getLogger(DownloadService.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(DownloadService.class);
 
     private static final Map<String, String> FILE_URLS = Map.of(
             "singles", "https://metabase.sssfonline.com/public/question/8648faf9-42e8-4a9c-b55d-2f251349de7f.csv",
@@ -28,20 +31,33 @@ public class DownloadService {
 
     public void downloadFiles(String[] trapTypes) throws IOException {
         var start = System.currentTimeMillis();
-        logger.info("Started downloading files");
+        LOGGER.info("Started downloading files");
 
+        ExecutorService executor = Executors.newFixedThreadPool(trapTypes.length);
         var charset = StandardCharsets.UTF_8;
         for (var type : trapTypes) {
-            logger.info("Downloading {} file", type);
-            copyURLToFile(URI.create(FILE_URLS.get(type)).toURL(), new File(type + ".csv"), 120000, 120000);
-            logger.info("Finished downloading {} file", type);
+            executor.submit(() -> {
+                try {
+                    LOGGER.info("Downloading {} file", type);
+                    copyURLToFile(URI.create(FILE_URLS.get(type)).toURL(), new File(type + ".csv"), 120000, 120000);
+                    LOGGER.info("Finished downloading {} file", type);
 
-            logger.info("Replacing double spaces for {} file", type);
-            var path = Path.of(type + ".csv");
-            var content = Files.readString(path, charset).replaceAll(" {2}", " ");
-            Files.writeString(path, content, charset);
-            logger.info("Finished replacing double spaces for {} file", type);
+                    LOGGER.info("Replacing double spaces for {} file", type);
+                    var path = Path.of(type + ".csv");
+                    var content = Files.readString(path, charset).replaceAll(" {2}", " ");
+                    Files.writeString(path, content, charset);
+                    LOGGER.info("Finished replacing double spaces for {} file", type);
+                } catch (IOException e) {
+                    LOGGER.error("Error processing {} file", type, e);
+                }
+            });
         }
-        logger.info("Files downloaded in {} ms", System.currentTimeMillis() - start);
+        executor.shutdown();
+        try {
+            executor.awaitTermination(1, TimeUnit.HOURS);
+        } catch (InterruptedException e) {
+            LOGGER.error("File download interrupted", e);
+        }
+        LOGGER.info("Files downloaded in {} ms", System.currentTimeMillis() - start);
     }
 }
