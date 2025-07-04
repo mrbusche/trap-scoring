@@ -29,6 +29,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static trap.report.TrapService.getRoundsToCount;
 import static trap.report.TrapService.parseInteger;
@@ -37,7 +38,7 @@ import static trap.report.TrapService.trimString;
 
 @Service
 public class ReportService {
-    private static final Logger logger = LoggerFactory.getLogger(ReportService.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ReportService.class);
     private final String currentDate = new SimpleDateFormat("MM/dd/yyyy").format(Calendar.getInstance().getTime());
     private final String[] trapTypes = new String[]{EventTypes.SINGLES, EventTypes.DOUBLES, EventTypes.HANDICAP, EventTypes.SKEET, EventTypes.CLAYS, EventTypes.FIVESTAND, EventTypes.DOUBLESKEET};
     TrapService trapService = new TrapService();
@@ -48,9 +49,9 @@ public class ReportService {
 
         var workbook = getWorkbook();
 
-        logger.info("Starting file creation");
-        logger.info("Workbook has {} sheets", workbook.getNumberOfSheets());
-        workbook.forEach(sheet -> logger.info("- {}", sheet.getSheetName()));
+        LOGGER.info("Starting file creation");
+        LOGGER.info("Workbook has {} sheets", workbook.getNumberOfSheets());
+        workbook.forEach(sheet -> LOGGER.info("- {}", sheet.getSheetName()));
 
         long start;
         var trueStart = System.currentTimeMillis();
@@ -64,7 +65,7 @@ public class ReportService {
         var style = ExcelHelper.setFontForHeaders(workbook);
 
         var allRoundScores = generateRoundScores();
-        logger.info("Generated round scores in {} ms", System.currentTimeMillis() - trueStart);
+        LOGGER.info("Generated round scores in {} ms", System.currentTimeMillis() - trueStart);
         populateCleanData(workbook.getSheet("Clean Data"), allRoundScores);
 
         var playerRoundTotals = trapService.calculatePlayerRoundTotals(allRoundScores);
@@ -76,7 +77,7 @@ public class ReportService {
         for (Map.Entry<String, String> entry : types.entrySet()) {
             start = System.currentTimeMillis();
             populateTeamData(workbook.getSheet(entry.getKey()), entry.getValue(), mainTextStyle, teamScoresThatCount);
-            logger.info("{} data populated in {} ms", entry.getKey(), System.currentTimeMillis() - start);
+            LOGGER.info("{} data populated in {} ms", entry.getKey(), System.currentTimeMillis() - start);
         }
 
         populateIndividualData(workbook, "Individual-Men", "M", style, mainTextStyle, playerFinalTotal);
@@ -87,7 +88,7 @@ public class ReportService {
 
         ExcelHelper.createFile(workbook);
 
-        logger.info("Finished creating file in {} ms", System.currentTimeMillis() - trueStart);
+        LOGGER.info("Finished creating file in {} ms", System.currentTimeMillis() - trueStart);
         workbook.close();
     }
 
@@ -153,22 +154,25 @@ public class ReportService {
     private void populateCleanData(Sheet sheet, List<RoundScore> allRoundScores) {
         var start = System.currentTimeMillis();
 
-        logger.info("Ran get all data for clean data population in {} ms", System.currentTimeMillis() - start);
+        LOGGER.info("Ran get all data for clean data population in {} ms", System.currentTimeMillis() - start);
 
-        var rows = sheet.getLastRowNum();
+        var rows = new AtomicInteger(sheet.getLastRowNum());
 
-        for (var type : trapTypes) {
+        // Use parallel stream for better performance
+        Arrays.stream(trapTypes).parallel().forEach(type -> {
             var typeStart = System.currentTimeMillis();
             var typeRoundScores = allRoundScores.stream().filter(t -> t.type().equals(type)).toList();
             for (var score : typeRoundScores) {
-                var row = sheet.createRow(++rows);
-                ExcelHelper.addCleanData(row, score);
+                synchronized (sheet) {
+                    var row = sheet.createRow(rows.incrementAndGet());
+                    ExcelHelper.addCleanData(row, score);
+                }
             }
-            logger.info("Clean data for {} {} scores populated in {} ms", typeRoundScores.size(), type, System.currentTimeMillis() - typeStart);
-        }
+            LOGGER.info("Clean data for {} {} scores populated in {} ms", typeRoundScores.size(), type, System.currentTimeMillis() - typeStart);
+        });
 
         sheet.setAutoFilter(CellRangeAddress.valueOf("A1:S1"));
-        logger.info("Clean data populated in {} ms", System.currentTimeMillis() - start);
+        LOGGER.info("Clean data populated in {} ms", System.currentTimeMillis() - start);
     }
 
     private List<TeamScore> getTeamScores(List<Map.Entry<String, ArrayList<IndividualTotal>>> teamData) {
@@ -213,7 +217,7 @@ public class ReportService {
 
         List<Map.Entry<String, ArrayList<IndividualTotal>>> teamData = teamScoresByTotal.entrySet().stream().filter(f -> f.getValue().getFirst().teamClassificationForTotal().equals(teamType) && f.getValue().getFirst().type().equals(EventTypes.SINGLES)).toList();
         List<TeamScore> teamScores = getTeamScores(teamData);
-        logger.info("Ran query for singles by {} in {} ms", teamType, System.currentTimeMillis() - start);
+        LOGGER.info("Ran query for singles by {} in {} ms", teamType, System.currentTimeMillis() - start);
         for (var teamScore : teamScores) {
             row = sheet.createRow(++updateRow);
             ExcelHelper.addTeamData(row, startColumn, teamScore.name(), teamScore.total(), mainTextStyle);
@@ -228,7 +232,7 @@ public class ReportService {
                 start = System.currentTimeMillis();
                 teamData = teamScoresByTotal.entrySet().stream().filter(f -> f.getValue().getFirst().teamClassificationForTotal().equals(teamType) && f.getValue().getFirst().type().equals(type)).toList();
                 teamScores = getTeamScores(teamData);
-                logger.info("Ran query for {} by {} in {} ms", type, teamType, System.currentTimeMillis() - start);
+                LOGGER.info("Ran query for {} by {} in {} ms", type, teamType, System.currentTimeMillis() - start);
                 for (var teamScore : teamScores) {
                     row = sheet.getRow(++updateRow);
                     ExcelHelper.addTeamData(row, startColumn, teamScore.name(), teamScore.total(), mainTextStyle);
@@ -290,7 +294,7 @@ public class ReportService {
             justValues.sort(Comparator.comparingInt(IndividualTotal::total).reversed());
 
             var individualData = justValues.stream().filter(f -> f.gender().equals(gender) && f.teamClassification().equals(classification) && f.type().equals(EventTypes.SINGLES)).toList();
-            logger.info("Ran query for singles by {} and {} in {} ms", gender, classification, System.currentTimeMillis() - start);
+            LOGGER.info("Ran query for singles by {} and {} in {} ms", gender, classification, System.currentTimeMillis() - start);
 
             for (IndividualTotal singlesRowData : individualData) {
                 row = sheet.createRow(++updateRow);
@@ -305,7 +309,7 @@ public class ReportService {
                 updateRow++;
                 start = System.currentTimeMillis();
                 individualData = justValues.stream().filter(f -> f.gender().equals(gender) && f.teamClassification().equals(classification) && f.type().equals(type)).toList();
-                logger.info("Ran query for {} by {} and {} in {} ms", type, gender, classification, System.currentTimeMillis() - start);
+                LOGGER.info("Ran query for {} by {} and {} in {} ms", type, gender, classification, System.currentTimeMillis() - start);
                 for (IndividualTotal data : individualData) {
                     row = sheet.getRow(++updateRow);
                     ExcelHelper.addPlayerData(row, column, data.athlete(), data.total(), data.team(), mainTextStyle);
@@ -316,7 +320,7 @@ public class ReportService {
 
             sheet.setAutoFilter(CellRangeAddress.valueOf("A13:AB13"));
         }
-        logger.info("{} data populated in {} ms", sheetName, System.currentTimeMillis() - initialStart);
+        LOGGER.info("{} data populated in {} ms", sheetName, System.currentTimeMillis() - initialStart);
     }
 
     private HashMap<String, ArrayList<IndividualTotal>> calculateTeamScores(List<IndividualTotal> justValues) {
@@ -370,7 +374,7 @@ public class ReportService {
         var sheet = workbook.getSheet(sheetName);
         var startTime = System.currentTimeMillis();
 
-        logger.info("Ran query for team scores in {} ms", System.currentTimeMillis() - startTime);
+        LOGGER.info("Ran query for team scores in {} ms", System.currentTimeMillis() - startTime);
 
         var rows = sheet.getLastRowNum();
         var teamScoresThatCount = calculateTeamScores(teamScoresByTotal);
@@ -382,7 +386,7 @@ public class ReportService {
 
         sheet.setAutoFilter(CellRangeAddress.valueOf("A1:E1"));
 
-        logger.info("Team Individual Scores data populated in {} ms", System.currentTimeMillis() - startTime);
+        LOGGER.info("Team Individual Scores data populated in {} ms", System.currentTimeMillis() - startTime);
     }
 
     private void populateAllIndividualData(Workbook workbook, String sheetName, Map<String, IndividualTotal> allRoundScores) {
@@ -393,7 +397,7 @@ public class ReportService {
                 .stream()
                 .sorted(Comparator.comparing(IndividualTotal::team))
                 .toList();
-        logger.info("Ran query for all scores in {} ms", System.currentTimeMillis() - start);
+        LOGGER.info("Ran query for all scores in {} ms", System.currentTimeMillis() - start);
 
         var rows = sheet.getLastRowNum();
 
@@ -403,6 +407,6 @@ public class ReportService {
             row.createCell(5).setCellValue(rowData.gender());
         }
         sheet.setAutoFilter(CellRangeAddress.valueOf("A1:F1"));
-        logger.info("Individual All Scores data populated in {} ms", System.currentTimeMillis() - start);
+        LOGGER.info("Individual All Scores data populated in {} ms", System.currentTimeMillis() - start);
     }
 }

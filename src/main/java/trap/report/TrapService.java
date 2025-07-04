@@ -15,8 +15,8 @@ import java.util.Set;
 
 
 public class TrapService {
-    protected static final Map<String, Integer> roundCounts = determineRoundsToCount();
-    private static final Map<String, Integer> eventCounts = determineEventsToCount();
+    protected static final Map<String, Integer> ROUND_COUNTS = determineRoundsToCount();
+    private static final Map<String, Integer> EVENT_COUNTS = determineEventsToCount();
 
     private static Map<String, Integer> determineEventsToCount() {
         var eventCounts = new HashMap<String, Integer>();
@@ -31,7 +31,7 @@ public class TrapService {
     }
 
     public static int getEventsToCount(String type) {
-        return eventCounts.getOrDefault(type, 0); // Default to 0 if type not found
+        return EVENT_COUNTS.getOrDefault(type, 0); // Default to 0 if type not found
     }
 
     public static String trimString(String s) {
@@ -52,7 +52,7 @@ public class TrapService {
     }
 
     public static int getRoundsToCount(String type) {
-        return roundCounts.getOrDefault(type, 0); // Default to 0 if type not found
+        return ROUND_COUNTS.getOrDefault(type, 0); // Default to 0 if type not found
     }
 
     public static int parseInteger(String number) {

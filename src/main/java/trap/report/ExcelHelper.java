@@ -19,7 +19,7 @@ import java.util.Date;
 
 public final class ExcelHelper {
 
-    private static final Logger logger = LoggerFactory.getLogger(ExcelHelper.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ExcelHelper.class);
     private static final DateTimeFormatter FILE_NAME_DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
     private static final String DEFAULT_FONT_NAME = "Calibri";
 
@@ -66,17 +66,17 @@ public final class ExcelHelper {
         long start = System.currentTimeMillis();
         String filename = generateFilename();
 
-        logger.info("Creating file: {}", filename);
+        LOGGER.info("Creating file: {}", filename);
         try (FileOutputStream fileOutputStream = new FileOutputStream(filename)) {
-            logger.info("Writing file...");
+            LOGGER.info("Writing file...");
             workbook.write(fileOutputStream);
-            logger.info("File written successfully.");
+            LOGGER.info("File written successfully.");
         } catch (IOException e) {
-            logger.error("Error writing file: {}", e.getMessage());
+            LOGGER.error("Error writing file: {}", e.getMessage());
             throw e;
         }
 
-        logger.info("Created file in {} ms", System.currentTimeMillis() - start);
+        LOGGER.info("Created file in {} ms", System.currentTimeMillis() - start);
     }
 
     private static String generateFilename() {
