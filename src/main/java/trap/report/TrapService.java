@@ -19,15 +19,15 @@ public class TrapService {
     private static final Map<String, Integer> EVENT_COUNTS = determineEventsToCount();
 
     private static Map<String, Integer> determineEventsToCount() {
-        var EVENT_COUNTS = new HashMap<String, Integer>();
-        EVENT_COUNTS.put(EventTypes.SINGLES, 4);
-        EVENT_COUNTS.put(EventTypes.DOUBLES, 4);
-        EVENT_COUNTS.put(EventTypes.HANDICAP, 4);
-        EVENT_COUNTS.put(EventTypes.SKEET, 4);
-        EVENT_COUNTS.put(EventTypes.CLAYS, 3);
-        EVENT_COUNTS.put(EventTypes.FIVESTAND, 4);
-        EVENT_COUNTS.put(EventTypes.DOUBLESKEET, 4);
-        return EVENT_COUNTS;
+        var eventCounts = new HashMap<String, Integer>();
+        eventCounts.put(EventTypes.SINGLES, 4);
+        eventCounts.put(EventTypes.DOUBLES, 4);
+        eventCounts.put(EventTypes.HANDICAP, 4);
+        eventCounts.put(EventTypes.SKEET, 4);
+        eventCounts.put(EventTypes.CLAYS, 3);
+        eventCounts.put(EventTypes.FIVESTAND, 4);
+        eventCounts.put(EventTypes.DOUBLESKEET, 4);
+        return eventCounts;
     }
 
     public static int getEventsToCount(String type) {
@@ -39,16 +39,16 @@ public class TrapService {
     }
 
     private static Map<String, Integer> determineRoundsToCount() {
-        var ROUND_CONTS = new HashMap<String, Integer>();
-        ROUND_CONTS.put(EventTypes.SINGLES, 5);
-        ROUND_CONTS.put(EventTypes.DOUBLES, 5);
-        ROUND_CONTS.put(EventTypes.HANDICAP, 5);
+        var roundCounts = new HashMap<String, Integer>();
+        roundCounts.put(EventTypes.SINGLES, 5);
+        roundCounts.put(EventTypes.DOUBLES, 5);
+        roundCounts.put(EventTypes.HANDICAP, 5);
 
-        ROUND_CONTS.put(EventTypes.SKEET, 3);
-        ROUND_CONTS.put(EventTypes.CLAYS, 3);
-        ROUND_CONTS.put(EventTypes.FIVESTAND, 3);
-        ROUND_CONTS.put(EventTypes.DOUBLESKEET, 3);
-        return ROUND_CONTS;
+        roundCounts.put(EventTypes.SKEET, 3);
+        roundCounts.put(EventTypes.CLAYS, 3);
+        roundCounts.put(EventTypes.FIVESTAND, 3);
+        roundCounts.put(EventTypes.DOUBLESKEET, 3);
+        return roundCounts;
     }
 
     public static int getRoundsToCount(String type) {
