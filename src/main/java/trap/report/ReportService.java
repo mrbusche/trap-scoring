@@ -45,7 +45,7 @@ public class ReportService {
     DownloadService downloadService = new DownloadService();
 
     public void generateExcelFile() throws Exception {
-        // downloadService.downloadFiles(trapTypes);
+        downloadService.downloadFiles(trapTypes);
 
         var workbook = getWorkbook();
 
