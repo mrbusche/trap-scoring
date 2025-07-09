@@ -20,8 +20,8 @@ public record IndividualTotal(
         return switch (classification) {
             case "Senior/Varsity" -> Classifications.VARSITY;
             case "Senior/Jr. Varsity", Classifications.JUNIOR_VARSITY -> Classifications.JUNIOR_VARSITY;
-            case "Intermediate/Advanced" -> "Intermediate Advanced";
-            case "Intermediate/Entry Level" -> "Intermediate Entry";
+            case "Intermediate/Advanced" -> Classifications.INTERMEDIATE_ADVANCED;
+            case "Intermediate/Entry Level" -> Classifications.INTERMEDIATE_ENTRY;
             default -> classification;
         };
     }
@@ -29,7 +29,7 @@ public record IndividualTotal(
     public String teamClassificationForTotal() {
         return switch (teamClassification()) {
             case "Senior/Varsity", "Senior/Jr. Varsity", Classifications.VARSITY, Classifications.JUNIOR_VARSITY -> Classifications.VARSITY;
-            case "Intermediate Advanced" -> "Intermediate Entry";
+            case Classifications.INTERMEDIATE_ADVANCED -> Classifications.INTERMEDIATE_ENTRY;
             default -> teamClassification();
         };
     }
