@@ -5,7 +5,7 @@ plugins {
 }
 
 group = "com.trap-scoring"
-version = "8.1.0"
+version = "9.0.0"
 
 java {
     toolchain {
