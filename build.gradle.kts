@@ -19,7 +19,7 @@ repositories {
 }
 
 val poiOoxmlVersion = "5.4.1"
-val openCsvVersion = "5.11.2"
+val openCsvVersion = "5.12.0"
 
 dependencies {
     implementation("org.apache.poi:poi-ooxml:$poiOoxmlVersion")
