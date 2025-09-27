@@ -13,7 +13,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SpringBootTest
 class TrapServiceTest {
-    TrapService trapService = new TrapService();
+    final TrapService trapService = new TrapService();
 
     private List<RoundScore> getRoundScoresPlayer1() {
         var roundScores = new ArrayList<RoundScore>();

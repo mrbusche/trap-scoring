@@ -25,14 +25,4 @@ public record RoundScore(
     public String uniqueName() {
         return athlete + " " + team + " " + classification + " " + type;
     }
-
-    public String teamClassification() {
-        return switch (classification) {
-            case "Senior/Varsity" -> "Varsity";
-            case "Senior/Jr. Varsity" -> "Senior Varsity";
-            case "Intermediate/Advanced" -> "Intermediate Advanced";
-            case "Intermediate/Entry Level" -> "Intermediate Entry";
-            default -> classification;
-        };
-    }
 }
