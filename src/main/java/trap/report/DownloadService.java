@@ -29,7 +29,7 @@ public class DownloadService {
             "doublesskeet", "https://metabase.sssfonline.com/public/question/bdd61066-6e29-4242-b6e9-adf286c2c4ae.csv"
     );
 
-    public void downloadFiles(String[] trapTypes) throws IOException {
+    public void downloadFiles(String[] trapTypes) {
         var start = System.currentTimeMillis();
         LOGGER.info("Started downloading files");
 

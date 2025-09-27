@@ -41,8 +41,8 @@ public class ReportService {
     private static final Logger LOGGER = LoggerFactory.getLogger(ReportService.class);
     private final String currentDate = new SimpleDateFormat("MM/dd/yyyy").format(Calendar.getInstance().getTime());
     private final String[] trapTypes = new String[]{EventTypes.SINGLES, EventTypes.DOUBLES, EventTypes.HANDICAP, EventTypes.SKEET, EventTypes.CLAYS, EventTypes.FIVESTAND, EventTypes.DOUBLESKEET};
-    TrapService trapService = new TrapService();
-    DownloadService downloadService = new DownloadService();
+    final TrapService trapService = new TrapService();
+    final DownloadService downloadService = new DownloadService();
 
     public void generateExcelFile() throws Exception {
         downloadService.downloadFiles(trapTypes);
@@ -83,8 +83,8 @@ public class ReportService {
         populateIndividualData(workbook, "Individual-Men", "M", style, mainTextStyle, playerFinalTotal);
         populateIndividualData(workbook, "Individual-Ladies", "F", style, mainTextStyle, playerFinalTotal);
 
-        populateTeamIndividualData(workbook, "Team-Individual-Scores", teamScoresByTotal);
-        populateAllIndividualData(workbook, "Individual-All-Scores", playerFinalTotal);
+        populateTeamIndividualData(workbook, teamScoresByTotal);
+        populateAllIndividualData(workbook, playerFinalTotal);
 
         ExcelHelper.createFile(workbook);
 
@@ -196,7 +196,7 @@ public class ReportService {
                     .sum();
 
             // Update the team's total score by creating a new TeamScore instance
-            teamScoresThatCount.computeIfPresent(teamName, (k, currentTeamScore) -> new TeamScore(teamName, currentTeamScore.total() + scoreSum));
+            teamScoresThatCount.computeIfPresent(teamName, (_, currentTeamScore) -> new TeamScore(teamName, currentTeamScore.total() + scoreSum));
         }
 
         return teamScoresThatCount.values().stream()
@@ -370,8 +370,8 @@ public class ReportService {
     }
 
     // Team-Individual-Scores tab
-    private void populateTeamIndividualData(Workbook workbook, String sheetName, List<IndividualTotal> teamScoresByTotal) {
-        var sheet = workbook.getSheet(sheetName);
+    private void populateTeamIndividualData(Workbook workbook, List<IndividualTotal> teamScoresByTotal) {
+        var sheet = workbook.getSheet("Team-Individual-Scores");
         var startTime = System.currentTimeMillis();
 
         LOGGER.info("Ran query for team scores in {} ms", System.currentTimeMillis() - startTime);
@@ -389,8 +389,8 @@ public class ReportService {
         LOGGER.info("Team Individual Scores data populated in {} ms", System.currentTimeMillis() - startTime);
     }
 
-    private void populateAllIndividualData(Workbook workbook, String sheetName, Map<String, IndividualTotal> allRoundScores) {
-        var sheet = workbook.getSheet(sheetName);
+    private void populateAllIndividualData(Workbook workbook, Map<String, IndividualTotal> allRoundScores) {
+        var sheet = workbook.getSheet("Individual-All-Scores");
         var start = System.currentTimeMillis();
 
         var sortedValues = allRoundScores.values()

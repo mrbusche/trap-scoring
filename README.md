@@ -25,7 +25,7 @@ Every day at 6 AM UTC the report is [generated and uploaded](https://github.com/
 ## Generating standings on demand
 
 - Download jar file from the [latest release](https://github.com/mrbusche/trap-scoring/releases)
-- You will need [Java 24](https://adoptium.net/) to run the jar file
+- You will need [Java 25](https://adoptium.net/) to run the jar file
 - Open command prompt to directory with downloaded jar file
 - Run `java -jar trap-8.1.0.jar` (make sure you have the correct filename from the release)
 - There will be output as the process generates the file
