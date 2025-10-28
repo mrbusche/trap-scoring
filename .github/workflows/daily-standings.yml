@@ -29,9 +29,9 @@ jobs:
         uses: gradle/actions/setup-gradle@v5
 
       - name: Run Gradle build
-        shell: bash
-        run: >-
-          export SPRING_PROFILES_ACTIVE=test && ./gradlew build --no-daemon --info
+        env:
+          SPRING_PROFILES_ACTIVE: test 
+        run: ./gradlew build --parallel --configuration-cache
 
       - name: Generate file
         run: |
