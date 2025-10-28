@@ -39,10 +39,10 @@ Every day at 6 AM UTC the report is [generated and uploaded](https://github.com/
 
 The project uses several Gradle optimizations to speed up builds in CI/CD:
 
-- **Build Cache**: Enabled via `org.gradle.caching=true` to reuse outputs from previous builds
-- **Configuration Cache**: Enabled via `org.gradle.configuration-cache=true` for faster configuration phase
+- **Build Cache**: Enabled via `org.gradle.caching=true` to reuse outputs from previous builds across workflow runs
+- **Configuration Cache**: Enabled via `org.gradle.configuration-cache=true` for faster configuration phase (persisted by GitHub Actions)
 - **Parallel Execution**: Enabled via `org.gradle.parallel=true` to execute independent tasks concurrently
 - **JVM Tuning**: Configured heap size (2GB) and metaspace (512MB) for optimal performance
-- **GitHub Actions**: Uses `gradle/actions/setup-gradle@v5` with build cache enabled
+- **GitHub Actions Integration**: Uses `gradle/actions/setup-gradle@v5` with build cache enabled to persist caches between workflow runs
 
 These optimizations reduce build times by reusing cached artifacts and executing tasks in parallel.
