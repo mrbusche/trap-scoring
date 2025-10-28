@@ -27,11 +27,13 @@ jobs:
 
       - name: Setup and execute Gradle
         uses: gradle/actions/setup-gradle@v5
+        with:
+          cache-read-only: false
 
       - name: Run Gradle build
         shell: bash
         run: >-
-          export SPRING_PROFILES_ACTIVE=test && ./gradlew build --no-daemon --info
+          export SPRING_PROFILES_ACTIVE=test && ./gradlew build --no-daemon --build-cache
 
       - name: Generate file
         run: |
