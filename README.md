@@ -34,3 +34,15 @@ Every day at 6 AM UTC the report is [generated and uploaded](https://github.com/
 ## Online metabase links
 
 [Singles](https://metabase.sssfonline.com/public/question/8648faf9-42e8-4a9c-b55d-2f251349de7f) | [Doubles](https://metabase.sssfonline.com/public/question/5d5a78a5-2356-477f-b1b8-fe6ee11d25b1) | [Handicap](https://metabase.sssfonline.com/public/question/69ca55d9-3e18-45bc-b57f-73aeb205ece8) | [Skeet](https://metabase.sssfonline.com/public/question/c697d744-0e06-4c3f-a640-fea02f9c9ecd) | [Sporting Clays](https://metabase.sssfonline.com/public/question/2c6edb1a-a7ee-43c2-8180-ad199a57be55) | [Five Stand](https://metabase.sssfonline.com/public/question/3c5aecf2-a9f2-49b2-a11f-36965cb1a964) | [Doubles Skeet](https://metabase.sssfonline.com/public/question/bdd61066-6e29-4242-b6e9-adf286c2c4ae.csv)
+
+## Build Performance Optimizations
+
+The project uses several Gradle optimizations to speed up builds in CI/CD:
+
+- **Build Cache**: Enabled via `org.gradle.caching=true` to reuse outputs from previous builds
+- **Configuration Cache**: Enabled via `org.gradle.configuration-cache=true` for faster configuration phase
+- **Parallel Execution**: Enabled via `org.gradle.parallel=true` to execute independent tasks concurrently
+- **JVM Tuning**: Configured heap size (2GB) and metaspace (512MB) for optimal performance
+- **GitHub Actions**: Uses `gradle/actions/setup-gradle@v5` with build cache enabled
+
+These optimizations reduce build times by reusing cached artifacts and executing tasks in parallel.
