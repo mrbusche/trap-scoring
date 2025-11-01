@@ -58,7 +58,7 @@ public class TrapService {
     public static int parseInteger(String number) {
         try {
             return Integer.parseInt(number);
-        } catch (NumberFormatException e) {
+        } catch (NumberFormatException _) {
             return 0;
         }
     }
