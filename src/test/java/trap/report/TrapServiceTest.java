@@ -17,7 +17,6 @@ class TrapServiceTest {
 
     private List<RoundScore> getRoundScoresPlayer1() {
         var roundScores = new ArrayList<RoundScore>();
-
         roundScores.add(new RoundScore(16923, "NS Trap Fall Invitational", 1132, "Clinton County Sportsman Club", "2022-10-29", "Wilton Varsity", "UNI Trap Team", "Scott W Busche", "Senior/Varsity", "M", 22, 23, 0, 0, 0, 0, 0, 0, "singles"));
         roundScores.add(new RoundScore(16945, "Stockdale/Jags season Opener! Sunday", 73, "Stockdale Gun Club", "2022-09-04", "UNI Trap Team", "UNI Trap Team", "Scott W Busche", "Senior/Varsity", "M", 23, 24, 24, 24, 0, 0, 0, 0, "singles"));
         roundScores.add(new RoundScore(16946, "Stockdale/Jags season Opener! Monday", 73, "Stockdale Gun Club", "2022-09-05", "UNI Trap Team", "UNI Trap Team", "Scott W Busche", "Senior/Varsity", "M", 25, 21, 22, 24, 0, 0, 0, 0, "singles"));
@@ -35,7 +34,6 @@ class TrapServiceTest {
 
     private List<RoundScore> getRoundScoresPlayer2() {
         var roundScores = new ArrayList<RoundScore>();
-
         roundScores.add(new RoundScore(17258, "Otter Creek October ATA Shoot", 1, "Otter Creek Sportsmans Club", "2022-10-09", "UNI Trap Team", "UNI Trap Team", "Matt Busche", "Senior/Varsity", "M", 25, 24, 25, 24, 0, 0, 0, 0, "singles"));
         roundScores.add(new RoundScore(17277, "Wilton Invitational", 1, "Muscatine Izaak Walton League", "2022-10-08", "Wilton / Mt. Pleasant - High School", "UNI Trap Team", "Matt Busche", "Senior/Varsity", "M", 25, 24, 0, 0, 0, 0, 0, 0, "singles"));
         roundScores.add(new RoundScore(17321, "Wilton Invitational", 1, "Muscatine Izaak Walton League", "2022-10-22", "Wilton V", "UNI Trap Team", "Matt Busche", "Senior/Varsity", "M", 25, 24, 0, 0, 0, 0, 0, 0, "singles"));
@@ -191,7 +189,7 @@ class TrapServiceTest {
     }
 
     @Test
-    void playerFinalTotal2() {
+    void playerFinalTotal2With2Locations() {
         var roundScores = getRoundScoresPlayer3();
         var playerRoundTotals = trapService.calculatePlayerRoundTotals(roundScores);
         var playerIndividualTotal = trapService.calculatePlayerIndividualTotal(roundScores, playerRoundTotals);
@@ -203,7 +201,7 @@ class TrapServiceTest {
         assertEquals("Justin Jefferson", playerFinalTotal.get(player1.uniqueName()).athlete());
         assertEquals("Senior/Varsity", playerFinalTotal.get(player1.uniqueName()).classification());
         assertEquals("M", playerFinalTotal.get(player1.uniqueName()).gender());
-        assertEquals(300, playerFinalTotal.get(player1.uniqueName()).total());
+        assertEquals(250, playerFinalTotal.get(player1.uniqueName()).total());
         assertEquals("singles", playerFinalTotal.get(player1.uniqueName()).type());
     }
 
@@ -401,7 +399,7 @@ class TrapServiceTest {
         assertEquals("Sam LaPorta", playerFinalTotal.get(player1.uniqueName()).athlete());
         assertEquals("Senior/Varsity", playerFinalTotal.get(player1.uniqueName()).classification());
         assertEquals("M", playerFinalTotal.get(player1.uniqueName()).gender());
-        assertEquals(250, playerFinalTotal.get(player1.uniqueName()).total());
+        assertEquals(227, playerFinalTotal.get(player1.uniqueName()).total());
         assertEquals("doubles", playerFinalTotal.get(player1.uniqueName()).type());
     }
 
@@ -711,7 +709,7 @@ class TrapServiceTest {
         assertEquals("Sam LaPorta", playerFinalTotal.get(player1.uniqueName()).athlete());
         assertEquals("Senior/Varsity", playerFinalTotal.get(player1.uniqueName()).classification());
         assertEquals("M", playerFinalTotal.get(player1.uniqueName()).gender());
-        assertEquals(227, playerFinalTotal.get(player1.uniqueName()).total());
+        assertEquals(204, playerFinalTotal.get(player1.uniqueName()).total());
         assertEquals("doublesskeet", playerFinalTotal.get(player1.uniqueName()).type());
     }
 

@@ -158,8 +158,8 @@ public class TrapService {
             locationIds.add(locationId);
             return true;
         }
-        // If there are already 2 or 3 unique locations, consider adding the round
-        return locationIds.size() >= 2;
+        // If there are already 3 or more unique locations, consider adding the round
+        return locationIds.size() >= 3;
     }
 
     public Map<String, IndividualTotal> calculatePlayerFinalTotal(Map<String, List<IndividualTotal>> playerIndividualTotals) {
