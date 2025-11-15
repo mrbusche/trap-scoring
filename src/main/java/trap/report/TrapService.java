@@ -20,13 +20,13 @@ public class TrapService {
 
     private static Map<String, Integer> determineEventsToCount() {
         var eventCounts = new HashMap<String, Integer>();
-        eventCounts.put(EventTypes.SINGLES, 4);
-        eventCounts.put(EventTypes.DOUBLES, 4);
-        eventCounts.put(EventTypes.HANDICAP, 4);
-        eventCounts.put(EventTypes.SKEET, 4);
+        eventCounts.put(EventTypes.SINGLES, 6);
+        eventCounts.put(EventTypes.DOUBLES, 6);
+        eventCounts.put(EventTypes.HANDICAP, 6);
+        eventCounts.put(EventTypes.SKEET, 6);
         eventCounts.put(EventTypes.CLAYS, 3);
-        eventCounts.put(EventTypes.FIVESTAND, 4);
-        eventCounts.put(EventTypes.DOUBLESKEET, 4);
+        eventCounts.put(EventTypes.FIVESTAND, 6);
+        eventCounts.put(EventTypes.DOUBLESKEET, 6);
         return eventCounts;
     }
 
@@ -159,7 +159,7 @@ public class TrapService {
             return true;
         }
         // If there are already 2 or 3 unique locations, consider adding the round
-        return locationIds.size() == 2 || locationIds.size() == 3;
+        return locationIds.size() >= 2;
     }
 
     public Map<String, IndividualTotal> calculatePlayerFinalTotal(Map<String, List<IndividualTotal>> playerIndividualTotals) {
