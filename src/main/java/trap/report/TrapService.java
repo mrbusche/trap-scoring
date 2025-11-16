@@ -20,13 +20,13 @@ public class TrapService {
 
     private static Map<String, Integer> determineEventsToCount() {
         var eventCounts = new HashMap<String, Integer>();
-        eventCounts.put(EventTypes.SINGLES, 6);
-        eventCounts.put(EventTypes.DOUBLES, 6);
-        eventCounts.put(EventTypes.HANDICAP, 6);
-        eventCounts.put(EventTypes.SKEET, 6);
-        eventCounts.put(EventTypes.CLAYS, 3);
-        eventCounts.put(EventTypes.FIVESTAND, 6);
-        eventCounts.put(EventTypes.DOUBLESKEET, 6);
+        eventCounts.put(EventTypes.SINGLES, 5);
+        eventCounts.put(EventTypes.DOUBLES, 5);
+        eventCounts.put(EventTypes.HANDICAP, 5);
+        eventCounts.put(EventTypes.SKEET, 5);
+        eventCounts.put(EventTypes.CLAYS, 4);
+        eventCounts.put(EventTypes.FIVESTAND, 5);
+        eventCounts.put(EventTypes.DOUBLESKEET, 5);
         return eventCounts;
     }
 

@@ -120,28 +120,35 @@ class TrapServiceTest {
         var playerIndividualTotal = trapService.calculatePlayerIndividualTotal(roundScores, playerRoundTotals);
 
         var player1 = playerIndividualTotal.get(roundScoresPlayer1.getFirst().uniqueName());
-        assertEquals(6, player1.size());
+        assertEquals(5, player1.size());
         assertEquals(49, player1.getFirst().total());
         assertEquals(48, player1.get(1).total());
         assertEquals(48, player1.get(2).total());
         assertEquals(48, player1.get(3).total());
         assertEquals(48, player1.get(4).total());
-        assertEquals(47, player1.get(5).total());
 
         var player2 = playerIndividualTotal.get(roundScoresPlayer2.getFirst().uniqueName());
-        assertEquals(6, player2.size()); // Only 2 locations, max 5 scores
+        assertEquals(4, player2.size()); // Only 2 locations, max 4 scores
         assertEquals(49, player2.getFirst().total());
         assertEquals(49, player2.get(1).total());
         assertEquals(49, player2.get(2).total());
         assertEquals(49, player2.get(3).total());
-        assertEquals(49, player2.get(4).total());
-        assertEquals(40, player2.get(5).total());
+        assertEquals(40, player2.get(4).total());
     }
 
     @Test
     void playerFinalTotal() {
         var roundScoresPlayer1 = getRoundScoresPlayer1();
-        var roundScoresPlayer2 = getRoundScoresPlayer2();
+        var roundScoresPlayer2 = new ArrayList<RoundScore>();
+        roundScoresPlayer2.add(new RoundScore(17258, "Otter Creek October ATA Shoot", 1, "Otter Creek Sportsmans Club", "2022-10-09", "UNI Trap Team", "UNI Trap Team", "Matt Busche", "Senior/Varsity", "M", 25, 24, 25, 24, 0, 0, 0, 0, "singles"));
+        roundScoresPlayer2.add(new RoundScore(17277, "Wilton Invitational", 1, "Muscatine Izaak Walton League", "2022-10-08", "Wilton / Mt. Pleasant - High School", "UNI Trap Team", "Matt Busche", "Senior/Varsity", "M", 25, 24, 0, 0, 0, 0, 0, 0, "singles"));
+        roundScoresPlayer2.add(new RoundScore(17321, "Wilton Invitational", 1, "Muscatine Izaak Walton League", "2022-10-22", "Wilton V", "UNI Trap Team", "Matt Busche", "Senior/Varsity", "M", 25, 24, 0, 0, 0, 0, 0, 0, "singles"));
+        roundScoresPlayer2.add(new RoundScore(17975, "Kennedy Trap Club Invitational", 1, "Otter Creek Sportsmans Club", "2023-04-15", "Wilton HS 1", "UNI Trap Team", "Matt Busche", "Senior/Varsity", "M", 25, 24, 0, 0, 0, 0, 0, 0, "singles"));
+        roundScoresPlayer2.add(new RoundScore(18256, "Wilton and Solon", 2, "Muscatine Izaak Walton League", "2023-04-08", "Wilton Varsity 1", "UNI Trap Team", "Matt Busche", "Senior/Varsity", "M", 20, 20, 0, 0, 0, 0, 0, 0, "singles"));
+        roundScoresPlayer2.add(new RoundScore(18256, "Wilton and Solon", 2, "Muscatine Izaak Walton League", "2023-04-08", "Wilton Varsity 1", "UNI Trap Team", "Matt Busche", "Intermediate/Advanced", "M", 20, 7, 0, 0, 0, 0, 0, 0, "singles"));
+        roundScoresPlayer2.add(new RoundScore(18256, "Wilton and Solon", 2, "Muscatine Izaak Walton League", "2023-04-08", "Wilton Varsity 1", "UNI Trap Team", "Matt Busche", "Intermediate/Advanced", "M", 20, 20, 0, 0, 0, 0, 0, 0, "doubles"));
+
+
         var roundScores = new ArrayList<RoundScore>();
         roundScores.addAll(roundScoresPlayer1);
         roundScores.addAll(roundScoresPlayer2);
@@ -155,7 +162,7 @@ class TrapServiceTest {
         assertEquals("Scott W Busche", playerFinalTotal.get(player1.uniqueName()).athlete());
         assertEquals("Senior/Varsity", playerFinalTotal.get(player1.uniqueName()).classification());
         assertEquals("M", playerFinalTotal.get(player1.uniqueName()).gender());
-        assertEquals(288, playerFinalTotal.get(player1.uniqueName()).total());
+        assertEquals(241, playerFinalTotal.get(player1.uniqueName()).total());
         assertEquals("singles", playerFinalTotal.get(player1.uniqueName()).type());
 
         assertEquals(4, playerFinalTotal.size());
@@ -166,7 +173,7 @@ class TrapServiceTest {
         assertEquals("Matt Busche", playerFinalTotal.get(firstResult).athlete());
         assertEquals("Senior/Varsity", playerFinalTotal.get(firstResult).classification());
         assertEquals("M", playerFinalTotal.get(firstResult).gender());
-        assertEquals(285, playerFinalTotal.get(firstResult).total()); // Sum of 5 scores (2 locations)
+        assertEquals(187, playerFinalTotal.get(firstResult).total()); // 49 49 49 40
         assertEquals("singles", playerFinalTotal.get(firstResult).type());
 
         var secondResult = roundScoresPlayer2.get(5).uniqueName();
@@ -201,7 +208,7 @@ class TrapServiceTest {
         assertEquals("Justin Jefferson", playerFinalTotal.get(player1.uniqueName()).athlete());
         assertEquals("Senior/Varsity", playerFinalTotal.get(player1.uniqueName()).classification());
         assertEquals("M", playerFinalTotal.get(player1.uniqueName()).gender());
-        assertEquals(250, playerFinalTotal.get(player1.uniqueName()).total());
+        assertEquals(200, playerFinalTotal.get(player1.uniqueName()).total());
         assertEquals("singles", playerFinalTotal.get(player1.uniqueName()).type());
     }
 
@@ -218,7 +225,7 @@ class TrapServiceTest {
         assertEquals("Sam LaPorta", playerFinalTotal.get(player1.uniqueName()).athlete());
         assertEquals("Senior/Varsity", playerFinalTotal.get(player1.uniqueName()).classification());
         assertEquals("M", playerFinalTotal.get(player1.uniqueName()).gender());
-        assertEquals(141, playerFinalTotal.get(player1.uniqueName()).total());
+        assertEquals(187, playerFinalTotal.get(player1.uniqueName()).total());
         assertEquals("clays", playerFinalTotal.get(player1.uniqueName()).type());
     }
 
@@ -235,7 +242,7 @@ class TrapServiceTest {
         assertEquals("TJ Hockenson", playerFinalTotal.get(player1.uniqueName()).athlete());
         assertEquals("Intermediate/Advanced", playerFinalTotal.get(player1.uniqueName()).classification());
         assertEquals("M", playerFinalTotal.get(player1.uniqueName()).gender());
-        assertEquals(276, playerFinalTotal.get(player1.uniqueName()).total());
+        assertEquals(232, playerFinalTotal.get(player1.uniqueName()).total());
         assertEquals("singles", playerFinalTotal.get(player1.uniqueName()).type());
     }
 
@@ -304,7 +311,7 @@ class TrapServiceTest {
         assertEquals("Sam LaPorta", playerFinalTotal.get(player1.uniqueName()).athlete());
         assertEquals("Senior/Varsity", playerFinalTotal.get(player1.uniqueName()).classification());
         assertEquals("M", playerFinalTotal.get(player1.uniqueName()).gender());
-        assertEquals(227, playerFinalTotal.get(player1.uniqueName()).total());
+        assertEquals(185, playerFinalTotal.get(player1.uniqueName()).total());
         assertEquals("singles", playerFinalTotal.get(player1.uniqueName()).type());
     }
 
@@ -318,7 +325,7 @@ class TrapServiceTest {
         roundScores.add(new RoundScore(16963, "Event 4", 986, "Location 1", "2022-09-03", "Squad Name", "Team Name", "Sam LaPorta", "Senior/Varsity", "M", 24, 24, 0, 0, 0, 0, 0, 0, "singles"));
         roundScores.add(new RoundScore(16973, "Event 5", 986, "Location 1", "2022-09-03", "Squad Name", "Team Name", "Sam LaPorta", "Senior/Varsity", "M", 24, 24, 0, 0, 0, 0, 0, 0, "singles"));
         roundScores.add(new RoundScore(16940, "Event 6", 50, "Location 2", "2022-09-11", "Squad Name", "Team Name", "Sam LaPorta", "Senior/Varsity", "M", 23, 22, 0, 0, 0, 0, 0, 0, "singles"));
-        roundScores.add(new RoundScore(18168, "Event 7", 50, "Location 6", "2023-04-09", "Squad Name", "Team Name", "Sam LaPorta", "Senior/Varsity", "M", 21, 23, 0, 0, 0, 0, 0, 0, "singles"));
+        roundScores.add(new RoundScore(18168, "Event 7", 50, "Location 2", "2023-04-09", "Squad Name", "Team Name", "Sam LaPorta", "Senior/Varsity", "M", 21, 23, 0, 0, 0, 0, 0, 0, "singles"));
 
         var playerRoundTotals = trapService.calculatePlayerRoundTotals(roundScores);
         var playerIndividualTotal = trapService.calculatePlayerIndividualTotal(roundScores, playerRoundTotals);
@@ -330,7 +337,7 @@ class TrapServiceTest {
         assertEquals("Sam LaPorta", playerFinalTotal.get(player1.uniqueName()).athlete());
         assertEquals("Senior/Varsity", playerFinalTotal.get(player1.uniqueName()).classification());
         assertEquals("M", playerFinalTotal.get(player1.uniqueName()).gender());
-        assertEquals(285, playerFinalTotal.get(player1.uniqueName()).total());
+        assertEquals(237, playerFinalTotal.get(player1.uniqueName()).total());
         assertEquals("singles", playerFinalTotal.get(player1.uniqueName()).type());
     }
 
@@ -353,7 +360,7 @@ class TrapServiceTest {
         assertEquals("Sam LaPorta", playerFinalTotal.get(player1.uniqueName()).athlete());
         assertEquals("Senior/Varsity", playerFinalTotal.get(player1.uniqueName()).classification());
         assertEquals("M", playerFinalTotal.get(player1.uniqueName()).gender());
-        assertEquals(228, playerFinalTotal.get(player1.uniqueName()).total());
+        assertEquals(205, playerFinalTotal.get(player1.uniqueName()).total());
         assertEquals("doubles", playerFinalTotal.get(player1.uniqueName()).type());
     }
 
@@ -376,7 +383,7 @@ class TrapServiceTest {
         assertEquals("Sam LaPorta", playerFinalTotal.get(player1.uniqueName()).athlete());
         assertEquals("Senior/Varsity", playerFinalTotal.get(player1.uniqueName()).classification());
         assertEquals("M", playerFinalTotal.get(player1.uniqueName()).gender());
-        assertEquals(228, playerFinalTotal.get(player1.uniqueName()).total());
+        assertEquals(205, playerFinalTotal.get(player1.uniqueName()).total());
         assertEquals("doubles", playerFinalTotal.get(player1.uniqueName()).type());
     }
 
@@ -399,7 +406,7 @@ class TrapServiceTest {
         assertEquals("Sam LaPorta", playerFinalTotal.get(player1.uniqueName()).athlete());
         assertEquals("Senior/Varsity", playerFinalTotal.get(player1.uniqueName()).classification());
         assertEquals("M", playerFinalTotal.get(player1.uniqueName()).gender());
-        assertEquals(227, playerFinalTotal.get(player1.uniqueName()).total());
+        assertEquals(185, playerFinalTotal.get(player1.uniqueName()).total());
         assertEquals("doubles", playerFinalTotal.get(player1.uniqueName()).type());
     }
 
@@ -425,7 +432,7 @@ class TrapServiceTest {
         assertEquals("Sam LaPorta", playerFinalTotal.get(player1.uniqueName()).athlete());
         assertEquals("Senior/Varsity", playerFinalTotal.get(player1.uniqueName()).classification());
         assertEquals("M", playerFinalTotal.get(player1.uniqueName()).gender());
-        assertEquals(285, playerFinalTotal.get(player1.uniqueName()).total());
+        assertEquals(237, playerFinalTotal.get(player1.uniqueName()).total());
         assertEquals("doubles", playerFinalTotal.get(player1.uniqueName()).type());
     }
 
@@ -494,7 +501,7 @@ class TrapServiceTest {
         assertEquals("Sam LaPorta", playerFinalTotal.get(player1.uniqueName()).athlete());
         assertEquals("Senior/Varsity", playerFinalTotal.get(player1.uniqueName()).classification());
         assertEquals("M", playerFinalTotal.get(player1.uniqueName()).gender());
-        assertEquals(219, playerFinalTotal.get(player1.uniqueName()).total());
+        assertEquals(179, playerFinalTotal.get(player1.uniqueName()).total());
         assertEquals("handicap", playerFinalTotal.get(player1.uniqueName()).type());
     }
 
@@ -508,7 +515,7 @@ class TrapServiceTest {
         roundScores.add(new RoundScore(16963, "Event 4", 986, "Location 1", "2022-09-03", "Squad Name", "Team Name", "Sam LaPorta", "Senior/Varsity", "M", 24, 24, 0, 0, 0, 0, 0, 0, "handicap"));
         roundScores.add(new RoundScore(16973, "Event 5", 986, "Location 1", "2022-09-03", "Squad Name", "Team Name", "Sam LaPorta", "Senior/Varsity", "M", 24, 24, 0, 0, 0, 0, 0, 0, "handicap"));
         roundScores.add(new RoundScore(16940, "Event 6", 50, "Location 2", "2022-09-11", "Squad Name", "Team Name", "Sam LaPorta", "Senior/Varsity", "M", 23, 22, 0, 0, 0, 0, 0, 0, "handicap"));
-        roundScores.add(new RoundScore(18168, "Event 7", 50, "Location 6", "2023-04-09", "Squad Name", "Team Name", "Sam LaPorta", "Senior/Varsity", "M", 21, 23, 0, 0, 0, 0, 0, 0, "handicap"));
+        roundScores.add(new RoundScore(18168, "Event 7", 50, "Location 2", "2023-04-09", "Squad Name", "Team Name", "Sam LaPorta", "Senior/Varsity", "M", 21, 23, 0, 0, 0, 0, 0, 0, "handicap"));
 
         var playerRoundTotals = trapService.calculatePlayerRoundTotals(roundScores);
         var playerIndividualTotal = trapService.calculatePlayerIndividualTotal(roundScores, playerRoundTotals);
@@ -520,7 +527,7 @@ class TrapServiceTest {
         assertEquals("Sam LaPorta", playerFinalTotal.get(player1.uniqueName()).athlete());
         assertEquals("Senior/Varsity", playerFinalTotal.get(player1.uniqueName()).classification());
         assertEquals("M", playerFinalTotal.get(player1.uniqueName()).gender());
-        assertEquals(285, playerFinalTotal.get(player1.uniqueName()).total());
+        assertEquals(237, playerFinalTotal.get(player1.uniqueName()).total());
         assertEquals("handicap", playerFinalTotal.get(player1.uniqueName()).type());
     }
 
@@ -566,7 +573,7 @@ class TrapServiceTest {
         assertEquals("Sam LaPorta", playerFinalTotal.get(player1.uniqueName()).athlete());
         assertEquals("Senior/Varsity", playerFinalTotal.get(player1.uniqueName()).classification());
         assertEquals("M", playerFinalTotal.get(player1.uniqueName()).gender());
-        assertEquals(219, playerFinalTotal.get(player1.uniqueName()).total());
+        assertEquals(179, playerFinalTotal.get(player1.uniqueName()).total());
         assertEquals("skeet", playerFinalTotal.get(player1.uniqueName()).type());
     }
 
@@ -580,7 +587,7 @@ class TrapServiceTest {
         roundScores.add(new RoundScore(16963, "Event 4", 986, "Location 1", "2022-09-03", "Squad Name", "Team Name", "Sam LaPorta", "Senior/Varsity", "M", 24, 24, 0, 0, 0, 0, 0, 0, "skeet"));
         roundScores.add(new RoundScore(16973, "Event 5", 986, "Location 1", "2022-09-03", "Squad Name", "Team Name", "Sam LaPorta", "Senior/Varsity", "M", 24, 24, 0, 0, 0, 0, 0, 0, "skeet"));
         roundScores.add(new RoundScore(16940, "Event 6", 50, "Location 2", "2022-09-11", "Squad Name", "Team Name", "Sam LaPorta", "Senior/Varsity", "M", 23, 22, 0, 0, 0, 0, 0, 0, "skeet"));
-        roundScores.add(new RoundScore(18168, "Event 7", 50, "Location 6", "2023-04-09", "Squad Name", "Team Name", "Sam LaPorta", "Senior/Varsity", "M", 21, 23, 0, 0, 0, 0, 0, 0, "skeet"));
+        roundScores.add(new RoundScore(18168, "Event 7", 50, "Location 2", "2023-04-09", "Squad Name", "Team Name", "Sam LaPorta", "Senior/Varsity", "M", 21, 23, 0, 0, 0, 0, 0, 0, "skeet"));
 
         var playerRoundTotals = trapService.calculatePlayerRoundTotals(roundScores);
         var playerIndividualTotal = trapService.calculatePlayerIndividualTotal(roundScores, playerRoundTotals);
@@ -592,7 +599,7 @@ class TrapServiceTest {
         assertEquals("Sam LaPorta", playerFinalTotal.get(player1.uniqueName()).athlete());
         assertEquals("Senior/Varsity", playerFinalTotal.get(player1.uniqueName()).classification());
         assertEquals("M", playerFinalTotal.get(player1.uniqueName()).gender());
-        assertEquals(285, playerFinalTotal.get(player1.uniqueName()).total());
+        assertEquals(189, playerFinalTotal.get(player1.uniqueName()).total()); // 48 48 48 45, only 2 locations
         assertEquals("skeet", playerFinalTotal.get(player1.uniqueName()).type());
     }
 
@@ -614,7 +621,7 @@ class TrapServiceTest {
         assertEquals("Sam LaPorta", playerFinalTotal.get(player1.uniqueName()).athlete());
         assertEquals("Senior/Varsity", playerFinalTotal.get(player1.uniqueName()).classification());
         assertEquals("M", playerFinalTotal.get(player1.uniqueName()).gender());
-        assertEquals(277, playerFinalTotal.get(player1.uniqueName()).total());
+        assertEquals(300, playerFinalTotal.get(player1.uniqueName()).total());
         assertEquals("clays", playerFinalTotal.get(player1.uniqueName()).type());
     }
 
@@ -640,7 +647,7 @@ class TrapServiceTest {
         assertEquals("Sam LaPorta", playerFinalTotal.get(player1.uniqueName()).athlete());
         assertEquals("Senior/Varsity", playerFinalTotal.get(player1.uniqueName()).classification());
         assertEquals("M", playerFinalTotal.get(player1.uniqueName()).gender());
-        assertEquals(282, playerFinalTotal.get(player1.uniqueName()).total());
+        assertEquals(370, playerFinalTotal.get(player1.uniqueName()).total()); // 96 96 90 88 location 986 986 50 12
         assertEquals("clays", playerFinalTotal.get(player1.uniqueName()).type());
     }
 
@@ -663,18 +670,17 @@ class TrapServiceTest {
         assertEquals("Sam LaPorta", playerFinalTotal.get(player1.uniqueName()).athlete());
         assertEquals("Senior/Varsity", playerFinalTotal.get(player1.uniqueName()).classification());
         assertEquals("M", playerFinalTotal.get(player1.uniqueName()).gender());
-        assertEquals(227, playerFinalTotal.get(player1.uniqueName()).total());
+        assertEquals(204, playerFinalTotal.get(player1.uniqueName()).total());
         assertEquals("doublesskeet", playerFinalTotal.get(player1.uniqueName()).type());
     }
 
     @Test
     void doublesskeetScoring3Locations() {
         var roundScores = new ArrayList<RoundScore>();
-
-        roundScores.add(new RoundScore(16933, "Event 1", 986, "Location 1", "2022-09-03", "Squad Name", "Team Name", "Sam LaPorta", "Senior/Varsity", "M", 48, 23, 0, 0, 0, 0, 0, 0, "doublesskeet"));
-        roundScores.add(new RoundScore(16940, "Event 2", 50, "Location 2", "2022-09-11", "Squad Name", "Team Name", "Sam LaPorta", "Senior/Varsity", "M", 45, 22, 0, 0, 0, 0, 0, 0, "doublesskeet"));
-        roundScores.add(new RoundScore(17159, "Event 3", 123, "Location 3", "2022-09-24", "Squad Name", "Team Name", "Sam LaPorta", "Senior/Varsity", "M", 44, 23, 0, 0, 0, 0, 0, 0, "doublesskeet"));
-        roundScores.add(new RoundScore(17159, "Event 4", 123, "Location 4", "2022-09-24", "Squad Name", "Team Name", "Sam LaPorta", "Senior/Varsity", "M", 44, 23, 0, 0, 0, 0, 0, 0, "doublesskeet"));
+        roundScores.add(new RoundScore(16933, "Event 1", 986, "Location 1", "2022-09-03", "Squad Name", "Team Name", "Sam LaPorta", "Senior/Varsity", "M", 25, 23, 0, 0, 0, 0, 0, 0, "doublesskeet"));
+        roundScores.add(new RoundScore(16940, "Event 2", 50, "Location 2", "2022-09-11", "Squad Name", "Team Name", "Sam LaPorta", "Senior/Varsity", "M", 23, 22, 0, 0, 0, 0, 0, 0, "doublesskeet"));
+        roundScores.add(new RoundScore(17159, "Event 3", 123, "Location 3", "2022-09-24", "Squad Name", "Team Name", "Sam LaPorta", "Senior/Varsity", "M", 21, 23, 0, 0, 0, 0, 0, 0, "doublesskeet"));
+        roundScores.add(new RoundScore(17169, "Event 4", 123, "Location 3", "2022-09-24", "Squad Name", "Team Name", "Sam LaPorta", "Senior/Varsity", "M", 22, 23, 0, 0, 0, 0, 0, 0, "doublesskeet"));
 
         var playerRoundTotals = trapService.calculatePlayerRoundTotals(roundScores);
         var playerIndividualTotal = trapService.calculatePlayerIndividualTotal(roundScores, playerRoundTotals);
@@ -686,7 +692,7 @@ class TrapServiceTest {
         assertEquals("Sam LaPorta", playerFinalTotal.get(player1.uniqueName()).athlete());
         assertEquals("Senior/Varsity", playerFinalTotal.get(player1.uniqueName()).classification());
         assertEquals("M", playerFinalTotal.get(player1.uniqueName()).gender());
-        assertEquals(227, playerFinalTotal.get(player1.uniqueName()).total());
+        assertEquals(182, playerFinalTotal.get(player1.uniqueName()).total()); // all 4 scores count
         assertEquals("doublesskeet", playerFinalTotal.get(player1.uniqueName()).type());
     }
 
@@ -709,7 +715,7 @@ class TrapServiceTest {
         assertEquals("Sam LaPorta", playerFinalTotal.get(player1.uniqueName()).athlete());
         assertEquals("Senior/Varsity", playerFinalTotal.get(player1.uniqueName()).classification());
         assertEquals("M", playerFinalTotal.get(player1.uniqueName()).gender());
-        assertEquals(204, playerFinalTotal.get(player1.uniqueName()).total());
+        assertEquals(181, playerFinalTotal.get(player1.uniqueName()).total());
         assertEquals("doublesskeet", playerFinalTotal.get(player1.uniqueName()).type());
     }
 
@@ -735,7 +741,7 @@ class TrapServiceTest {
         assertEquals("Sam LaPorta", playerFinalTotal.get(player1.uniqueName()).athlete());
         assertEquals("Senior/Varsity", playerFinalTotal.get(player1.uniqueName()).classification());
         assertEquals("M", playerFinalTotal.get(player1.uniqueName()).gender());
-        assertEquals(285, playerFinalTotal.get(player1.uniqueName()).total());
+        assertEquals(233, playerFinalTotal.get(player1.uniqueName()).total()); // 48 48 48 45 44
         assertEquals("doublesskeet", playerFinalTotal.get(player1.uniqueName()).type());
     }
 
@@ -758,7 +764,7 @@ class TrapServiceTest {
         assertEquals("Sam LaPorta", playerFinalTotal.get(player1.uniqueName()).athlete());
         assertEquals("Senior/Varsity", playerFinalTotal.get(player1.uniqueName()).classification());
         assertEquals("M", playerFinalTotal.get(player1.uniqueName()).gender());
-        assertEquals(233, playerFinalTotal.get(player1.uniqueName()).total());
+        assertEquals(210, playerFinalTotal.get(player1.uniqueName()).total());
         assertEquals("fivestand", playerFinalTotal.get(player1.uniqueName()).type());
     }
 
@@ -784,20 +790,20 @@ class TrapServiceTest {
         assertEquals("Sam LaPorta", playerFinalTotal.get(player1.uniqueName()).athlete());
         assertEquals("Senior/Varsity", playerFinalTotal.get(player1.uniqueName()).classification());
         assertEquals("M", playerFinalTotal.get(player1.uniqueName()).gender());
-        assertEquals(285, playerFinalTotal.get(player1.uniqueName()).total());
+        assertEquals(233, playerFinalTotal.get(player1.uniqueName()).total()); // 48 48 48 45 44, need to use 3 locations
         assertEquals("fivestand", playerFinalTotal.get(player1.uniqueName()).type());
     }
 
     @Test
     void eventsToCount() {
-        assertEquals(6, TrapService.getEventsToCount("singles"));
-        assertEquals(6, TrapService.getEventsToCount("doubles"));
-        assertEquals(6, TrapService.getEventsToCount("handicap"));
-        assertEquals(6, TrapService.getEventsToCount("skeet"));
-        assertEquals(6, TrapService.getEventsToCount("fivestand"));
-        assertEquals(6, TrapService.getEventsToCount("doublesskeet"));
+        assertEquals(5, TrapService.getEventsToCount("singles"));
+        assertEquals(5, TrapService.getEventsToCount("doubles"));
+        assertEquals(5, TrapService.getEventsToCount("handicap"));
+        assertEquals(5, TrapService.getEventsToCount("skeet"));
+        assertEquals(5, TrapService.getEventsToCount("fivestand"));
+        assertEquals(5, TrapService.getEventsToCount("doublesskeet"));
 
-        assertEquals(3, TrapService.getEventsToCount("clays"));
+        assertEquals(4, TrapService.getEventsToCount("clays"));
     }
 
     @Test
