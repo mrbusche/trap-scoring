@@ -17,6 +17,7 @@ import java.util.Set;
 public class TrapService {
     protected static final Map<String, Integer> ROUND_COUNTS = determineRoundsToCount();
     private static final Map<String, Integer> EVENT_COUNTS = determineEventsToCount();
+    private static final int MIN_UNIQUE_LOCATIONS = 3;
 
     private static Map<String, Integer> determineEventsToCount() {
         var eventCounts = new HashMap<String, Integer>();
@@ -127,20 +128,51 @@ public class TrapService {
             // Sort in descending order based on total score
             playerRoundTotal.sort(Comparator.comparingInt(RoundTotal::total).reversed());
 
-            Set<Integer> locationIds = new HashSet<>();
-            for (RoundTotal t : playerRoundTotal) {
-                if (indTotal.size() < roundsToCount - 1) {
-                    // Add round directly until we reach the number of rounds to count
-                    indTotal.add(toIndividualTotal(t));
-                    locationIds.add(t.locationId());
-                } else if (shouldAddRound(t, locationIds)) {
-                    // Handle special case when location constraints are applied
-                    indTotal.add(toIndividualTotal(t));
-                    break;
+            List<IndividualTotal> finalList = new ArrayList<>();
+            Set<Integer> foundLocationIds = new HashSet<>();
+            List<IndividualTotal> nonUniqueScores = new ArrayList<>();
+
+            // Find the best score from up to MIN_UNIQUE_LOCATIONS
+            for (RoundTotal roundTotal : playerRoundTotal) {
+                if (foundLocationIds.size() < MIN_UNIQUE_LOCATIONS) {
+                    // Check if this score is from a new location
+                    if (!foundLocationIds.contains(roundTotal.locationId())) {
+                        finalList.add(toIndividualTotal(roundTotal)); // Add it to our core list
+                        foundLocationIds.add(roundTotal.locationId());
+                    } else {
+                        // We've already got a score from this location.
+                        // Add it to the "remainder" pile for Pass 2.
+                        nonUniqueScores.add(toIndividualTotal(roundTotal));
+                    }
+                } else {
+                    // We have found our 3 unique locations.
+                    // Add this score (and all remaining) to the remainder pile.
+                    nonUniqueScores.add(toIndividualTotal(roundTotal));
                 }
             }
 
-            playerIndividualTotal.put(playerName, indTotal);
+            int totalUniqueCount = foundLocationIds.size();
+            int targetSize;
+
+            if (totalUniqueCount >= MIN_UNIQUE_LOCATIONS) {
+                // We found 3+ unique locations. Our target of scores is roundsToCount
+                targetSize = roundsToCount;
+            } else {
+                // Only found 1 or 2 unique locations in the whole list, decrease target size.
+                int deficit = MIN_UNIQUE_LOCATIONS - totalUniqueCount;
+                targetSize = roundsToCount - deficit;
+            }
+
+            // --- PASS 2: Fill the list to the target size ---
+            int scoresNeeded = targetSize - finalList.size();
+            if (scoresNeeded > 0) {
+                finalList.addAll(nonUniqueScores.stream().limit(scoresNeeded).toList());
+            }
+
+            // Ensure the final list is returned in sorted order
+            finalList.sort(Comparator.comparingInt(IndividualTotal::total).reversed());
+
+            playerIndividualTotal.put(playerName, finalList);
         }
 
         return playerIndividualTotal;
