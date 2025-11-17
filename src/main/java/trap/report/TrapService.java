@@ -123,7 +123,6 @@ public class TrapService {
 
             String playerName = playerRoundTotal.getFirst().uniqueName();
             int roundsToCount = getEventsToCount(playerRoundTotal.getFirst().type());
-            List<IndividualTotal> indTotal = new ArrayList<>();
 
             // Sort in descending order based on total score
             playerRoundTotal.sort(Comparator.comparingInt(RoundTotal::total).reversed());
@@ -180,18 +179,6 @@ public class TrapService {
 
     private IndividualTotal toIndividualTotal(RoundTotal t) {
         return new IndividualTotal(t.locationId(), t.team(), t.athlete(), t.classification(), t.gender(), t.total(), t.type());
-    }
-
-    // Method to determine if a round should be added based on location constraints
-    private boolean shouldAddRound(RoundTotal t, Set<Integer> locationIds) {
-        int locationId = t.locationId();
-        // Check if the location doesn't already exist
-        if (!locationIds.contains(locationId)) {
-            locationIds.add(locationId);
-            return true;
-        }
-        // If there are already 3 or more unique locations, consider adding the round
-        return locationIds.size() >= 3;
     }
 
     public Map<String, IndividualTotal> calculatePlayerFinalTotal(Map<String, List<IndividualTotal>> playerIndividualTotals) {
