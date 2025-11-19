@@ -3,21 +3,27 @@ package trap.report;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.Map;
 import java.util.concurrent.Executors;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.TimeUnit;
-
-import static org.apache.commons.io.FileUtils.copyURLToFile;
 
 public class DownloadService {
     private static final Logger LOGGER = LoggerFactory.getLogger(DownloadService.class);
+
+    private static final HttpClient HTTP_CLIENT = HttpClient.newBuilder()
+            .followRedirects(HttpClient.Redirect.NORMAL)
+            .connectTimeout(Duration.ofSeconds(10))
+            .build();
 
     private static final Map<String, String> FILE_URLS = Map.of(
             "singles", "https://metabase.sssfonline.com/public/question/8648faf9-42e8-4a9c-b55d-2f251349de7f.csv",
@@ -30,34 +36,49 @@ public class DownloadService {
     );
 
     public void downloadFiles(String[] trapTypes) {
-        var start = System.currentTimeMillis();
+        var start = Instant.now();
         LOGGER.info("Started downloading files");
 
-        ExecutorService executor = Executors.newFixedThreadPool(trapTypes.length);
-        var charset = StandardCharsets.UTF_8;
-        for (var type : trapTypes) {
-            executor.submit(() -> {
-                try {
-                    LOGGER.info("Downloading {} file", type);
-                    copyURLToFile(URI.create(FILE_URLS.get(type)).toURL(), new File(type + ".csv"), 120000, 120000);
-                    LOGGER.info("Finished downloading {} file", type);
+        try (var executor = Executors.newVirtualThreadPerTaskExecutor()) {
+            for (var type : trapTypes) {
+                executor.submit(() -> processFile(type, FILE_URLS.get(type)));
+            }
+        }
 
-                    LOGGER.info("Replacing double spaces for {} file", type);
-                    var path = Path.of(type + ".csv");
-                    var content = Files.readString(path, charset).replaceAll(" {2}", " ");
-                    Files.writeString(path, content, charset);
-                    LOGGER.info("Finished replacing double spaces for {} file", type);
-                } catch (IOException e) {
-                    LOGGER.error("Error processing {} file", type, e);
-                }
-            });
-        }
-        executor.shutdown();
+        var duration = Duration.between(start, Instant.now());
+        LOGGER.info("Files downloaded in {} ms", duration.toMillis());
+    }
+
+    private void processFile(String type, String url) {
         try {
-            executor.awaitTermination(1, TimeUnit.HOURS);
-        } catch (InterruptedException e) {
-            LOGGER.error("File download interrupted", e);
+            LOGGER.info("Downloading {} file", type);
+
+            HttpRequest request = HttpRequest.newBuilder().uri(URI.create(url)).GET().build();
+
+            // Using BodyHandlers.ofString to manipulate content in memory before saving
+            HttpResponse<String> response = HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8));
+
+            if (response.statusCode() != 200) {
+                LOGGER.error("Failed to download {}: HTTP {}", type, response.statusCode());
+                return;
+            }
+
+            LOGGER.info("Finished downloading {} file", type);
+
+            // Replace in memory string instead of reading file back from disk
+            String cleanContent = response.body().replaceAll(" {2}", " ");
+
+            var path = Path.of(type + ".csv");
+            Files.writeString(path, cleanContent, StandardCharsets.UTF_8,
+                    StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
+
+            LOGGER.info("Finished replacing double spaces for {} file", type);
+
+        } catch (IOException | InterruptedException e) {
+            if (e instanceof InterruptedException) {
+                Thread.currentThread().interrupt();
+            }
+            LOGGER.error("Error processing {} file", type, e);
         }
-        LOGGER.info("Files downloaded in {} ms", System.currentTimeMillis() - start);
     }
 }
