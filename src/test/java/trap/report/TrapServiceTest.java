@@ -301,6 +301,31 @@ class TrapServiceTest {
     }
 
     @Test
+    void singlesScoring2LocationsFavorOneLocation() {
+        var roundScores = new ArrayList<RoundScore>();
+        // Location 1 stronger
+        roundScores.add(new RoundScore(20001, "Event A", 201, "Loc1", "2023-02-01", "Squad", "Team Y", "Player B", "Senior/Varsity", "M", 25, 25, 0, 0, 0, 0, 0, 0, "singles")); // 50
+        roundScores.add(new RoundScore(20002, "Event B", 201, "Loc1", "2023-02-02", "Squad", "Team Y", "Player B", "Senior/Varsity", "M", 25, 24, 0, 0, 0, 0, 0, 0, "singles")); // 49
+        roundScores.add(new RoundScore(20003, "Event C", 201, "Loc1", "2023-02-03", "Squad", "Team Y", "Player B", "Senior/Varsity", "M", 24, 24, 0, 0, 0, 0, 0, 0, "singles")); // 48
+        // Location 2
+        roundScores.add(new RoundScore(20004, "Event D", 202, "Loc2", "2023-02-04", "Squad", "Team Y", "Player B", "Senior/Varsity", "M", 24, 23, 0, 0, 0, 0, 0, 0, "singles")); // 47
+        roundScores.add(new RoundScore(20005, "Event E", 202, "Loc2", "2023-02-05", "Squad", "Team Y", "Player B", "Senior/Varsity", "M", 23, 23, 0, 0, 0, 0, 0, 0, "singles")); // 46
+
+        var playerRoundTotals = trapService.calculatePlayerRoundTotals(roundScores);
+        var playerIndividualTotal = trapService.calculatePlayerIndividualTotal(roundScores, playerRoundTotals);
+        var playerFinalTotal = trapService.calculatePlayerFinalTotal(playerIndividualTotal);
+
+        var key = roundScores.getFirst().uniqueName();
+        assertEquals(0, playerFinalTotal.get(key).locationId());
+        assertEquals("Team Y", playerFinalTotal.get(key).team());
+        assertEquals("Player B", playerFinalTotal.get(key).athlete());
+        assertEquals("Senior/Varsity", playerFinalTotal.get(key).classification());
+        assertEquals("M", playerFinalTotal.get(key).gender());
+        assertEquals(194, playerFinalTotal.get(key).total()); // 50 + 49 + 48 + 47 (2 locations => 5 - 1 = 4 scores)
+        assertEquals("singles", playerFinalTotal.get(key).type());
+    }
+
+    @Test
     void singlesScoring2LocationsWithHigherScoresInOneLocation() {
         var roundScores = new ArrayList<RoundScore>();
         roundScores.add(new RoundScore(16933, "Event 1", 986, "Location 1", "2022-09-03", "Squad Name", "Team Name", "Sam LaPorta", "Senior/Varsity", "M", 24, 24, 0, 0, 0, 0, 0, 0, "singles"));
@@ -348,6 +373,32 @@ class TrapServiceTest {
     }
 
     @Test
+    void singlesScoring3LocationsFavorOneLocation() {
+        var roundScores = new ArrayList<RoundScore>();
+        // Location 1 dominates
+        roundScores.add(new RoundScore(30001, "Event A", 301, "Loc1", "2023-03-01", "Squad", "Team Z", "Player C", "Senior/Varsity", "M", 25, 25, 0, 0, 0, 0, 0, 0, "singles")); // 50
+        roundScores.add(new RoundScore(30002, "Event B", 301, "Loc1", "2023-03-02", "Squad", "Team Z", "Player C", "Senior/Varsity", "M", 25, 24, 0, 0, 0, 0, 0, 0, "singles")); // 49
+        // Location 2
+        roundScores.add(new RoundScore(30003, "Event C", 302, "Loc2", "2023-03-03", "Squad", "Team Z", "Player C", "Senior/Varsity", "M", 24, 24, 0, 0, 0, 0, 0, 0, "singles")); // 48
+        // Location 3
+        roundScores.add(new RoundScore(30004, "Event D", 303, "Loc3", "2023-03-04", "Squad", "Team Z", "Player C", "Senior/Varsity", "M", 24, 23, 0, 0, 0, 0, 0, 0, "singles")); // 47
+        roundScores.add(new RoundScore(30005, "Event E", 303, "Loc3", "2023-03-05", "Squad", "Team Z", "Player C", "Senior/Varsity", "M", 23, 23, 0, 0, 0, 0, 0, 0, "singles")); // 46
+
+        var playerRoundTotals = trapService.calculatePlayerRoundTotals(roundScores);
+        var playerIndividualTotal = trapService.calculatePlayerIndividualTotal(roundScores, playerRoundTotals);
+        var playerFinalTotal = trapService.calculatePlayerFinalTotal(playerIndividualTotal);
+
+        var key = roundScores.getFirst().uniqueName();
+        assertEquals(0, playerFinalTotal.get(key).locationId());
+        assertEquals("Team Z", playerFinalTotal.get(key).team());
+        assertEquals("Player C", playerFinalTotal.get(key).athlete());
+        assertEquals("Senior/Varsity", playerFinalTotal.get(key).classification());
+        assertEquals("M", playerFinalTotal.get(key).gender());
+        assertEquals(240, playerFinalTotal.get(key).total()); // 50 + 48 + 47 + 49 + 46 (3+ locations => 5 scores)
+        assertEquals("singles", playerFinalTotal.get(key).type());
+    }
+
+    @Test
     void doublesScoring3Locations() {
         var roundScores = new ArrayList<RoundScore>();
         roundScores.add(new RoundScore(16933, "Event 1", 986, "Location 1", "2022-09-03", "Squad Name", "Team Name", "Sam LaPorta", "Senior/Varsity", "M", 48, 24, 0, 0, 0, 0, 0, 0, "doubles"));
@@ -370,6 +421,32 @@ class TrapServiceTest {
     }
 
     @Test
+    void singlesScoring4LocationsOneLocationHasMultipleHigher() {
+        var roundScores = new ArrayList<RoundScore>();
+        // Location 1 strongest with multiple high scores
+        roundScores.add(new RoundScore(40001, "Event A", 401, "Loc1", "2023-04-01", "Squad", "Team A1", "Player D", "Senior/Varsity", "M", 25, 25, 0, 0, 0, 0, 0, 0, "singles")); // 50
+        roundScores.add(new RoundScore(40002, "Event B", 401, "Loc1", "2023-04-02", "Squad", "Team A1", "Player D", "Senior/Varsity", "M", 25, 24, 0, 0, 0, 0, 0, 0, "singles")); // 49
+        roundScores.add(new RoundScore(40003, "Event C", 401, "Loc1", "2023-04-03", "Squad", "Team A1", "Player D", "Senior/Varsity", "M", 24, 24, 0, 0, 0, 0, 0, 0, "singles")); // 48
+        // Other locations
+        roundScores.add(new RoundScore(40004, "Event D", 402, "Loc2", "2023-04-04", "Squad", "Team A1", "Player D", "Senior/Varsity", "M", 24, 23, 0, 0, 0, 0, 0, 0, "singles")); // 47
+        roundScores.add(new RoundScore(40005, "Event E", 403, "Loc3", "2023-04-05", "Squad", "Team A1", "Player D", "Senior/Varsity", "M", 23, 23, 0, 0, 0, 0, 0, 0, "singles")); // 46
+        roundScores.add(new RoundScore(40006, "Event F", 404, "Loc4", "2023-04-06", "Squad", "Team A1", "Player D", "Senior/Varsity", "M", 22, 23, 0, 0, 0, 0, 0, 0, "singles")); // 45
+
+        var playerRoundTotals = trapService.calculatePlayerRoundTotals(roundScores);
+        var playerIndividualTotal = trapService.calculatePlayerIndividualTotal(roundScores, playerRoundTotals);
+        var playerFinalTotal = trapService.calculatePlayerFinalTotal(playerIndividualTotal);
+
+        var key = roundScores.getFirst().uniqueName();
+        assertEquals(0, playerFinalTotal.get(key).locationId());
+        assertEquals("Team A1", playerFinalTotal.get(key).team());
+        assertEquals("Player D", playerFinalTotal.get(key).athlete());
+        assertEquals("Senior/Varsity", playerFinalTotal.get(key).classification());
+        assertEquals("M", playerFinalTotal.get(key).gender());
+        assertEquals(240, playerFinalTotal.get(key).total()); // 50 (L1) + 47 (L2) + 46 (L3) + 49 + 48
+        assertEquals("singles", playerFinalTotal.get(key).type());
+    }
+
+    @Test
     void doublesScoring2Locations() {
         var roundScores = new ArrayList<RoundScore>();
         roundScores.add(new RoundScore(16933, "Event 1", 986, "Location 1", "2022-09-03", "Squad Name", "Team Name", "Sam LaPorta", "Senior/Varsity", "M", 48, 48, 0, 0, 0, 0, 0, 0, "doubles"));
@@ -389,6 +466,27 @@ class TrapServiceTest {
         assertEquals("M", playerFinalTotal.get(player1.uniqueName()).gender());
         assertEquals(185, playerFinalTotal.get(player1.uniqueName()).total());
         assertEquals("doubles", playerFinalTotal.get(player1.uniqueName()).type());
+    }
+
+    @Test
+    void doublesScoring1LocationTop3OnlySingleRoundHandling() {
+        var roundScores = new ArrayList<RoundScore>();
+        // doubles is singleRound => each round counts separately if > 0
+        roundScores.add(new RoundScore(50001, "Event A", 501, "Loc1", "2023-05-01", "Squad", "Team D1", "Player E", "Senior/Varsity", "M", 48, 47, 0, 0, 0, 0, 0, 0, "doubles")); // 48, 47
+        roundScores.add(new RoundScore(50002, "Event B", 501, "Loc1", "2023-05-02", "Squad", "Team D1", "Player E", "Senior/Varsity", "M", 46, 45, 0, 0, 0, 0, 0, 0, "doubles")); // 46, 45
+
+        var playerRoundTotals = trapService.calculatePlayerRoundTotals(roundScores);
+        var playerIndividualTotal = trapService.calculatePlayerIndividualTotal(roundScores, playerRoundTotals);
+        var playerFinalTotal = trapService.calculatePlayerFinalTotal(playerIndividualTotal);
+
+        var key = roundScores.getFirst().uniqueName();
+        assertEquals(0, playerFinalTotal.get(key).locationId());
+        assertEquals("Team D1", playerFinalTotal.get(key).team());
+        assertEquals("Player E", playerFinalTotal.get(key).athlete());
+        assertEquals("Senior/Varsity", playerFinalTotal.get(key).classification());
+        assertEquals("M", playerFinalTotal.get(key).gender());
+        assertEquals(141, playerFinalTotal.get(key).total()); // 48 + 47 + 46 (1 location => 3 scores)
+        assertEquals("doubles", playerFinalTotal.get(key).type());
     }
 
     @Test
