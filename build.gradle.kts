@@ -18,7 +18,7 @@ repositories {
     maven { url = uri("https://repo.spring.io/milestone") }
 }
 
-val poiOoxmlVersion = "5.4.1"
+val poiOoxmlVersion = "5.5.0"
 val openCsvVersion = "5.12.0"
 
 dependencies {
