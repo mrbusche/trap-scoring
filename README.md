@@ -3,11 +3,11 @@
 ## Scoring
 
 | Discipline     | Scoring        | Events | Locations | Birds |
-| -------------- | -------------- |--------| --------- |-------|
-| Singles        | 1 round of 50  | 5      | 3         | 250   |
+| -------------- |----------------|--------| --------- |-------|
+| Singles        | 2 round of 25  | 5      | 3         | 250   |
 | Doubles        | 1 round of 50  | 5      | 3         | 250   |
-| Handicap       | 1 round of 50  | 5      | 3         | 250   |
-| American Skeet | 1 round of 50  | 5      | 3         | 250   |
+| Handicap       | 2 round of 25  | 5      | 3         | 250   |
+| American Skeet | 2 round of 25  | 5      | 3         | 250   |
 | Doubles Skeet  | 1 round of 50  | 5      | 3         | 250   |
 | Sporting Clay  | 1 round of 100 | 4      | 3         | 400   |
 | 5-Stand        | 1 round of 50  | 5      | 3         | 250   |
