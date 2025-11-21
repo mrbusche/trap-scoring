@@ -69,8 +69,7 @@ public class DownloadService {
             String cleanContent = response.body().replaceAll(" {2}", " ");
 
             var path = Path.of(type + ".csv");
-            Files.writeString(path, cleanContent, StandardCharsets.UTF_8,
-                    StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
+            Files.writeString(path, cleanContent, StandardCharsets.UTF_8, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
 
             LOGGER.info("Finished replacing double spaces for {} file", type);
 

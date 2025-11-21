@@ -2,8 +2,8 @@ package trap.report;
 
 import trap.common.EventTypes;
 import trap.model.IndividualTotal;
-import trap.model.TrapRoundScore;
 import trap.model.RoundTotal;
+import trap.model.TrapRoundScore;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -69,39 +69,30 @@ public class TrapService {
     }
 
     public Map<String, List<RoundTotal>> calculatePlayerRoundTotals(List<TrapRoundScore> roundScores) {
-        return roundScores.stream()
-                .<RoundTotal>mapMulti((r, consumer) -> {
-                    boolean isSingle = isSingleRound(r.type());
+        return roundScores.stream().<RoundTotal>mapMulti((r, consumer) -> {
+            boolean isSingle = isSingleRound(r.type());
 
-                    if (isSingle) {
-                        // Process Round 1
-                        acceptRound(consumer, r, r.round1());
-                        // Optional Round 2
-                        if (r.round2() > 0) acceptRound(consumer, r, r.round2());
-                    } else {
-                        // Combined Round 1+2
-                        acceptRound(consumer, r, r.round1() + r.round2());
+            if (isSingle) {
+                // Process Round 1
+                acceptRound(consumer, r, r.round1());
+                // Optional Round 2
+                if (r.round2() > 0) acceptRound(consumer, r, r.round2());
+            } else {
+                // Combined Round 1+2
+                acceptRound(consumer, r, r.round1() + r.round2());
 
-                        // Process remaining pairs
-                        processAdditionalRounds(r, consumer);
-                    }
-                })
-                .collect(Collectors.groupingBy(RoundTotal::uniqueName));
+                // Process remaining pairs
+                processAdditionalRounds(r, consumer);
+            }
+        }).collect(Collectors.groupingBy(RoundTotal::uniqueName));
     }
 
     private void acceptRound(Consumer<RoundTotal> consumer, TrapRoundScore r, int total) {
-        consumer.accept(new RoundTotal(
-                r.eventId(), r.locationId(), r.team(), r.athlete(),
-                r.classification(), r.gender(), total, r.type()
-        ));
+        consumer.accept(new RoundTotal(r.eventId(), r.locationId(), r.team(), r.athlete(), r.classification(), r.gender(), total, r.type()));
     }
 
     private void processAdditionalRounds(TrapRoundScore r, Consumer<RoundTotal> consumer) {
-        int[] additionalRounds = {
-                r.round3() + r.round4(),
-                r.round5() + r.round6(),
-                r.round7() + r.round8()
-        };
+        int[] additionalRounds = {r.round3() + r.round4(), r.round5() + r.round6(), r.round7() + r.round8()};
 
         for (int score : additionalRounds) {
             if (score <= 0) break;
@@ -110,13 +101,7 @@ public class TrapService {
     }
 
     public Map<String, List<IndividualTotal>> calculatePlayerIndividualTotal(List<TrapRoundScore> roundScores, Map<String, List<RoundTotal>> playerRoundTotals) {
-        Map<String, List<IndividualTotal>> result = roundScores.stream()
-                .map(TrapRoundScore::uniqueName)
-                .distinct()
-                .collect(Collectors.toMap(
-                        name -> name,
-                        _ -> new ArrayList<>()
-                ));
+        Map<String, List<IndividualTotal>> result = roundScores.stream().map(TrapRoundScore::uniqueName).distinct().collect(Collectors.toMap(name -> name, _ -> new ArrayList<>()));
 
         playerRoundTotals.forEach((player, totals) -> {
             if (!totals.isEmpty()) {
@@ -151,9 +136,7 @@ public class TrapService {
         }
 
         int uniqueFound = usedLocations.size();
-        int targetSize = (uniqueFound >= MIN_UNIQUE_LOCATIONS)
-                ? roundsToCount
-                : roundsToCount - (MIN_UNIQUE_LOCATIONS - uniqueFound);
+        int targetSize = (uniqueFound >= MIN_UNIQUE_LOCATIONS) ? roundsToCount : roundsToCount - (MIN_UNIQUE_LOCATIONS - uniqueFound);
 
         // Pass 2: Fill remaining slots from the highest scoring remainders
         int needed = targetSize - finalList.size();
@@ -167,26 +150,17 @@ public class TrapService {
     }
 
     public Map<String, IndividualTotal> calculatePlayerFinalTotal(Map<String, List<IndividualTotal>> playerIndividualTotals) {
-        return playerIndividualTotals.entrySet().stream()
-                .filter(e -> !e.getValue().isEmpty())
-                .collect(Collectors.toMap(
-                        Map.Entry::getKey,
-                        e -> {
-                            var list = e.getValue();
-                            var first = list.getFirst(); // Java 21
-                            int sum = list.stream().mapToInt(IndividualTotal::total).sum();
+        return playerIndividualTotals.entrySet().stream().filter(e -> !e.getValue().isEmpty()).collect(Collectors.toMap(Map.Entry::getKey, e -> {
+            var list = e.getValue();
+            var first = list.getFirst(); // Java 21
+            int sum = list.stream().mapToInt(IndividualTotal::total).sum();
 
-                            return new IndividualTotal(
-                                    0, first.team(), first.athlete(), first.classification(),
-                                    first.gender(), sum, first.type()
-                            );
-                        }
-                ));
+            return new IndividualTotal(0, first.team(), first.athlete(), first.classification(), first.gender(), sum, first.type());
+        }));
     }
 
     private IndividualTotal toIndividualTotal(RoundTotal t) {
-        return new IndividualTotal(t.locationId(), t.team(), t.athlete(),
-                t.classification(), t.gender(), t.total(), t.type());
+        return new IndividualTotal(t.locationId(), t.team(), t.athlete(), t.classification(), t.gender(), t.total(), t.type());
     }
 
     public boolean isSingleRound(String roundType) {
