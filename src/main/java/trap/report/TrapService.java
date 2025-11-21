@@ -2,7 +2,7 @@ package trap.report;
 
 import trap.common.EventTypes;
 import trap.model.IndividualTotal;
-import trap.model.RoundScore;
+import trap.model.TrapRoundScore;
 import trap.model.RoundTotal;
 
 import java.util.ArrayList;
@@ -68,7 +68,7 @@ public class TrapService {
         return number.isEmpty() ? 0 : parseInteger(number);
     }
 
-    public Map<String, List<RoundTotal>> calculatePlayerRoundTotals(List<RoundScore> roundScores) {
+    public Map<String, List<RoundTotal>> calculatePlayerRoundTotals(List<TrapRoundScore> roundScores) {
         return roundScores.stream()
                 .<RoundTotal>mapMulti((r, consumer) -> {
                     boolean isSingle = isSingleRound(r.type());
@@ -89,14 +89,14 @@ public class TrapService {
                 .collect(Collectors.groupingBy(RoundTotal::uniqueName));
     }
 
-    private void acceptRound(Consumer<RoundTotal> consumer, RoundScore r, int total) {
+    private void acceptRound(Consumer<RoundTotal> consumer, TrapRoundScore r, int total) {
         consumer.accept(new RoundTotal(
                 r.eventId(), r.locationId(), r.team(), r.athlete(),
                 r.classification(), r.gender(), total, r.type()
         ));
     }
 
-    private void processAdditionalRounds(RoundScore r, Consumer<RoundTotal> consumer) {
+    private void processAdditionalRounds(TrapRoundScore r, Consumer<RoundTotal> consumer) {
         int[] additionalRounds = {
                 r.round3() + r.round4(),
                 r.round5() + r.round6(),
@@ -109,11 +109,11 @@ public class TrapService {
         }
     }
 
-    public Map<String, List<IndividualTotal>> calculatePlayerIndividualTotal(List<RoundScore> roundScores,
+    public Map<String, List<IndividualTotal>> calculatePlayerIndividualTotal(List<TrapRoundScore> roundScores,
                                                                              Map<String, List<RoundTotal>> playerRoundTotals) {
 
         Map<String, List<IndividualTotal>> result = roundScores.stream()
-                .map(RoundScore::uniqueName)
+                .map(TrapRoundScore::uniqueName)
                 .distinct()
                 .collect(Collectors.toMap(
                         name -> name,

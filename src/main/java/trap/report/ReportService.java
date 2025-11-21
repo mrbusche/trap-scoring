@@ -17,6 +17,7 @@ import trap.common.EventTypes;
 import trap.model.IndividualTotal;
 import trap.model.RoundScore;
 import trap.model.TeamScore;
+import trap.model.TrapRoundScore;
 
 import java.io.FileReader;
 import java.io.IOException;
@@ -68,8 +69,9 @@ public class ReportService {
         LOGGER.info("Generated round scores in {} ms", System.currentTimeMillis() - trueStart);
         populateCleanData(workbook.getSheet("Clean Data"), allRoundScores);
 
-        var playerRoundTotals = trapService.calculatePlayerRoundTotals(allRoundScores);
-        var playerIndividualTotal = trapService.calculatePlayerIndividualTotal(allRoundScores, playerRoundTotals);
+        var trapRoundScores = allRoundScores.stream().map(TrapRoundScore::new).toList();
+        var playerRoundTotals = trapService.calculatePlayerRoundTotals(trapRoundScores);
+        var playerIndividualTotal = trapService.calculatePlayerIndividualTotal(trapRoundScores, playerRoundTotals);
         var playerFinalTotal = trapService.calculatePlayerFinalTotal(playerIndividualTotal);
         var teamScoresByTotal = getTeamScoresByTotal(playerFinalTotal);
         var teamScoresThatCount = calculateTeamScores(teamScoresByTotal);
