@@ -109,9 +109,7 @@ public class TrapService {
         }
     }
 
-    public Map<String, List<IndividualTotal>> calculatePlayerIndividualTotal(List<TrapRoundScore> roundScores,
-                                                                             Map<String, List<RoundTotal>> playerRoundTotals) {
-
+    public Map<String, List<IndividualTotal>> calculatePlayerIndividualTotal(List<TrapRoundScore> roundScores, Map<String, List<RoundTotal>> playerRoundTotals) {
         Map<String, List<IndividualTotal>> result = roundScores.stream()
                 .map(TrapRoundScore::uniqueName)
                 .distinct()
