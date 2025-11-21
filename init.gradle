@@ -9,15 +9,18 @@ rootProject {
     dependencies {
         rewrite("org.openrewrite.recipe:rewrite-spring:+")
         rewrite("org.openrewrite:rewrite-java:+")
+        rewrite("org.openrewrite.recipe:rewrite-testing-frameworks:+")
+
     }
     rewrite {
         activeRecipe("org.openrewrite.gradle.UpdateGradleWrapper")
         activeRecipe("org.openrewrite.maven.RemoveRedundantDependencyVersions")
         activeRecipe("org.openrewrite.java.spring.boot3.SpringBoot3BestPracticesOnly")
-        activeRecipe("org.openrewrite.java.spring.boot3.UpgradeSpringBoot_3_5")
+        activeRecipe("org.openrewrite.java.spring.boot4.UpgradeSpringBoot_4_0")
         activeRecipe("org.openrewrite.java.migrate.UpgradeToJava25")
         activeRecipe("org.openrewrite.java.spring.boot2.SpringBoot2JUnit4to5Migration")
         activeRecipe("org.openrewrite.java.testing.junit6.JUnit5to6Migration")
+        activeRecipe("org.openrewrite.java.testing.junit.JUnit6BestPractices")
         setExportDatatables(true)
     }
     afterEvaluate {
