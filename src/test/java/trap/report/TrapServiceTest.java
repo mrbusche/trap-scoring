@@ -939,13 +939,13 @@ class TrapServiceTest {
     @Test
     void roundsToCount() {
         assertAll(
-            () -> assertTrue(trapService.singleRound("clays")),
-            () -> assertTrue(trapService.singleRound("doubles")),
-            () -> assertTrue(trapService.singleRound("fivestand")),
-            () -> assertTrue(trapService.singleRound("doublesskeet")),
-            () -> assertFalse(trapService.singleRound("singles")),
-            () -> assertFalse(trapService.singleRound("handicap")),
-            () -> assertFalse(trapService.singleRound("skeet"))
+            () -> assertTrue(trapService.isSingleRound("clays")),
+            () -> assertTrue(trapService.isSingleRound("doubles")),
+            () -> assertTrue(trapService.isSingleRound("fivestand")),
+            () -> assertTrue(trapService.isSingleRound("doublesskeet")),
+            () -> assertFalse(trapService.isSingleRound("singles")),
+            () -> assertFalse(trapService.isSingleRound("handicap")),
+            () -> assertFalse(trapService.isSingleRound("skeet"))
         );
     }
 }
