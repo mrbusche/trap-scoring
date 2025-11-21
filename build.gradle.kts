@@ -25,8 +25,6 @@ dependencies {
     implementation("org.apache.poi:poi-ooxml:$poiOoxmlVersion")
     implementation("com.opencsv:opencsv:$openCsvVersion")
     implementation("org.springframework.boot:spring-boot-starter-test")
-
-    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
 tasks.withType<Test> {
