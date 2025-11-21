@@ -30,7 +30,7 @@ jobs:
 
       - name: Run Gradle build
         env:
-          SPRING_PROFILES_ACTIVE: test 
+          SPRING_PROFILES_ACTIVE: test
         run: ./gradlew build --parallel --configuration-cache
 
       - name: Generate file
