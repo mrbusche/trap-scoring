@@ -3,14 +3,14 @@
 ## Scoring
 
 | Discipline     | Scoring        | Events | Locations | Birds |
-|----------------|----------------|--------|-----------|-------|
-| Singles        | 2 rounds of 25 | 4      | 2         | 200   |
-| Doubles        | 1 round of 50  | 4      | 2         | 200   |
-| Handicap       | 2 rounds of 25 | 4      | 2         | 200   |
-| American Skeet | 2 rounds of 25 | 4      | 2         | 200   |
-| Doubles Skeet  | 1 round of 50  | 4      | 2         | 200   |
-| Sporting Clay  | 1 round of 100 | 3      | 2         | 300   |
-| 5-Stand        | 1 round of 50  | 4      | 2         | 200   |
+| -------------- | -------------- | ------ | --------- | ----- |
+| Singles        | 2 rounds of 25 | 5      | 3         | 250   |
+| Doubles        | 1 round of 50  | 5      | 3         | 250   |
+| Handicap       | 2 rounds of 25 | 5      | 3         | 250   |
+| American Skeet | 2 rounds of 25 | 5      | 3         | 250   |
+| Doubles Skeet  | 1 round of 50  | 5      | 3         | 250   |
+| Sporting Clay  | 1 round of 100 | 4      | 3         | 400   |
+| 5-Stand        | 1 round of 50  | 5      | 3         | 250   |
 
 ## Downloading the daily generated report
 
