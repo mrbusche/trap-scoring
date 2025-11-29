@@ -13,7 +13,7 @@ public record IndividualTotal(
 ) {
 
     public String teamForScores() {
-        return type + " " + team + " " + teamClassificationForTotal();
+        return "%s %s %s".formatted(type, team, teamClassificationForTotal());
     }
 
     public String teamClassification() {
