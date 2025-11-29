@@ -21,7 +21,8 @@ public record RoundScore(
         int round8,
         String type
 ) {
+
     public String uniqueName() {
-        return "%s %s %s %s".formatted(athlete, team, classification, type);
+        return athlete + " " + team + " " + classification + " " + type;
     }
 }

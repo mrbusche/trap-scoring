@@ -81,7 +81,7 @@ public final class ExcelHelper {
 
     private static String generateFilename() {
         var currentDate = LocalDateTime.now();
-        return "league-data-%s.xlsx".formatted(currentDate.format(FILE_NAME_DATE_FORMATTER));
+        return "league-data-" + currentDate.format(FILE_NAME_DATE_FORMATTER) + ".xlsx";
     }
 
     public static void addCleanData(Row row, RoundScore rowData) {
