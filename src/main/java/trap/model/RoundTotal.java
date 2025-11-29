@@ -10,4 +10,7 @@ public record RoundTotal(
         int total,
         String type
 ) {
+    public String uniqueName() {
+        return athlete + " " + team + " " + classification + " " + type;
+    }
 }

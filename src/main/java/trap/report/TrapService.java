@@ -12,7 +12,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Gatherer;
+
 
 public class TrapService {
     protected static final Map<String, Integer> ROUND_COUNTS = determineRoundsToCount();
@@ -113,72 +113,53 @@ public class TrapService {
 
     public Map<String, List<IndividualTotal>> calculatePlayerIndividualTotal(List<RoundScore> roundScores, Map<String, List<RoundTotal>> playerRoundTotals) {
         Map<String, List<IndividualTotal>> playerIndividualTotal = new HashMap<>();
+
+        // Initialize scores with empty lists
         roundScores.forEach(r -> playerIndividualTotal.put(r.uniqueName(), new ArrayList<>()));
 
-        for (var entry : playerRoundTotals.entrySet()) {
-            List<RoundTotal> rounds = entry.getValue();
-            if (rounds.isEmpty()) continue;
+        for (List<RoundTotal> playerRoundTotal : playerRoundTotals.values()) {
+            if (playerRoundTotal.isEmpty()) continue;
 
-            int roundsToCount = getEventsToCount(rounds.getFirst().type());
+            String playerName = playerRoundTotal.getFirst().uniqueName();
+            int roundsToCount = getEventsToCount(playerRoundTotal.getFirst().type());
+            List<IndividualTotal> indTotal = new ArrayList<>();
 
-            List<IndividualTotal> selectedRounds = rounds.stream()
-                    .sorted(Comparator.comparingInt(RoundTotal::total).reversed())
-                    .gather(selectTopRoundsWithLocationConstraint(roundsToCount))
-                    .map(this::toIndividualTotal)
-                    .toList();
+            // Sort in descending order based on total score
+            playerRoundTotal.sort(Comparator.comparingInt(RoundTotal::total).reversed());
 
-            playerIndividualTotal.put(entry.getKey(), selectedRounds);
+            Set<Integer> locationIds = new HashSet<>();
+            for (RoundTotal t : playerRoundTotal) {
+                if (indTotal.size() < roundsToCount - 1) {
+                    // Add round directly until we reach the number of rounds to count
+                    indTotal.add(toIndividualTotal(t));
+                    locationIds.add(t.locationId());
+                } else if (shouldAddRound(t, locationIds)) {
+                    // Handle special case when location constraints are applied
+                    indTotal.add(toIndividualTotal(t));
+                    break;
+                }
+            }
+
+            playerIndividualTotal.put(playerName, indTotal);
         }
 
         return playerIndividualTotal;
     }
 
-    // State class to track progress inside the Gatherer
-    private static class ScoringState {
-        int count = 0;
-        final Set<Integer> locations = new HashSet<>();
-    }
-
-    private static Gatherer<RoundTotal, ScoringState, RoundTotal> selectTopRoundsWithLocationConstraint(int limit) {
-        return Gatherer.ofSequential(
-                // Initializer
-                ScoringState::new,
-                // Integrator
-                (state, element, downstream) -> {
-                    // 1. If we haven't reached the "final round" check (N-1), just add it.
-                    if (state.count < limit - 1) {
-                        state.count++;
-                        state.locations.add(element.locationId());
-                        downstream.push(element);
-                        return true;
-                    }
-                    // 2. If we are looking for the final round (the Nth round)
-                    else if (state.count == limit - 1) {
-                        boolean accept = false;
-                        int locationId = element.locationId();
-
-                        if (!state.locations.contains(locationId)) {
-                            state.locations.add(locationId);
-                            accept = true;
-                        } else if (state.locations.size() == 2 || state.locations.size() == 3) {
-                            accept = true;
-                        }
-
-                        if (accept) {
-                            state.count++;
-                            downstream.push(element);
-                            return false; // Stop processing, we found our limit
-                        }
-                        return true; // Skip this round, keep looking for a valid final round
-                    }
-
-                    return false; // Stop if we are over the limit
-                }
-        );
-    }
-
     private IndividualTotal toIndividualTotal(RoundTotal t) {
         return new IndividualTotal(t.locationId(), t.team(), t.athlete(), t.classification(), t.gender(), t.total(), t.type());
+    }
+
+    // Method to determine if a round should be added based on location constraints
+    private boolean shouldAddRound(RoundTotal t, Set<Integer> locationIds) {
+        int locationId = t.locationId();
+        // Check if the location doesn't already exist
+        if (!locationIds.contains(locationId)) {
+            locationIds.add(locationId);
+            return true;
+        }
+        // If there are already 2 or 3 unique locations, consider adding the round
+        return locationIds.size() == 2 || locationIds.size() == 3;
     }
 
     public Map<String, IndividualTotal> calculatePlayerFinalTotal(Map<String, List<IndividualTotal>> playerIndividualTotals) {
