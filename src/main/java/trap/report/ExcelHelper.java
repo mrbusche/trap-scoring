@@ -114,10 +114,11 @@ public final class ExcelHelper {
     private static void createAndStyleCell(Row row, int column, Object value, CellStyle style) {
         Cell cell = row.createCell(column);
 
-        if (value instanceof String s) {
-            cell.setCellValue(s);
-        } else if (value instanceof Integer i) {
-            cell.setCellValue(i);
+        switch (value) {
+            case String s -> cell.setCellValue(s);
+            case Integer i -> cell.setCellValue(i);
+            case null -> { }
+            default -> LOGGER.warn("Unknown cell value type: {}", value.getClass());
         }
 
         cell.setCellStyle(style);
