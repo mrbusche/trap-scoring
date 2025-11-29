@@ -5,7 +5,7 @@ plugins {
 }
 
 group = "com.trap-scoring"
-version = "9.0.0"
+version = "10.0.0"
 
 java {
     toolchain {
@@ -24,7 +24,10 @@ val openCsvVersion = "5.12.0"
 dependencies {
     implementation("org.apache.poi:poi-ooxml:$poiOoxmlVersion")
     implementation("com.opencsv:opencsv:$openCsvVersion")
-    implementation("org.springframework.boot:spring-boot-starter-test")
+
+    implementation("org.springframework.boot:spring-boot-starter")
+
+    testImplementation("org.springframework.boot:spring-boot-starter-test")
 }
 
 tasks.withType<Test> {
