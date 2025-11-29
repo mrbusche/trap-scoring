@@ -111,16 +111,15 @@ public final class ExcelHelper {
         createAndStyleCell(row, startColumn + 1, total, mainTextStyle);
     }
 
-    private static void createAndStyleCell(Row row, int column, Object value, CellStyle style) {
+    private static void createAndStyleCell(Row row, int column, String value, CellStyle style) {
         Cell cell = row.createCell(column);
+        cell.setCellValue(value);
+        cell.setCellStyle(style);
+    }
 
-        switch (value) {
-            case String s -> cell.setCellValue(s);
-            case Integer i -> cell.setCellValue(i);
-            case null -> { }
-            default -> LOGGER.warn("Unknown cell value type: {}", value.getClass());
-        }
-
+    private static void createAndStyleCell(Row row, int column, int value, CellStyle style) {
+        Cell cell = row.createCell(column);
+        cell.setCellValue(value);
         cell.setCellStyle(style);
     }
 
