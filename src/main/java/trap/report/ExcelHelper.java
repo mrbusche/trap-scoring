@@ -114,11 +114,10 @@ public final class ExcelHelper {
     private static void createAndStyleCell(Row row, int column, Object value, CellStyle style) {
         Cell cell = row.createCell(column);
 
-        switch (value) {
-            case String s -> cell.setCellValue(s);
-            case Integer i -> cell.setCellValue(i);
-            case null -> { }
-            default -> throw new IllegalArgumentException("Unexpected type: " + value.getClass());
+        if (value instanceof String s) {
+            cell.setCellValue(s);
+        } else if (value instanceof Integer i) {
+            cell.setCellValue(i);
         }
 
         cell.setCellStyle(style);
