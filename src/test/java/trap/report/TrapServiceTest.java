@@ -1,7 +1,6 @@
 package trap.report;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
 import trap.model.TrapRoundScore;
 
 import java.util.ArrayList;
@@ -12,7 +11,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@SpringBootTest
 class TrapServiceTest {
     final TrapService trapService = new TrapService();
 
