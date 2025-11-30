@@ -1,6 +1,6 @@
 plugins {
     java
-    id("org.springframework.boot") version "4.0.0"
+    alias(libs.plugins.spring.boot)
     id("io.spring.dependency-management") version "1.1.7"
 }
 
@@ -18,16 +18,13 @@ repositories {
     maven { url = uri("https://repo.spring.io/milestone") }
 }
 
-val poiOoxmlVersion = "5.5.0"
-val openCsvVersion = "5.12.0"
-
 dependencies {
-    implementation("org.apache.poi:poi-ooxml:$poiOoxmlVersion")
-    implementation("com.opencsv:opencsv:$openCsvVersion")
+    implementation(libs.poi.ooxml)
+    implementation(libs.opencsv)
 
-    implementation("org.springframework.boot:spring-boot-starter")
+    implementation(libs.spring.boot.starter)
 
-    testImplementation("org.springframework.boot:spring-boot-starter-test")
+    testImplementation(libs.spring.boot.starter.test)
 }
 
 tasks.withType<Test> {
