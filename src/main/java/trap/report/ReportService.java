@@ -43,7 +43,11 @@ public class ReportService {
     private final String currentDate = new SimpleDateFormat("MM/dd/yyyy").format(Calendar.getInstance().getTime());
     private final String[] trapTypes = new String[]{EventTypes.SINGLES, EventTypes.DOUBLES, EventTypes.HANDICAP, EventTypes.SKEET, EventTypes.CLAYS, EventTypes.FIVESTAND, EventTypes.DOUBLESKEET};
     final TrapService trapService = new TrapService();
-    final DownloadService downloadService = new DownloadService();
+    private final DownloadService downloadService;
+
+    public ReportService(DownloadService downloadService) {
+        this.downloadService = downloadService;
+    }
 
     public void generateExcelFile() throws Exception {
         downloadService.downloadFiles(trapTypes);

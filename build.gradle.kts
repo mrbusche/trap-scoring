@@ -23,6 +23,7 @@ dependencies {
     implementation(libs.opencsv)
 
     implementation(libs.spring.boot.starter)
+    implementation(libs.spring.web)
 
     testImplementation(libs.spring.boot.starter.test)
 }
