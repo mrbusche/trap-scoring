@@ -17,6 +17,7 @@ import trap.common.EventTypes;
 import trap.model.IndividualTotal;
 import trap.model.RoundScore;
 import trap.model.TeamScore;
+import trap.model.TrapRoundScore;
 
 import java.io.FileReader;
 import java.io.IOException;
@@ -42,7 +43,11 @@ public class ReportService {
     private final String currentDate = new SimpleDateFormat("MM/dd/yyyy").format(Calendar.getInstance().getTime());
     private final String[] trapTypes = new String[]{EventTypes.SINGLES, EventTypes.DOUBLES, EventTypes.HANDICAP, EventTypes.SKEET, EventTypes.CLAYS, EventTypes.FIVESTAND, EventTypes.DOUBLESKEET};
     final TrapService trapService = new TrapService();
-    final DownloadService downloadService = new DownloadService();
+    private final DownloadService downloadService;
+
+    public ReportService(DownloadService downloadService) {
+        this.downloadService = downloadService;
+    }
 
     public void generateExcelFile() throws Exception {
         downloadService.downloadFiles(trapTypes);
@@ -68,8 +73,9 @@ public class ReportService {
         LOGGER.info("Generated round scores in {} ms", System.currentTimeMillis() - trueStart);
         populateCleanData(workbook.getSheet("Clean Data"), allRoundScores);
 
-        var playerRoundTotals = trapService.calculatePlayerRoundTotals(allRoundScores);
-        var playerIndividualTotal = trapService.calculatePlayerIndividualTotal(allRoundScores, playerRoundTotals);
+        var trapRoundScores = allRoundScores.stream().map(TrapRoundScore::new).toList();
+        var playerRoundTotals = trapService.calculatePlayerRoundTotals(trapRoundScores);
+        var playerIndividualTotal = trapService.calculatePlayerIndividualTotal(trapRoundScores, playerRoundTotals);
         var playerFinalTotal = trapService.calculatePlayerFinalTotal(playerIndividualTotal);
         var teamScoresByTotal = getTeamScoresByTotal(playerFinalTotal);
         var teamScoresThatCount = calculateTeamScores(teamScoresByTotal);
@@ -94,15 +100,13 @@ public class ReportService {
 
     private List<RoundScore> generateRoundScores() {
         try {
-            return Arrays.stream(trapTypes)
-                    .flatMap(type -> {
-                        try {
-                            return generateRoundScores(type).stream();
-                        } catch (IOException | CsvException e) {
-                            throw new RuntimeException("Error generating round scores for type: " + type, e);
-                        }
-                    })
-                    .toList();
+            return Arrays.stream(trapTypes).flatMap(type -> {
+                try {
+                    return generateRoundScores(type).stream();
+                } catch (IOException | CsvException e) {
+                    throw new RuntimeException("Error generating round scores for type: " + type, e);
+                }
+            }).toList();
         } catch (RuntimeException e) {
             throw new RuntimeException("Error generating round scores", e);
         }
@@ -121,9 +125,7 @@ public class ReportService {
             }
             roundScores.removeFirst(); // Remove the header row
 
-            return roundScores.stream()
-                    .map(s -> createRoundScore(s, type))
-                    .toList();
+            return roundScores.stream().map(s -> createRoundScore(s, type)).toList();
         }
     }
 
@@ -190,18 +192,13 @@ public class ReportService {
             int scoresToCount = getRoundsToCount(firstIndividual.type());
 
             // Sum the top scores up to the limit (scoresToCount)
-            int scoreSum = entry.getValue().stream()
-                    .limit(scoresToCount)
-                    .mapToInt(IndividualTotal::total)
-                    .sum();
+            int scoreSum = entry.getValue().stream().limit(scoresToCount).mapToInt(IndividualTotal::total).sum();
 
             // Update the team's total score by creating a new TeamScore instance
             teamScoresThatCount.computeIfPresent(teamName, (_, currentTeamScore) -> new TeamScore(teamName, currentTeamScore.total() + scoreSum));
         }
 
-        return teamScoresThatCount.values().stream()
-                .sorted(Comparator.comparingInt(TeamScore::total).reversed())
-                .toList();
+        return teamScoresThatCount.values().stream().sorted(Comparator.comparingInt(TeamScore::total).reversed()).toList();
     }
 
     private void populateTeamData(Sheet sheet, String teamType, CellStyle mainTextStyle, HashMap<String, ArrayList<IndividualTotal>> teamScoresByTotal) {
@@ -363,10 +360,7 @@ public class ReportService {
     }
 
     private List<IndividualTotal> getTeamScoresByTotal(Map<String, IndividualTotal> allRoundScores) {
-        return allRoundScores.values()
-                .stream()
-                .sorted(Comparator.comparingInt(IndividualTotal::total).reversed())
-                .toList();
+        return allRoundScores.values().stream().sorted(Comparator.comparingInt(IndividualTotal::total).reversed()).toList();
     }
 
     // Team-Individual-Scores tab
@@ -393,10 +387,7 @@ public class ReportService {
         var sheet = workbook.getSheet("Individual-All-Scores");
         var start = System.currentTimeMillis();
 
-        var sortedValues = allRoundScores.values()
-                .stream()
-                .sorted(Comparator.comparing(IndividualTotal::team))
-                .toList();
+        var sortedValues = allRoundScores.values().stream().sorted(Comparator.comparing(IndividualTotal::team)).toList();
         LOGGER.info("Ran query for all scores in {} ms", System.currentTimeMillis() - start);
 
         var rows = sheet.getLastRowNum();

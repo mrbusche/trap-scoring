@@ -81,7 +81,7 @@ public final class ExcelHelper {
 
     private static String generateFilename() {
         var currentDate = LocalDateTime.now();
-        return "league-data-" + currentDate.format(FILE_NAME_DATE_FORMATTER) + ".xlsx";
+        return "league-data-%s.xlsx".formatted(currentDate.format(FILE_NAME_DATE_FORMATTER));
     }
 
     public static void addCleanData(Row row, RoundScore rowData) {
@@ -111,15 +111,15 @@ public final class ExcelHelper {
         createAndStyleCell(row, startColumn + 1, total, mainTextStyle);
     }
 
-    private static void createAndStyleCell(Row row, int column, Object value, CellStyle style) {
+    private static void createAndStyleCell(Row row, int column, String value, CellStyle style) {
         Cell cell = row.createCell(column);
+        cell.setCellValue(value);
+        cell.setCellStyle(style);
+    }
 
-        if (value instanceof String s) {
-            cell.setCellValue(s);
-        } else if (value instanceof Integer i) {
-            cell.setCellValue(i);
-        }
-
+    private static void createAndStyleCell(Row row, int column, int value, CellStyle style) {
+        Cell cell = row.createCell(column);
+        cell.setCellValue(value);
         cell.setCellStyle(style);
     }
 

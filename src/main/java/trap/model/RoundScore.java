@@ -21,8 +21,4 @@ public record RoundScore(
         int round8,
         String type
 ) {
-
-    public String uniqueName() {
-        return athlete + " " + team + " " + classification + " " + type;
-    }
 }
