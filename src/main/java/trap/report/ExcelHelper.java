@@ -12,10 +12,9 @@ import trap.model.RoundScore;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Calendar;
-import java.util.Date;
 
 public final class ExcelHelper {
 
@@ -54,10 +53,9 @@ public final class ExcelHelper {
     }
 
     public static void setCurrentSeasonHeader(Sheet sheet) {
-        var cal = Calendar.getInstance();
-        cal.setTime(new Date());
-        var month = cal.get(Calendar.MONTH);
-        var year = cal.get(Calendar.YEAR);
+        var now = LocalDate.now();
+        var month = now.getMonthValue();
+        var year = now.getYear();
         var currentSeason = month > 8 ? year + 1 : year;
         sheet.getRow(8).getCell(1).setCellValue(currentSeason + " " + sheet.getRow(8).getCell(1).getStringCellValue());
     }

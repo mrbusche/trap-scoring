@@ -21,16 +21,17 @@ import trap.model.TrapRoundScore;
 
 import java.io.FileReader;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 import static trap.report.TrapService.getRoundsToCount;
 import static trap.report.TrapService.parseInteger;
@@ -40,7 +41,7 @@ import static trap.report.TrapService.trimString;
 @Service
 public class ReportService {
     private static final Logger LOGGER = LoggerFactory.getLogger(ReportService.class);
-    private final String currentDate = new SimpleDateFormat("MM/dd/yyyy").format(Calendar.getInstance().getTime());
+    private final String currentDate = LocalDate.now().format(DateTimeFormatter.ofPattern("MM/dd/yyyy"));
     private final String[] trapTypes = new String[]{EventTypes.SINGLES, EventTypes.DOUBLES, EventTypes.HANDICAP, EventTypes.SKEET, EventTypes.CLAYS, EventTypes.FIVESTAND, EventTypes.DOUBLESKEET};
     final TrapService trapService = new TrapService();
     private final DownloadService downloadService;
@@ -61,10 +62,11 @@ public class ReportService {
         long start;
         var trueStart = System.currentTimeMillis();
 
-        var types = new HashMap<String, String>();
-        types.put("Team-Senior", Classifications.VARSITY);
-        types.put("Team-Intermediate", Classifications.INTERMEDIATE_ENTRY);
-        types.put("Team-Rookie", Classifications.ROOKIE);
+        var types = Map.of(
+            "Team-Senior", Classifications.VARSITY,
+            "Team-Intermediate", Classifications.INTERMEDIATE_ENTRY,
+            "Team-Rookie", Classifications.ROOKIE
+        );
 
         var mainTextStyle = ExcelHelper.getCellStyle(workbook);
         var style = ExcelHelper.setFontForHeaders(workbook);
@@ -159,18 +161,17 @@ public class ReportService {
         LOGGER.info("Ran get all data for clean data population in {} ms", System.currentTimeMillis() - start);
 
         var rows = new AtomicInteger(sheet.getLastRowNum());
+        Map<String, List<RoundScore>> scoresByType = allRoundScores.stream()
+                .collect(Collectors.groupingBy(RoundScore::type));
 
-        // Use parallel stream for better performance
-        Arrays.stream(trapTypes).parallel().forEach(type -> {
+        scoresByType.forEach((type, scores) -> {
             var typeStart = System.currentTimeMillis();
-            var typeRoundScores = allRoundScores.stream().filter(t -> t.type().equals(type)).toList();
-            for (var score : typeRoundScores) {
-                synchronized (sheet) {
-                    var row = sheet.createRow(rows.incrementAndGet());
-                    ExcelHelper.addCleanData(row, score);
-                }
+            for (var score : scores) {
+                var row = sheet.createRow(rows.incrementAndGet());
+                ExcelHelper.addCleanData(row, score);
             }
-            LOGGER.info("Clean data for {} {} scores populated in {} ms", typeRoundScores.size(), type, System.currentTimeMillis() - typeStart);
+            LOGGER.info("Clean data for {} {} scores populated in {} ms",
+                    scores.size(), type, System.currentTimeMillis() - typeStart);
         });
 
         sheet.setAutoFilter(CellRangeAddress.valueOf("A1:S1"));
