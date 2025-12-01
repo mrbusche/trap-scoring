@@ -1,7 +1,6 @@
 package trap.report;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import trap.client.TrapDataClient;
 
@@ -17,9 +16,8 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.Executors;
 
 @Service
+@Slf4j
 public class DownloadService {
-    private static final Logger LOGGER = LoggerFactory.getLogger(DownloadService.class);
-
     private final TrapDataClient trapDataClient;
 
     private static final Map<String, String> FILE_IDS = Map.of(
@@ -38,7 +36,7 @@ public class DownloadService {
 
     public void downloadFiles(String[] trapTypes) {
         var start = Instant.now();
-        LOGGER.info("Started downloading files");
+        log.info("Started downloading files");
 
         try (var executor = Executors.newVirtualThreadPerTaskExecutor()) {
 
@@ -52,33 +50,33 @@ public class DownloadService {
 
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt(); // Restore interrupted status
-            LOGGER.error("Download process was interrupted", e);
+            log.error("Download process was interrupted", e);
             throw new RuntimeException("Download interrupted", e);
         }
 
         var duration = Duration.between(start, Instant.now());
-        LOGGER.info("Files downloaded in {} ms", duration.toMillis());
+        log.info("Files downloaded in {} ms", duration.toMillis());
     }
 
     private void processFile(String type, String fileId) {
         try {
-            LOGGER.info("Downloading {} file", type);
+            log.info("Downloading {} file", type);
             String content = trapDataClient.getFileContent(fileId);
 
             if (content == null) {
-                LOGGER.error("Failed to download {}: Received null content", type);
+                log.error("Failed to download {}: Received null content", type);
                 return;
             }
 
-            LOGGER.info("Finished downloading {} file", type);
+            log.info("Finished downloading {} file", type);
 
             String cleanContent = content.replaceAll(" {2}", " ");
             var path = Path.of(type + ".csv");
             Files.writeString(path, cleanContent, StandardCharsets.UTF_8, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
 
-            LOGGER.info("Finished replacing double spaces for {} file", type);
+            log.info("Finished replacing double spaces for {} file", type);
         } catch (Exception e) {
-            LOGGER.error("Error processing {} file", type, e);
+            log.error("Error processing {} file", type, e);
         }
     }
 }

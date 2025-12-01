@@ -1,12 +1,11 @@
 package trap.report;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import trap.model.IndividualTotal;
 import trap.model.RoundScore;
 
@@ -16,9 +15,8 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
+@Slf4j
 public final class ExcelHelper {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(ExcelHelper.class);
     private static final DateTimeFormatter FILE_NAME_DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
     private static final String DEFAULT_FONT_NAME = "Calibri";
 
@@ -64,17 +62,17 @@ public final class ExcelHelper {
         long start = System.currentTimeMillis();
         String filename = generateFilename();
 
-        LOGGER.info("Creating file: {}", filename);
+        log.info("Creating file: {}", filename);
         try (FileOutputStream fileOutputStream = new FileOutputStream(filename)) {
-            LOGGER.info("Writing file...");
+            log.info("Writing file...");
             workbook.write(fileOutputStream);
-            LOGGER.info("File written successfully.");
+            log.info("File written successfully.");
         } catch (IOException e) {
-            LOGGER.error("Error writing file: {}", e.getMessage());
+            log.error("Error writing file: {}", e.getMessage());
             throw e;
         }
 
-        LOGGER.info("Created file in {} ms", System.currentTimeMillis() - start);
+        log.info("Created file in {} ms", System.currentTimeMillis() - start);
     }
 
     private static String generateFilename() {
