@@ -1,11 +1,9 @@
 package trap.common;
 
+import lombok.experimental.UtilityClass;
+
+@UtilityClass
 public final class Classifications {
-
-    private Classifications() {
-        throw new IllegalStateException("Utility class");
-    }
-
     public static final String ROOKIE = "Rookie";
     public static final String VARSITY = "Varsity";
     public static final String INTERMEDIATE_ENTRY = "Intermediate Entry";

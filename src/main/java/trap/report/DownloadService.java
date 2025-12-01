@@ -1,5 +1,6 @@
 package trap.report;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import trap.client.TrapDataClient;
@@ -15,6 +16,7 @@ import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Executors;
 
+@RequiredArgsConstructor
 @Service
 @Slf4j
 public class DownloadService {
@@ -29,10 +31,6 @@ public class DownloadService {
             "fivestand", "3c5aecf2-a9f2-49b2-a11f-36965cb1a964",
             "doublesskeet", "bdd61066-6e29-4242-b6e9-adf286c2c4ae"
     );
-
-    public DownloadService(TrapDataClient trapDataClient) {
-        this.trapDataClient = trapDataClient;
-    }
 
     public void downloadFiles(String[] trapTypes) {
         var start = Instant.now();

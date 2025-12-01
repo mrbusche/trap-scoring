@@ -1,5 +1,6 @@
 package trap.report;
 
+import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
@@ -16,13 +17,10 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 @Slf4j
+@UtilityClass
 public final class ExcelHelper {
     private static final DateTimeFormatter FILE_NAME_DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
     private static final String DEFAULT_FONT_NAME = "Calibri";
-
-    private ExcelHelper() {
-        throw new UnsupportedOperationException("This is a utility class and cannot be instantiated");
-    }
 
     public static CellStyle setFontForHeaders(Workbook workbook) {
         var font = workbook.createFont();

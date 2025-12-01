@@ -1,5 +1,6 @@
 package trap.report;
 
+import org.springframework.stereotype.Service;
 import trap.common.EventTypes;
 import trap.model.IndividualTotal;
 import trap.model.RoundTotal;
@@ -16,8 +17,8 @@ import java.util.stream.Gatherer;
 
 import static java.util.Map.entry;
 
+@Service
 public class TrapService {
-
     private static final Map<String, Integer> EVENT_COUNTS = Map.ofEntries(
             entry(EventTypes.SINGLES, 5),
             entry(EventTypes.DOUBLES, 5),

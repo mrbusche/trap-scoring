@@ -1,11 +1,9 @@
 package trap.common;
 
+import lombok.experimental.UtilityClass;
+
+@UtilityClass
 public final class EventTypes {
-
-    private EventTypes() {
-        throw new IllegalStateException("Utility class");
-    }
-
     public static final String SINGLES = "singles";
     public static final String DOUBLES = "doubles";
     public static final String HANDICAP = "handicap";
