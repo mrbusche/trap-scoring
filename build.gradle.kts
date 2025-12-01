@@ -1,15 +1,15 @@
 plugins {
     java
-    id("org.springframework.boot") version "4.0.0"
+    alias(libs.plugins.spring.boot)
     id("io.spring.dependency-management") version "1.1.7"
 }
 
 group = "com.trap-scoring"
-version = "9.0.0"
+version = "10.0.0"
 
 java {
     toolchain {
-        languageVersion = JavaLanguageVersion.of(25)
+        languageVersion.set(JavaLanguageVersion.of(libs.versions.java.get().toInt()))
     }
 }
 
@@ -18,15 +18,17 @@ repositories {
     maven { url = uri("https://repo.spring.io/milestone") }
 }
 
-val poiOoxmlVersion = "5.5.1"
-val openCsvVersion = "5.12.0"
-
 dependencies {
-    implementation("org.apache.poi:poi-ooxml:$poiOoxmlVersion")
-    implementation("com.opencsv:opencsv:$openCsvVersion")
-    implementation("org.springframework.boot:spring-boot-starter-test")
+    implementation(libs.poi.ooxml)
+    implementation(libs.opencsv)
 
-    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+    implementation(libs.spring.boot.starter)
+    implementation(libs.spring.web)
+
+    compileOnly(libs.lombok)
+    annotationProcessor(libs.lombok)
+
+    testImplementation(libs.spring.boot.starter.test)
 }
 
 tasks.withType<Test> {

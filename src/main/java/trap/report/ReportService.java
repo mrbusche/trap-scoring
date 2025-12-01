@@ -2,6 +2,8 @@ package trap.report;
 
 import com.opencsv.CSVReader;
 import com.opencsv.exceptions.CsvException;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.Row;
@@ -9,27 +11,28 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.apache.poi.ss.util.CellRangeAddress;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import trap.common.Classifications;
 import trap.common.EventTypes;
 import trap.model.IndividualTotal;
 import trap.model.RoundScore;
 import trap.model.TeamScore;
+import trap.model.TrapRoundScore;
 
 import java.io.FileReader;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
+import java.nio.charset.StandardCharsets;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 import static trap.report.TrapService.getRoundsToCount;
 import static trap.report.TrapService.parseInteger;
@@ -37,39 +40,43 @@ import static trap.report.TrapService.setStringToZero;
 import static trap.report.TrapService.trimString;
 
 @Service
+@Slf4j
+@RequiredArgsConstructor
 public class ReportService {
-    private static final Logger LOGGER = LoggerFactory.getLogger(ReportService.class);
-    private final String currentDate = new SimpleDateFormat("MM/dd/yyyy").format(Calendar.getInstance().getTime());
+    private final String currentDate = LocalDate.now().format(DateTimeFormatter.ofPattern("MM/dd/yyyy"));
     private final String[] trapTypes = new String[]{EventTypes.SINGLES, EventTypes.DOUBLES, EventTypes.HANDICAP, EventTypes.SKEET, EventTypes.CLAYS, EventTypes.FIVESTAND, EventTypes.DOUBLESKEET};
-    final TrapService trapService = new TrapService();
-    final DownloadService downloadService = new DownloadService();
+
+    private final DownloadService downloadService;
+    private final TrapService trapService;
 
     public void generateExcelFile() throws Exception {
         downloadService.downloadFiles(trapTypes);
 
         var workbook = getWorkbook();
 
-        LOGGER.info("Starting file creation");
-        LOGGER.info("Workbook has {} sheets", workbook.getNumberOfSheets());
-        workbook.forEach(sheet -> LOGGER.info("- {}", sheet.getSheetName()));
+        log.info("Starting file creation");
+        log.info("Workbook has {} sheets", workbook.getNumberOfSheets());
+        workbook.forEach(sheet -> log.info("- {}", sheet.getSheetName()));
 
         long start;
         var trueStart = System.currentTimeMillis();
 
-        var types = new HashMap<String, String>();
-        types.put("Team-Senior", Classifications.VARSITY);
-        types.put("Team-Intermediate", Classifications.INTERMEDIATE_ENTRY);
-        types.put("Team-Rookie", Classifications.ROOKIE);
+        var types = Map.of(
+                "Team-Senior", Classifications.VARSITY,
+                "Team-Intermediate", Classifications.INTERMEDIATE_ENTRY,
+                "Team-Rookie", Classifications.ROOKIE
+        );
 
         var mainTextStyle = ExcelHelper.getCellStyle(workbook);
         var style = ExcelHelper.setFontForHeaders(workbook);
 
         var allRoundScores = generateRoundScores();
-        LOGGER.info("Generated round scores in {} ms", System.currentTimeMillis() - trueStart);
+        log.info("Generated round scores in {} ms", System.currentTimeMillis() - trueStart);
         populateCleanData(workbook.getSheet("Clean Data"), allRoundScores);
 
-        var playerRoundTotals = trapService.calculatePlayerRoundTotals(allRoundScores);
-        var playerIndividualTotal = trapService.calculatePlayerIndividualTotal(allRoundScores, playerRoundTotals);
+        var trapRoundScores = allRoundScores.stream().map(TrapRoundScore::new).toList();
+        var playerRoundTotals = trapService.calculatePlayerRoundTotals(trapRoundScores);
+        var playerIndividualTotal = trapService.calculatePlayerIndividualTotal(trapRoundScores, playerRoundTotals);
         var playerFinalTotal = trapService.calculatePlayerFinalTotal(playerIndividualTotal);
         var teamScoresByTotal = getTeamScoresByTotal(playerFinalTotal);
         var teamScoresThatCount = calculateTeamScores(teamScoresByTotal);
@@ -77,7 +84,7 @@ public class ReportService {
         for (Map.Entry<String, String> entry : types.entrySet()) {
             start = System.currentTimeMillis();
             populateTeamData(workbook.getSheet(entry.getKey()), entry.getValue(), mainTextStyle, teamScoresThatCount);
-            LOGGER.info("{} data populated in {} ms", entry.getKey(), System.currentTimeMillis() - start);
+            log.info("{} data populated in {} ms", entry.getKey(), System.currentTimeMillis() - start);
         }
 
         populateIndividualData(workbook, "Individual-Men", "M", style, mainTextStyle, playerFinalTotal);
@@ -88,21 +95,19 @@ public class ReportService {
 
         ExcelHelper.createFile(workbook);
 
-        LOGGER.info("Finished creating file in {} ms", System.currentTimeMillis() - trueStart);
+        log.info("Finished creating file in {} ms", System.currentTimeMillis() - trueStart);
         workbook.close();
     }
 
     private List<RoundScore> generateRoundScores() {
         try {
-            return Arrays.stream(trapTypes)
-                    .flatMap(type -> {
-                        try {
-                            return generateRoundScores(type).stream();
-                        } catch (IOException | CsvException e) {
-                            throw new RuntimeException("Error generating round scores for type: " + type, e);
-                        }
-                    })
-                    .toList();
+            return Arrays.stream(trapTypes).flatMap(type -> {
+                try {
+                    return generateRoundScores(type).stream();
+                } catch (IOException | CsvException e) {
+                    throw new RuntimeException("Error generating round scores for type: " + type, e);
+                }
+            }).toList();
         } catch (RuntimeException e) {
             throw new RuntimeException("Error generating round scores", e);
         }
@@ -114,65 +119,61 @@ public class ReportService {
     }
 
     private List<RoundScore> generateRoundScores(String type) throws IOException, CsvException {
-        try (var reader = new CSVReader(new FileReader(type + ".csv"))) {
+        try (var reader = new CSVReader(new FileReader(type + ".csv", StandardCharsets.UTF_8))) {
             var roundScores = reader.readAll();
             if (roundScores.isEmpty()) {
                 return new ArrayList<>(); // or handle as appropriate
             }
             roundScores.removeFirst(); // Remove the header row
 
-            return roundScores.stream()
-                    .map(s -> createRoundScore(s, type))
-                    .toList();
+            return roundScores.stream().map(s -> createRoundScore(s, type)).toList();
         }
     }
 
     private RoundScore createRoundScore(String[] data, String type) {
-        return new RoundScore(
-                parseInteger(data[1]),
-                trimString(data[2]),
-                parseInteger(data[3]),
-                trimString(data[4]),
-                trimString(data[5]),
-                trimString(data[6]),
-                trimString(data[7]).replace("Club", "Team"),
-                trimString(data[8]),
-                trimString(data[10]),
-                trimString(data[11]),
-                setStringToZero(data[12]),
-                setStringToZero(data[13]),
-                setStringToZero(data[14]),
-                setStringToZero(data[15]),
-                setStringToZero(data[16]),
-                setStringToZero(data[17]),
-                setStringToZero(data[18]),
-                setStringToZero(data[19]),
-                type
-        );
+        return RoundScore.builder()
+                .eventId(parseInteger(data[1]))
+                .event(trimString(data[2]))
+                .locationId(parseInteger(data[3]))
+                .location(trimString(data[4]))
+                .eventDate(trimString(data[5]))
+                .squadName(trimString(data[6]))
+                .team(trimString(data[7]).replace("Club", "Team"))
+                .athlete(trimString(data[8]))
+                .classification(trimString(data[10]))
+                .gender(trimString(data[11]))
+                .round1(setStringToZero(data[12]))
+                .round2(setStringToZero(data[13]))
+                .round3(setStringToZero(data[14]))
+                .round4(setStringToZero(data[15]))
+                .round5(setStringToZero(data[16]))
+                .round6(setStringToZero(data[17]))
+                .round7(setStringToZero(data[18]))
+                .round8(setStringToZero(data[19]))
+                .type(type)
+                .build();
     }
 
     private void populateCleanData(Sheet sheet, List<RoundScore> allRoundScores) {
         var start = System.currentTimeMillis();
 
-        LOGGER.info("Ran get all data for clean data population in {} ms", System.currentTimeMillis() - start);
+        log.info("Ran get all data for clean data population in {} ms", System.currentTimeMillis() - start);
 
         var rows = new AtomicInteger(sheet.getLastRowNum());
+        Map<String, List<RoundScore>> scoresByType = allRoundScores.stream()
+                .collect(Collectors.groupingBy(RoundScore::type));
 
-        // Use parallel stream for better performance
-        Arrays.stream(trapTypes).parallel().forEach(type -> {
+        scoresByType.forEach((type, scores) -> {
             var typeStart = System.currentTimeMillis();
-            var typeRoundScores = allRoundScores.stream().filter(t -> t.type().equals(type)).toList();
-            for (var score : typeRoundScores) {
-                synchronized (sheet) {
-                    var row = sheet.createRow(rows.incrementAndGet());
-                    ExcelHelper.addCleanData(row, score);
-                }
+            for (var score : scores) {
+                var row = sheet.createRow(rows.incrementAndGet());
+                ExcelHelper.addCleanData(row, score);
             }
-            LOGGER.info("Clean data for {} {} scores populated in {} ms", typeRoundScores.size(), type, System.currentTimeMillis() - typeStart);
+            log.info("Clean data for {} {} scores populated in {} ms", scores.size(), type, System.currentTimeMillis() - typeStart);
         });
 
         sheet.setAutoFilter(CellRangeAddress.valueOf("A1:S1"));
-        LOGGER.info("Clean data populated in {} ms", System.currentTimeMillis() - start);
+        log.info("Clean data populated in {} ms", System.currentTimeMillis() - start);
     }
 
     private List<TeamScore> getTeamScores(List<Map.Entry<String, ArrayList<IndividualTotal>>> teamData) {
@@ -190,18 +191,13 @@ public class ReportService {
             int scoresToCount = getRoundsToCount(firstIndividual.type());
 
             // Sum the top scores up to the limit (scoresToCount)
-            int scoreSum = entry.getValue().stream()
-                    .limit(scoresToCount)
-                    .mapToInt(IndividualTotal::total)
-                    .sum();
+            int scoreSum = entry.getValue().stream().limit(scoresToCount).mapToInt(IndividualTotal::total).sum();
 
             // Update the team's total score by creating a new TeamScore instance
             teamScoresThatCount.computeIfPresent(teamName, (_, currentTeamScore) -> new TeamScore(teamName, currentTeamScore.total() + scoreSum));
         }
 
-        return teamScoresThatCount.values().stream()
-                .sorted(Comparator.comparingInt(TeamScore::total).reversed())
-                .toList();
+        return teamScoresThatCount.values().stream().sorted(Comparator.comparingInt(TeamScore::total).reversed()).toList();
     }
 
     private void populateTeamData(Sheet sheet, String teamType, CellStyle mainTextStyle, HashMap<String, ArrayList<IndividualTotal>> teamScoresByTotal) {
@@ -217,7 +213,7 @@ public class ReportService {
 
         List<Map.Entry<String, ArrayList<IndividualTotal>>> teamData = teamScoresByTotal.entrySet().stream().filter(f -> f.getValue().getFirst().teamClassificationForTotal().equals(teamType) && f.getValue().getFirst().type().equals(EventTypes.SINGLES)).toList();
         List<TeamScore> teamScores = getTeamScores(teamData);
-        LOGGER.info("Ran query for singles by {} in {} ms", teamType, System.currentTimeMillis() - start);
+        log.info("Ran query for singles by {} in {} ms", teamType, System.currentTimeMillis() - start);
         for (var teamScore : teamScores) {
             row = sheet.createRow(++updateRow);
             ExcelHelper.addTeamData(row, startColumn, teamScore.name(), teamScore.total(), mainTextStyle);
@@ -232,7 +228,7 @@ public class ReportService {
                 start = System.currentTimeMillis();
                 teamData = teamScoresByTotal.entrySet().stream().filter(f -> f.getValue().getFirst().teamClassificationForTotal().equals(teamType) && f.getValue().getFirst().type().equals(type)).toList();
                 teamScores = getTeamScores(teamData);
-                LOGGER.info("Ran query for {} by {} in {} ms", type, teamType, System.currentTimeMillis() - start);
+                log.info("Ran query for {} by {} in {} ms", type, teamType, System.currentTimeMillis() - start);
                 for (var teamScore : teamScores) {
                     row = sheet.getRow(++updateRow);
                     ExcelHelper.addTeamData(row, startColumn, teamScore.name(), teamScore.total(), mainTextStyle);
@@ -294,7 +290,7 @@ public class ReportService {
             justValues.sort(Comparator.comparingInt(IndividualTotal::total).reversed());
 
             var individualData = justValues.stream().filter(f -> f.gender().equals(gender) && f.teamClassification().equals(classification) && f.type().equals(EventTypes.SINGLES)).toList();
-            LOGGER.info("Ran query for singles by {} and {} in {} ms", gender, classification, System.currentTimeMillis() - start);
+            log.info("Ran query for singles by {} and {} in {} ms", gender, classification, System.currentTimeMillis() - start);
 
             for (IndividualTotal singlesRowData : individualData) {
                 row = sheet.createRow(++updateRow);
@@ -309,7 +305,7 @@ public class ReportService {
                 updateRow++;
                 start = System.currentTimeMillis();
                 individualData = justValues.stream().filter(f -> f.gender().equals(gender) && f.teamClassification().equals(classification) && f.type().equals(type)).toList();
-                LOGGER.info("Ran query for {} by {} and {} in {} ms", type, gender, classification, System.currentTimeMillis() - start);
+                log.info("Ran query for {} by {} and {} in {} ms", type, gender, classification, System.currentTimeMillis() - start);
                 for (IndividualTotal data : individualData) {
                     row = sheet.getRow(++updateRow);
                     ExcelHelper.addPlayerData(row, column, data.athlete(), data.total(), data.team(), mainTextStyle);
@@ -320,7 +316,7 @@ public class ReportService {
 
             sheet.setAutoFilter(CellRangeAddress.valueOf("A13:AB13"));
         }
-        LOGGER.info("{} data populated in {} ms", sheetName, System.currentTimeMillis() - initialStart);
+        log.info("{} data populated in {} ms", sheetName, System.currentTimeMillis() - initialStart);
     }
 
     private HashMap<String, ArrayList<IndividualTotal>> calculateTeamScores(List<IndividualTotal> justValues) {
@@ -363,10 +359,7 @@ public class ReportService {
     }
 
     private List<IndividualTotal> getTeamScoresByTotal(Map<String, IndividualTotal> allRoundScores) {
-        return allRoundScores.values()
-                .stream()
-                .sorted(Comparator.comparingInt(IndividualTotal::total).reversed())
-                .toList();
+        return allRoundScores.values().stream().sorted(Comparator.comparingInt(IndividualTotal::total).reversed()).toList();
     }
 
     // Team-Individual-Scores tab
@@ -374,7 +367,7 @@ public class ReportService {
         var sheet = workbook.getSheet("Team-Individual-Scores");
         var startTime = System.currentTimeMillis();
 
-        LOGGER.info("Ran query for team scores in {} ms", System.currentTimeMillis() - startTime);
+        log.info("Ran query for team scores in {} ms", System.currentTimeMillis() - startTime);
 
         var rows = sheet.getLastRowNum();
         var teamScoresThatCount = calculateTeamScores(teamScoresByTotal);
@@ -386,18 +379,15 @@ public class ReportService {
 
         sheet.setAutoFilter(CellRangeAddress.valueOf("A1:E1"));
 
-        LOGGER.info("Team Individual Scores data populated in {} ms", System.currentTimeMillis() - startTime);
+        log.info("Team Individual Scores data populated in {} ms", System.currentTimeMillis() - startTime);
     }
 
     private void populateAllIndividualData(Workbook workbook, Map<String, IndividualTotal> allRoundScores) {
         var sheet = workbook.getSheet("Individual-All-Scores");
         var start = System.currentTimeMillis();
 
-        var sortedValues = allRoundScores.values()
-                .stream()
-                .sorted(Comparator.comparing(IndividualTotal::team))
-                .toList();
-        LOGGER.info("Ran query for all scores in {} ms", System.currentTimeMillis() - start);
+        var sortedValues = allRoundScores.values().stream().sorted(Comparator.comparing(IndividualTotal::team)).toList();
+        log.info("Ran query for all scores in {} ms", System.currentTimeMillis() - start);
 
         var rows = sheet.getLastRowNum();
 
@@ -407,6 +397,6 @@ public class ReportService {
             row.createCell(5).setCellValue(rowData.gender());
         }
         sheet.setAutoFilter(CellRangeAddress.valueOf("A1:F1"));
-        LOGGER.info("Individual All Scores data populated in {} ms", System.currentTimeMillis() - start);
+        log.info("Individual All Scores data populated in {} ms", System.currentTimeMillis() - start);
     }
 }

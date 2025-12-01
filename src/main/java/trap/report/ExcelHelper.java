@@ -1,31 +1,26 @@
 package trap.report;
 
+import lombok.experimental.UtilityClass;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import trap.model.IndividualTotal;
 import trap.model.RoundScore;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Calendar;
-import java.util.Date;
 
+@Slf4j
+@UtilityClass
 public final class ExcelHelper {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(ExcelHelper.class);
     private static final DateTimeFormatter FILE_NAME_DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
     private static final String DEFAULT_FONT_NAME = "Calibri";
-
-    private ExcelHelper() {
-        throw new UnsupportedOperationException("This is a utility class and cannot be instantiated");
-    }
 
     public static CellStyle setFontForHeaders(Workbook workbook) {
         var font = workbook.createFont();
@@ -54,10 +49,9 @@ public final class ExcelHelper {
     }
 
     public static void setCurrentSeasonHeader(Sheet sheet) {
-        var cal = Calendar.getInstance();
-        cal.setTime(new Date());
-        var month = cal.get(Calendar.MONTH);
-        var year = cal.get(Calendar.YEAR);
+        var now = LocalDate.now();
+        var month = now.getMonthValue();
+        var year = now.getYear();
         var currentSeason = month > 8 ? year + 1 : year;
         sheet.getRow(8).getCell(1).setCellValue(currentSeason + " " + sheet.getRow(8).getCell(1).getStringCellValue());
     }
@@ -66,22 +60,22 @@ public final class ExcelHelper {
         long start = System.currentTimeMillis();
         String filename = generateFilename();
 
-        LOGGER.info("Creating file: {}", filename);
+        log.info("Creating file: {}", filename);
         try (FileOutputStream fileOutputStream = new FileOutputStream(filename)) {
-            LOGGER.info("Writing file...");
+            log.info("Writing file...");
             workbook.write(fileOutputStream);
-            LOGGER.info("File written successfully.");
+            log.info("File written successfully.");
         } catch (IOException e) {
-            LOGGER.error("Error writing file: {}", e.getMessage());
+            log.error("Error writing file: {}", e.getMessage());
             throw e;
         }
 
-        LOGGER.info("Created file in {} ms", System.currentTimeMillis() - start);
+        log.info("Created file in {} ms", System.currentTimeMillis() - start);
     }
 
     private static String generateFilename() {
         var currentDate = LocalDateTime.now();
-        return "league-data-" + currentDate.format(FILE_NAME_DATE_FORMATTER) + ".xlsx";
+        return "league-data-%s.xlsx".formatted(currentDate.format(FILE_NAME_DATE_FORMATTER));
     }
 
     public static void addCleanData(Row row, RoundScore rowData) {
@@ -111,15 +105,15 @@ public final class ExcelHelper {
         createAndStyleCell(row, startColumn + 1, total, mainTextStyle);
     }
 
-    private static void createAndStyleCell(Row row, int column, Object value, CellStyle style) {
+    private static void createAndStyleCell(Row row, int column, String value, CellStyle style) {
         Cell cell = row.createCell(column);
+        cell.setCellValue(value);
+        cell.setCellStyle(style);
+    }
 
-        if (value instanceof String s) {
-            cell.setCellValue(s);
-        } else if (value instanceof Integer i) {
-            cell.setCellValue(i);
-        }
-
+    private static void createAndStyleCell(Row row, int column, int value, CellStyle style) {
+        Cell cell = row.createCell(column);
+        cell.setCellValue(value);
         cell.setCellStyle(style);
     }
 

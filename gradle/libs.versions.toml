@@ -1,0 +1,16 @@
+[versions]
+java = "25"
+springBoot = "4.0.0"
+poi = "5.5.1"
+opencsv = "5.12.0"
+
+[libraries]
+poi-ooxml = { module = "org.apache.poi:poi-ooxml", version.ref = "poi" }
+opencsv = { module = "com.opencsv:opencsv", version.ref = "opencsv" }
+spring-boot-starter = { module = "org.springframework.boot:spring-boot-starter" }
+spring-boot-starter-test = { module = "org.springframework.boot:spring-boot-starter-test" }
+spring-web = { module = "org.springframework:spring-web" }
+lombok = { module = "org.projectlombok:lombok" }
+
+[plugins]
+spring-boot = { id = "org.springframework.boot", version.ref = "springBoot" }

@@ -1,5 +1,8 @@
 package trap.model;
 
+import lombok.Builder;
+
+@Builder
 public record RoundScore(
         int eventId,
         String event,
@@ -21,8 +24,4 @@ public record RoundScore(
         int round8,
         String type
 ) {
-
-    public String uniqueName() {
-        return athlete + " " + team + " " + classification + " " + type;
-    }
 }
