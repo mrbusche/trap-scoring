@@ -1,4 +1,6 @@
 package trap.model;
 
-public record TeamScore(String name, int total) {
+import lombok.With;
+
+public record TeamScore(String name, @With int total) {
 }
