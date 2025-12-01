@@ -37,8 +37,8 @@ public class DownloadService {
         this.restClient = builder
                 .baseUrl("https://metabase.sssfonline.com/public/question")
                 .requestFactory(new SimpleClientHttpRequestFactory() {{
-                    setConnectTimeout(10_000);
-                    setReadTimeout(30_000);
+                    setConnectTimeout(30_000);
+                    setReadTimeout(120_000);
                 }})
                 .build();
     }
