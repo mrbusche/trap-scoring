@@ -1,8 +1,8 @@
 package trap.report;
 
 import com.opencsv.CSVReader;
-import com.opencsv.exceptions.CsvException;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
@@ -100,17 +100,9 @@ public class ReportService {
     }
 
     private List<RoundScore> generateRoundScores() {
-        try {
-            return Arrays.stream(trapTypes).flatMap(type -> {
-                try {
-                    return generateRoundScores(type).stream();
-                } catch (IOException | CsvException e) {
-                    throw new RuntimeException("Error generating round scores for type: " + type, e);
-                }
-            }).toList();
-        } catch (RuntimeException e) {
-            throw new RuntimeException("Error generating round scores", e);
-        }
+        return Arrays.stream(trapTypes)
+                .flatMap(type -> generateRoundScores(type).stream())
+                .toList();
     }
 
     private Workbook getWorkbook() throws IOException {
@@ -118,7 +110,8 @@ public class ReportService {
         return WorkbookFactory.create(Objects.requireNonNull(in));
     }
 
-    private List<RoundScore> generateRoundScores(String type) throws IOException, CsvException {
+    @SneakyThrows
+    private List<RoundScore> generateRoundScores(String type) {
         try (var reader = new CSVReader(new FileReader(type + ".csv", StandardCharsets.UTF_8))) {
             var roundScores = reader.readAll();
             if (roundScores.isEmpty()) {
@@ -194,7 +187,8 @@ public class ReportService {
             int scoreSum = entry.getValue().stream().limit(scoresToCount).mapToInt(IndividualTotal::total).sum();
 
             // Update the team's total score by creating a new TeamScore instance
-            teamScoresThatCount.computeIfPresent(teamName, (_, currentTeamScore) -> new TeamScore(teamName, currentTeamScore.total() + scoreSum));
+            teamScoresThatCount.computeIfPresent(teamName, (_, currentTeamScore) ->
+                    currentTeamScore.withTotal(currentTeamScore.total() + scoreSum));
         }
 
         return teamScoresThatCount.values().stream().sorted(Comparator.comparingInt(TeamScore::total).reversed()).toList();
