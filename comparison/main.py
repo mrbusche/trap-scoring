@@ -5,7 +5,8 @@ import warnings
 import glob
 
 # Suppress specific openpyxl warnings about unparseable headers/footers
-warnings.filterwarnings("ignore", message="Cannot parse header or footer")
+warnings.filterwarnings('ignore', message='Cannot parse header or footer')
+
 
 def compare_excel_files(file1_path, file2_path):
     """
@@ -16,22 +17,22 @@ def compare_excel_files(file1_path, file2_path):
     """
 
     if not os.path.exists(file1_path):
-        print(f"Error: File not found -> {file1_path}")
+        print(f'Error: File not found -> {file1_path}')
         return
     if not os.path.exists(file2_path):
-        print(f"Error: File not found -> {file2_path}")
+        print(f'Error: File not found -> {file2_path}')
         return
 
-    print(f"--- Starting Comparison ---")
-    print(f"File A: {file1_path}")
-    print(f"File B: {file2_path}")
-    print("---------------------------\n")
+    print(f'--- Starting Comparison ---')
+    print(f'File A: {file1_path}')
+    print(f'File B: {file2_path}')
+    print('---------------------------\n')
 
     try:
         xl1 = pd.ExcelFile(file1_path)
         xl2 = pd.ExcelFile(file2_path)
     except Exception as e:
-        print(f"Critical Error reading Excel files: {e}")
+        print(f'Critical Error reading Excel files: {e}')
         return
 
     # Compare Sheet Names
@@ -39,15 +40,15 @@ def compare_excel_files(file1_path, file2_path):
     sheets2 = set(xl2.sheet_names)
 
     if sheets1 != sheets2:
-        print("x Sheet mismatch detected!")
+        print('x Sheet mismatch detected!')
         only_in_1 = sheets1 - sheets2
         only_in_2 = sheets2 - sheets1
         if only_in_1:
-            print(f"  - Sheets only in File A: {only_in_1}")
+            print(f'  - Sheets only in File A: {only_in_1}')
         if only_in_2:
-            print(f"  - Sheets only in File B: {only_in_2}")
+            print(f'  - Sheets only in File B: {only_in_2}')
     else:
-        print("✓ Sheet names match.")
+        print('✓ Sheet names match.')
 
     common_sheets = sheets1.intersection(sheets2)
 
@@ -59,56 +60,65 @@ def compare_excel_files(file1_path, file2_path):
         try:
             df1 = xl1.parse(sheet, header=None)
             df2 = xl2.parse(sheet, header=None)
+
+            # Normalize "As of:" cells to ignore date differences
+            df1 = df1.replace(to_replace=r'As of:.*', value='As of: IGNORED', regex=True)
+            df2 = df2.replace(to_replace=r'As of:.*', value='As of: IGNORED', regex=True)
         except Exception as e:
             print(f"  x Error parsing sheet '{sheet}': {e}")
             continue
 
         # Compare Dimensions
         if df1.shape != df2.shape:
-            print(f"  x Dimension mismatch:")
-            print(f"    File A: {df1.shape[0]} rows, {df1.shape[1]} columns")
-            print(f"    File B: {df2.shape[0]} rows, {df2.shape[1]} columns")
+            print(f'  x Dimension mismatch:')
+            print(f'    File A: {df1.shape[0]} rows, {df1.shape[1]} columns')
+            print(f'    File B: {df2.shape[0]} rows, {df2.shape[1]} columns')
             differences_found = True
             continue
 
         # Strict Value Comparison (Order matters)
         if df1.equals(df2):
-            print("  ✓ Identical (Order and Content match)")
+            print('  ✓ Identical (Order and Content match)')
         else:
             # Smart Comparison (Ignore Sort Order)
-            print("  ! Strict mismatch found. Checking if data is just sorted differently...")
+            print('  ! Strict mismatch found. Checking if data is just sorted differently...')
 
             # Sort by all columns to align data
             # convert to string temporarily to avoid sorting errors with mixed types (int vs str)
-            df1_sorted = df1.sort_values(by=df1.columns.tolist(), key=lambda col: col.astype(str)).reset_index(drop=True)
-            df2_sorted = df2.sort_values(by=df2.columns.tolist(), key=lambda col: col.astype(str)).reset_index(drop=True)
+            df1_sorted = df1.sort_values(by=df1.columns.tolist(), key=lambda col: col.astype(str)).reset_index(
+                drop=True
+            )
+            df2_sorted = df2.sort_values(by=df2.columns.tolist(), key=lambda col: col.astype(str)).reset_index(
+                drop=True
+            )
 
             if df1_sorted.equals(df2_sorted):
-                print("  ✓ Identical Content (Data matches, but sort order was different)")
+                print('  ✓ Identical Content (Data matches, but sort order was different)')
             else:
-                print("  x True content differences found.")
+                print('  x True content differences found.')
                 differences_found = True
 
                 try:
                     diff = df1_sorted.compare(df2_sorted, align_axis=0)
 
-                    print(f"    First 10 differences (after aligning rows):")
+                    print(f'    First 10 differences (after aligning rows):')
                     print(diff.head(10).to_string())
 
                     if len(diff) > 10:
-                        print(f"\n    ... {len(diff) - 10} more differences hidden.")
+                        print(f'\n    ... {len(diff) - 10} more differences hidden.')
                 except Exception as e:
-                    print(f"    Could not generate detailed diff report: {e}")
+                    print(f'    Could not generate detailed diff report: {e}')
 
-    print("\n---------------------------")
+    print('\n---------------------------')
     if differences_found:
-        print("RESULT: Files are DIFFERENT.")
+        print('RESULT: Files are DIFFERENT.')
         sys.exit(1)
     else:
-        print("RESULT: Files match (Content is identical).")
+        print('RESULT: Files match (Content is identical).')
         sys.exit(0)
 
-if __name__ == "__main__":
+
+if __name__ == '__main__':
     file1 = sys.argv[1]
 
     search_pattern = os.path.join('..', 'league-data-*.xlsx')
@@ -121,8 +131,8 @@ if __name__ == "__main__":
     # Sort by modification time to get the newest
     try:
         newest_file = max(candidates, key=os.path.getmtime)
-        print(f"(Auto-selected baseline file: {newest_file})")
+        print(f'(Auto-selected baseline file: {newest_file})')
         compare_excel_files(file1, newest_file)
     except Exception as e:
-        print(f"Error determining newest file: {e}")
+        print(f'Error determining newest file: {e}')
         sys.exit(1)
