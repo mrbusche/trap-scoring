@@ -10,6 +10,7 @@ rootProject {
         rewrite("org.openrewrite.recipe:rewrite-spring:+")
         rewrite("org.openrewrite:rewrite-java:+")
         rewrite("org.openrewrite.recipe:rewrite-testing-frameworks:+")
+        rewrite("org.openrewrite.recipe:rewrite-migrate-java:+")
 
     }
     rewrite {
@@ -21,6 +22,8 @@ rootProject {
         activeRecipe("org.openrewrite.java.spring.boot2.SpringBoot2JUnit4to5Migration")
         activeRecipe("org.openrewrite.java.testing.junit6.JUnit5to6Migration")
         activeRecipe("org.openrewrite.java.testing.junit.JUnit6BestPractices")
+        activeRecipe("org.openrewrite.java.migrate.lombok.log.UseSlf4j")
+        activeRecipe("org.openrewrite.java.migrate.lombok.LombokBestPractices")
         setExportDatatables(true)
     }
     afterEvaluate {
