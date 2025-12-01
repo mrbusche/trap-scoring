@@ -1,5 +1,8 @@
 package trap.model;
 
+import lombok.Builder;
+
+@Builder
 public record RoundScore(
         int eventId,
         String event,

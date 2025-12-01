@@ -62,9 +62,9 @@ public class ReportService {
         var trueStart = System.currentTimeMillis();
 
         var types = Map.of(
-            "Team-Senior", Classifications.VARSITY,
-            "Team-Intermediate", Classifications.INTERMEDIATE_ENTRY,
-            "Team-Rookie", Classifications.ROOKIE
+                "Team-Senior", Classifications.VARSITY,
+                "Team-Intermediate", Classifications.INTERMEDIATE_ENTRY,
+                "Team-Rookie", Classifications.ROOKIE
         );
 
         var mainTextStyle = ExcelHelper.getCellStyle(workbook);
@@ -131,27 +131,27 @@ public class ReportService {
     }
 
     private RoundScore createRoundScore(String[] data, String type) {
-        return new RoundScore(
-                parseInteger(data[1]),
-                trimString(data[2]),
-                parseInteger(data[3]),
-                trimString(data[4]),
-                trimString(data[5]),
-                trimString(data[6]),
-                trimString(data[7]).replace("Club", "Team"),
-                trimString(data[8]),
-                trimString(data[10]),
-                trimString(data[11]),
-                setStringToZero(data[12]),
-                setStringToZero(data[13]),
-                setStringToZero(data[14]),
-                setStringToZero(data[15]),
-                setStringToZero(data[16]),
-                setStringToZero(data[17]),
-                setStringToZero(data[18]),
-                setStringToZero(data[19]),
-                type
-        );
+        return RoundScore.builder()
+                .eventId(parseInteger(data[1]))
+                .event(trimString(data[2]))
+                .locationId(parseInteger(data[3]))
+                .location(trimString(data[4]))
+                .eventDate(trimString(data[5]))
+                .squadName(trimString(data[6]))
+                .team(trimString(data[7]).replace("Club", "Team"))
+                .athlete(trimString(data[8]))
+                .classification(trimString(data[10]))
+                .gender(trimString(data[11]))
+                .round1(setStringToZero(data[12]))
+                .round2(setStringToZero(data[13]))
+                .round3(setStringToZero(data[14]))
+                .round4(setStringToZero(data[15]))
+                .round5(setStringToZero(data[16]))
+                .round6(setStringToZero(data[17]))
+                .round7(setStringToZero(data[18]))
+                .round8(setStringToZero(data[19]))
+                .type(type)
+                .build();
     }
 
     private void populateCleanData(Sheet sheet, List<RoundScore> allRoundScores) {
