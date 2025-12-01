@@ -34,12 +34,13 @@ public class DownloadService {
 
     // Spring Boot automatically provides a pre-configured Builder prototype
     public DownloadService(RestClient.Builder builder) {
+        var factory = new SimpleClientHttpRequestFactory();
+        factory.setConnectTimeout(30_000);
+        factory.setReadTimeout(120_000);
+
         this.restClient = builder
                 .baseUrl("https://metabase.sssfonline.com/public/question")
-                .requestFactory(new SimpleClientHttpRequestFactory() {{
-                    setConnectTimeout(30_000);
-                    setReadTimeout(120_000);
-                }})
+                .requestFactory(factory)
                 .build();
     }
 

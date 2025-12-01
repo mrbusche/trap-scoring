@@ -11,7 +11,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Gatherer;
 
@@ -105,10 +104,6 @@ public class TrapService {
 
     private static RoundTotal createRoundTotal(TrapRoundScore r, int total) {
         return new RoundTotal(r.eventId(), r.locationId(), r.team(), r.athlete(), r.classification(), r.gender(), total, r.type());
-    }
-
-    private void acceptRound(Consumer<RoundTotal> consumer, TrapRoundScore r, int total) {
-        consumer.accept(new RoundTotal(r.eventId(), r.locationId(), r.team(), r.athlete(), r.classification(), r.gender(), total, r.type()));
     }
 
     public Map<String, List<IndividualTotal>> calculatePlayerIndividualTotal(List<TrapRoundScore> roundScores, Map<String, List<RoundTotal>> playerRoundTotals) {
