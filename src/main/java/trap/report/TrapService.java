@@ -20,16 +20,16 @@ import static java.util.Map.entry;
 @Service
 public class TrapService {
     private static final Map<String, Integer> EVENT_COUNTS = Map.ofEntries(
-            entry(EventTypes.SINGLES, 5),
-            entry(EventTypes.DOUBLES, 5),
-            entry(EventTypes.HANDICAP, 5),
-            entry(EventTypes.SKEET, 5),
-            entry(EventTypes.CLAYS, 4),
-            entry(EventTypes.FIVESTAND, 5),
-            entry(EventTypes.DOUBLESKEET, 5)
+            entry(EventTypes.SINGLES, 6),
+            entry(EventTypes.DOUBLES, 6),
+            entry(EventTypes.HANDICAP, 6),
+            entry(EventTypes.SKEET, 6),
+            entry(EventTypes.CLAYS, 3),
+            entry(EventTypes.FIVESTAND, 6),
+            entry(EventTypes.DOUBLESKEET, 6)
     );
 
-    private static final Map<String, Integer> ROUND_COUNTS = Map.ofEntries(
+    private static final Map<String, Integer> ROUND_COUNTS_FOR_TIES = Map.ofEntries(
             entry(EventTypes.SINGLES, 5),
             entry(EventTypes.DOUBLES, 5),
             entry(EventTypes.HANDICAP, 5),
@@ -49,8 +49,9 @@ public class TrapService {
         return EVENT_COUNTS.getOrDefault(type, 0);
     }
 
+    // this is for ties only
     public static int getRoundsToCount(String type) {
-        return ROUND_COUNTS.getOrDefault(type, 0); // Default to 0 if type not found
+        return ROUND_COUNTS_FOR_TIES.getOrDefault(type, 0); // Default to 0 if type not found
     }
 
     public static String trimString(String s) {
