@@ -3,7 +3,7 @@
 ## Scoring
 
 | Discipline     | Scoring        | Events | Locations | Birds |
-| -------------- | -------------- | ------ | --------- | ----- |
+|----------------|----------------|--------|-----------|-------|
 | Singles        | 2 rounds of 25 | 5      | 3         | 250   |
 | Doubles        | 1 round of 50  | 5      | 3         | 250   |
 | Handicap       | 2 rounds of 25 | 5      | 3         | 250   |
