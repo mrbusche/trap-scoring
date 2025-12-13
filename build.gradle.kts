@@ -1,7 +1,8 @@
 plugins {
-    java
     alias(libs.plugins.spring.boot)
     id("io.spring.dependency-management") version "1.1.7"
+    jacoco
+    java
 }
 
 group = "com.trap-scoring"
@@ -37,4 +38,16 @@ tasks.withType<Test> {
 
 tasks.getByName<Jar>("jar") {
     enabled = false
+}
+
+tasks.test {
+    finalizedBy(tasks.jacocoTestReport)
+}
+
+tasks.jacocoTestReport {
+    dependsOn(tasks.test)
+    reports {
+        xml.required.set(true)
+        html.required.set(true)
+    }
 }
