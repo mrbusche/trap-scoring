@@ -1,8 +1,6 @@
 package trap.report;
 
-import com.opencsv.CSVReader;
 import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
@@ -19,9 +17,7 @@ import trap.model.RoundScore;
 import trap.model.TeamScore;
 import trap.model.TrapRoundScore;
 
-import java.io.FileReader;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -36,9 +32,6 @@ import java.util.stream.Collectors;
 
 import static trap.report.TrapService.getEventsToCount;
 import static trap.report.TrapService.getRoundsToCount;
-import static trap.report.TrapService.parseInteger;
-import static trap.report.TrapService.setStringToZero;
-import static trap.report.TrapService.trimString;
 
 @Service
 @Slf4j
@@ -49,6 +42,7 @@ public class ReportService {
 
     private final DownloadService downloadService;
     private final TrapService trapService;
+    private final TrapDataRepository trapDataRepository;
 
     public void generateExcelFile() throws Exception {
         downloadService.downloadFiles(trapTypes);
@@ -102,50 +96,13 @@ public class ReportService {
 
     private List<RoundScore> generateRoundScores() {
         return Arrays.stream(trapTypes)
-                .flatMap(type -> generateRoundScores(type).stream())
+                .flatMap(type -> trapDataRepository.readRoundScores(type).stream())
                 .toList();
     }
 
     private Workbook getWorkbook() throws IOException {
         var in = getClass().getResourceAsStream("/main-template.xlsx");
         return WorkbookFactory.create(Objects.requireNonNull(in));
-    }
-
-    @SneakyThrows
-    private List<RoundScore> generateRoundScores(String type) {
-        try (var reader = new CSVReader(new FileReader(type + ".csv", StandardCharsets.UTF_8))) {
-            var roundScores = reader.readAll();
-            if (roundScores.isEmpty()) {
-                return new ArrayList<>(); // or handle as appropriate
-            }
-            roundScores.removeFirst(); // Remove the header row
-
-            return roundScores.stream().map(s -> createRoundScore(s, type)).toList();
-        }
-    }
-
-    private RoundScore createRoundScore(String[] data, String type) {
-        return RoundScore.builder()
-                .eventId(parseInteger(data[1]))
-                .event(trimString(data[2]))
-                .locationId(parseInteger(data[3]))
-                .location(trimString(data[4]))
-                .eventDate(trimString(data[5]))
-                .squadName(trimString(data[6]))
-                .team(trimString(data[7]).replace("Club", "Team"))
-                .athlete(trimString(data[8]))
-                .classification(trimString(data[10]))
-                .gender(trimString(data[11]))
-                .round1(setStringToZero(data[12]))
-                .round2(setStringToZero(data[13]))
-                .round3(setStringToZero(data[14]))
-                .round4(setStringToZero(data[15]))
-                .round5(setStringToZero(data[16]))
-                .round6(setStringToZero(data[17]))
-                .round7(setStringToZero(data[18]))
-                .round8(setStringToZero(data[19]))
-                .type(type)
-                .build();
     }
 
     private void populateCleanData(Sheet sheet, List<RoundScore> allRoundScores) {
