@@ -34,6 +34,7 @@ import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
+import static trap.report.TrapService.getEventsToCount;
 import static trap.report.TrapService.getRoundsToCount;
 import static trap.report.TrapService.parseInteger;
 import static trap.report.TrapService.setStringToZero;
@@ -181,7 +182,7 @@ public class ReportService {
             var teamName = firstIndividual.team();
 
             // Determine the number of scores to count based on the type
-            int scoresToCount = getRoundsToCount(firstIndividual.type());
+            int scoresToCount = getEventsToCount(firstIndividual.type());
 
             // Sum the top scores up to the limit (scoresToCount)
             int scoreSum = entry.getValue().stream().limit(scoresToCount).mapToInt(IndividualTotal::total).sum();
