@@ -323,12 +323,13 @@ class TrapServiceTest {
     void singlesScoring2LocationsFavorOneLocation() {
         var roundScores = new ArrayList<TrapRoundScore>();
         // Location 1 stronger
-        roundScores.add(new TrapRoundScore(20001, 201, "Team Y", "Player B", "Senior/Varsity", "M", 25, 25, 0, 0, 0, 0, 0, 0, "singles")); // 50
-        roundScores.add(new TrapRoundScore(20002, 201, "Team Y", "Player B", "Senior/Varsity", "M", 25, 24, 0, 0, 0, 0, 0, 0, "singles")); // 49
-        roundScores.add(new TrapRoundScore(20003, 201, "Team Y", "Player B", "Senior/Varsity", "M", 24, 24, 0, 0, 0, 0, 0, 0, "singles")); // 48
+        roundScores.add(new TrapRoundScore(20001, 201, "Team Y", "Player B", "Senior/Varsity", "M", 25, 25, 0, 0, 0, 0, 0, 0, "singles"));
+        roundScores.add(new TrapRoundScore(20002, 201, "Team Y", "Player B", "Senior/Varsity", "M", 25, 24, 0, 0, 0, 0, 0, 0, "singles"));
+        roundScores.add(new TrapRoundScore(20003, 201, "Team Y", "Player B", "Senior/Varsity", "M", 24, 24, 0, 0, 0, 0, 0, 0, "singles"));
+        roundScores.add(new TrapRoundScore(20003, 201, "Team Y", "Player B", "Senior/Varsity", "M", 24, 24, 0, 0, 0, 0, 0, 0, "singles"));
         // Location 2
-        roundScores.add(new TrapRoundScore(20004, 202, "Team Y", "Player B", "Senior/Varsity", "M", 24, 23, 0, 0, 0, 0, 0, 0, "singles")); // 47
-        roundScores.add(new TrapRoundScore(20005, 202, "Team Y", "Player B", "Senior/Varsity", "M", 23, 23, 0, 0, 0, 0, 0, 0, "singles")); // 46
+        roundScores.add(new TrapRoundScore(20004, 202, "Team Y", "Player B", "Senior/Varsity", "M", 24, 23, 0, 0, 0, 0, 0, 0, "singles"));
+        roundScores.add(new TrapRoundScore(20005, 202, "Team Y", "Player B", "Senior/Varsity", "M", 23, 23, 0, 0, 0, 0, 0, 0, "singles"));
 
         var playerRoundTotals = trapService.calculatePlayerRoundTotals(roundScores);
         var playerIndividualTotal = trapService.calculatePlayerIndividualTotal(roundScores, playerRoundTotals);
@@ -341,7 +342,7 @@ class TrapServiceTest {
                 () -> assertEquals("Player B", playerFinalTotal.get(key).athlete()),
                 () -> assertEquals("Senior/Varsity", playerFinalTotal.get(key).classification()),
                 () -> assertEquals("M", playerFinalTotal.get(key).gender()),
-                () -> assertEquals(240, playerFinalTotal.get(key).total()), // 50 + 49 + 48 + 47 (2 locations => 5 - 1 = 4 scores)
+                () -> assertEquals(242, playerFinalTotal.get(key).total()),
                 () -> assertEquals("singles", playerFinalTotal.get(key).type())
         );
     }
@@ -400,14 +401,14 @@ class TrapServiceTest {
     @Test
     void singlesScoring3LocationsFavorOneLocation() {
         var roundScores = new ArrayList<TrapRoundScore>();
-        // Location 1 dominates
-        roundScores.add(new TrapRoundScore(30001, 301, "Team Z", "Player C", "Senior/Varsity", "M", 25, 25, 0, 0, 0, 0, 0, 0, "singles")); // 50
-        roundScores.add(new TrapRoundScore(30002, 301, "Team Z", "Player C", "Senior/Varsity", "M", 25, 24, 0, 0, 0, 0, 0, 0, "singles")); // 49
+        // Location 1
+        roundScores.add(new TrapRoundScore(30001, 301, "Team Z", "Player C", "Senior/Varsity", "M", 25, 25, 0, 0, 0, 0, 0, 0, "singles"));
+        roundScores.add(new TrapRoundScore(30002, 301, "Team Z", "Player C", "Senior/Varsity", "M", 25, 24, 0, 0, 0, 0, 0, 0, "singles"));
         // Location 2
-        roundScores.add(new TrapRoundScore(30003, 302, "Team Z", "Player C", "Senior/Varsity", "M", 24, 24, 0, 0, 0, 0, 0, 0, "singles")); // 48
+        roundScores.add(new TrapRoundScore(30003, 302, "Team Z", "Player C", "Senior/Varsity", "M", 24, 24, 0, 0, 0, 0, 0, 0, "singles"));
         // Location 3
-        roundScores.add(new TrapRoundScore(30004, 303, "Team Z", "Player C", "Senior/Varsity", "M", 24, 23, 0, 0, 0, 0, 0, 0, "singles")); // 47
-        roundScores.add(new TrapRoundScore(30005, 303, "Team Z", "Player C", "Senior/Varsity", "M", 23, 23, 0, 0, 0, 0, 0, 0, "singles")); // 46
+        roundScores.add(new TrapRoundScore(30004, 303, "Team Z", "Player C", "Senior/Varsity", "M", 24, 23, 0, 0, 0, 0, 0, 0, "singles"));
+        roundScores.add(new TrapRoundScore(30005, 303, "Team Z", "Player C", "Senior/Varsity", "M", 23, 23, 0, 0, 0, 0, 0, 0, "singles"));
 
         var playerRoundTotals = trapService.calculatePlayerRoundTotals(roundScores);
         var playerIndividualTotal = trapService.calculatePlayerIndividualTotal(roundScores, playerRoundTotals);
@@ -453,13 +454,14 @@ class TrapServiceTest {
     void singlesScoring4LocationsOneLocationHasMultipleHigher() {
         var roundScores = new ArrayList<TrapRoundScore>();
         // Location 1 strongest with multiple high scores
-        roundScores.add(new TrapRoundScore(40001, 401, "Team A1", "Player D", "Senior/Varsity", "M", 25, 25, 0, 0, 0, 0, 0, 0, "singles")); // 50
-        roundScores.add(new TrapRoundScore(40002, 401, "Team A1", "Player D", "Senior/Varsity", "M", 25, 24, 0, 0, 0, 0, 0, 0, "singles")); // 49
-        roundScores.add(new TrapRoundScore(40003, 401, "Team A1", "Player D", "Senior/Varsity", "M", 24, 24, 0, 0, 0, 0, 0, 0, "singles")); // 48
+        roundScores.add(new TrapRoundScore(40001, 401, "Team A1", "Player D", "Senior/Varsity", "M", 25, 25, 0, 0, 0, 0, 0, 0, "singles"));
+        roundScores.add(new TrapRoundScore(40002, 401, "Team A1", "Player D", "Senior/Varsity", "M", 25, 24, 0, 0, 0, 0, 0, 0, "singles"));
+        roundScores.add(new TrapRoundScore(40003, 401, "Team A1", "Player D", "Senior/Varsity", "M", 24, 24, 0, 0, 0, 0, 0, 0, "singles"));
+        roundScores.add(new TrapRoundScore(40003, 401, "Team A1", "Player D", "Senior/Varsity", "M", 24, 24, 0, 0, 0, 0, 0, 0, "singles"));
         // Other locations
-        roundScores.add(new TrapRoundScore(40004, 402, "Team A1", "Player D", "Senior/Varsity", "M", 24, 23, 0, 0, 0, 0, 0, 0, "singles")); // 47
-        roundScores.add(new TrapRoundScore(40005, 403, "Team A1", "Player D", "Senior/Varsity", "M", 23, 23, 0, 0, 0, 0, 0, 0, "singles")); // 46
-        roundScores.add(new TrapRoundScore(40006, 404, "Team A1", "Player D", "Senior/Varsity", "M", 22, 23, 0, 0, 0, 0, 0, 0, "singles")); // 45
+        roundScores.add(new TrapRoundScore(40004, 402, "Team A1", "Player D", "Senior/Varsity", "M", 24, 23, 0, 0, 0, 0, 0, 0, "singles"));
+        roundScores.add(new TrapRoundScore(40005, 403, "Team A1", "Player D", "Senior/Varsity", "M", 23, 23, 0, 0, 0, 0, 0, 0, "singles"));
+        roundScores.add(new TrapRoundScore(40006, 404, "Team A1", "Player D", "Senior/Varsity", "M", 22, 23, 0, 0, 0, 0, 0, 0, "singles"));
 
         var playerRoundTotals = trapService.calculatePlayerRoundTotals(roundScores);
         var playerIndividualTotal = trapService.calculatePlayerIndividualTotal(roundScores, playerRoundTotals);
@@ -472,7 +474,7 @@ class TrapServiceTest {
                 () -> assertEquals("Player D", playerFinalTotal.get(key).athlete()),
                 () -> assertEquals("Senior/Varsity", playerFinalTotal.get(key).classification()),
                 () -> assertEquals("M", playerFinalTotal.get(key).gender()),
-                () -> assertEquals(285, playerFinalTotal.get(key).total()),
+                () -> assertEquals(288, playerFinalTotal.get(key).total()),
                 () -> assertEquals("singles", playerFinalTotal.get(key).type())
         );
     }
@@ -929,12 +931,12 @@ class TrapServiceTest {
     @Test
     void singlesScoring1Location() {
         var roundScores = new ArrayList<TrapRoundScore>();
-        roundScores.add(new TrapRoundScore(1001, 10, "Team One", "Player One", "Varsity", "M", 25, 25, 0, 0, 0, 0, 0, 0, "singles")); // 50
-        roundScores.add(new TrapRoundScore(1002, 10, "Team One", "Player One", "Varsity", "M", 25, 25, 0, 0, 0, 0, 0, 0, "singles")); // 50
-        roundScores.add(new TrapRoundScore(1003, 10, "Team One", "Player One", "Varsity", "M", 25, 25, 0, 0, 0, 0, 0, 0, "singles")); // 50
-        roundScores.add(new TrapRoundScore(1004, 10, "Team One", "Player One", "Varsity", "M", 25, 25, 0, 0, 0, 0, 0, 0, "singles")); // 50
-        roundScores.add(new TrapRoundScore(1005, 10, "Team One", "Player One", "Varsity", "M", 25, 25, 0, 0, 0, 0, 0, 0, "singles")); // 50
-        roundScores.add(new TrapRoundScore(1006, 10, "Team One", "Player One", "Varsity", "M", 25, 25, 0, 0, 0, 0, 0, 0, "singles")); // 50
+        roundScores.add(new TrapRoundScore(1001, 10, "Team One", "Player One", "Varsity", "M", 25, 25, 0, 0, 0, 0, 0, 0, "singles"));
+        roundScores.add(new TrapRoundScore(1002, 10, "Team One", "Player One", "Varsity", "M", 25, 25, 0, 0, 0, 0, 0, 0, "singles"));
+        roundScores.add(new TrapRoundScore(1003, 10, "Team One", "Player One", "Varsity", "M", 25, 25, 0, 0, 0, 0, 0, 0, "singles"));
+        roundScores.add(new TrapRoundScore(1004, 10, "Team One", "Player One", "Varsity", "M", 25, 25, 0, 0, 0, 0, 0, 0, "singles"));
+        roundScores.add(new TrapRoundScore(1005, 10, "Team One", "Player One", "Varsity", "M", 25, 25, 0, 0, 0, 0, 0, 0, "singles"));
+        roundScores.add(new TrapRoundScore(1006, 10, "Team One", "Player One", "Varsity", "M", 25, 25, 0, 0, 0, 0, 0, 0, "singles"));
 
         var playerRoundTotals = trapService.calculatePlayerRoundTotals(roundScores);
         var playerIndividualTotal = trapService.calculatePlayerIndividualTotal(roundScores, playerRoundTotals);
@@ -942,7 +944,7 @@ class TrapServiceTest {
 
         var player1 = roundScores.getFirst();
         assertAll(
-                () -> assertEquals(200, playerFinalTotal.get(player1.uniqueName()).total()), // 4 * 50
+                () -> assertEquals(200, playerFinalTotal.get(player1.uniqueName()).total()),
                 () -> assertEquals("singles", playerFinalTotal.get(player1.uniqueName()).type())
         );
     }
@@ -950,8 +952,8 @@ class TrapServiceTest {
     @Test
     void claysScoring1Location() {
         var roundScores = new ArrayList<TrapRoundScore>();
-        roundScores.add(new TrapRoundScore(2001, 20, "Team Two", "Player Two", "Varsity", "M", 50, 40, 0, 0, 0, 0, 0, 0, "clays")); // 50, 40
-        roundScores.add(new TrapRoundScore(2002, 20, "Team Two", "Player Two", "Varsity", "M", 45, 45, 0, 0, 0, 0, 0, 0, "clays")); // 45, 45
+        roundScores.add(new TrapRoundScore(2001, 20, "Team Two", "Player Two", "Varsity", "M", 50, 40, 0, 0, 0, 0, 0, 0, "clays"));
+        roundScores.add(new TrapRoundScore(2002, 20, "Team Two", "Player Two", "Varsity", "M", 45, 45, 0, 0, 0, 0, 0, 0, "clays"));
 
         var playerRoundTotals = trapService.calculatePlayerRoundTotals(roundScores);
         var playerIndividualTotal = trapService.calculatePlayerIndividualTotal(roundScores, playerRoundTotals);
@@ -967,9 +969,9 @@ class TrapServiceTest {
     @Test
     void doublesScoring1Location() {
         var roundScores = new ArrayList<TrapRoundScore>();
-        roundScores.add(new TrapRoundScore(4001, 40, "Team Four", "Player Four", "Varsity", "M", 50, 50, 0, 0, 0, 0, 0, 0, "doubles")); // 50, 50
-        roundScores.add(new TrapRoundScore(4002, 40, "Team Four", "Player Four", "Varsity", "M", 50, 50, 0, 0, 0, 0, 0, 0, "doubles")); // 50, 50
-        roundScores.add(new TrapRoundScore(4003, 40, "Team Four", "Player Four", "Varsity", "M", 50, 50, 0, 0, 0, 0, 0, 0, "doubles")); // 50, 50
+        roundScores.add(new TrapRoundScore(4001, 40, "Team Four", "Player Four", "Varsity", "M", 50, 50, 0, 0, 0, 0, 0, 0, "doubles"));
+        roundScores.add(new TrapRoundScore(4002, 40, "Team Four", "Player Four", "Varsity", "M", 50, 50, 0, 0, 0, 0, 0, 0, "doubles"));
+        roundScores.add(new TrapRoundScore(4003, 40, "Team Four", "Player Four", "Varsity", "M", 50, 50, 0, 0, 0, 0, 0, 0, "doubles"));
 
         var playerRoundTotals = trapService.calculatePlayerRoundTotals(roundScores);
         var playerIndividualTotal = trapService.calculatePlayerIndividualTotal(roundScores, playerRoundTotals);
@@ -986,9 +988,9 @@ class TrapServiceTest {
     void singlesScoringInsufficientScores() {
         var roundScores = new ArrayList<TrapRoundScore>();
         // 3 locations, so target is 6. But only 3 scores available.
-        roundScores.add(new TrapRoundScore(3001, 31, "Team Three", "Player Three", "Varsity", "M", 25, 25, 0, 0, 0, 0, 0, 0, "singles")); // 50
-        roundScores.add(new TrapRoundScore(3002, 32, "Team Three", "Player Three", "Varsity", "M", 25, 25, 0, 0, 0, 0, 0, 0, "singles")); // 50
-        roundScores.add(new TrapRoundScore(3003, 33, "Team Three", "Player Three", "Varsity", "M", 25, 25, 0, 0, 0, 0, 0, 0, "singles")); // 50
+        roundScores.add(new TrapRoundScore(3001, 31, "Team Three", "Player Three", "Varsity", "M", 25, 25, 0, 0, 0, 0, 0, 0, "singles"));
+        roundScores.add(new TrapRoundScore(3002, 32, "Team Three", "Player Three", "Varsity", "M", 25, 25, 0, 0, 0, 0, 0, 0, "singles"));
+        roundScores.add(new TrapRoundScore(3003, 33, "Team Three", "Player Three", "Varsity", "M", 25, 25, 0, 0, 0, 0, 0, 0, "singles"));
 
         var playerRoundTotals = trapService.calculatePlayerRoundTotals(roundScores);
         var playerIndividualTotal = trapService.calculatePlayerIndividualTotal(roundScores, playerRoundTotals);
