@@ -24,6 +24,7 @@ rootProject {
         activeRecipe("org.openrewrite.java.testing.junit.JUnit6BestPractices")
         activeRecipe("org.openrewrite.java.migrate.lombok.log.UseSlf4j")
         activeRecipe("org.openrewrite.java.migrate.lombok.LombokBestPractices")
+        activeRecipe("org.openrewrite.java.ShortenFullyQualifiedTypeReferences")
         setExportDatatables(true)
     }
     afterEvaluate {
@@ -33,8 +34,4 @@ rootProject {
             }
         }
     }
-}
-
-dependencies {
-    implementation "org.springframework.boot:spring-boot-starter-restclient:4.0.1"
 }
