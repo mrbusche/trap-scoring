@@ -34,3 +34,7 @@ rootProject {
         }
     }
 }
+
+dependencies {
+    implementation "org.springframework.boot:spring-boot-starter-restclient:4.0.1"
+}
