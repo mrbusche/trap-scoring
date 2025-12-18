@@ -38,7 +38,7 @@ class ReportServiceTest {
     private ReportService reportService;
 
     @Test
-    void testGenerateExcelFile() throws Exception {
+    void generateExcelFile() throws Exception {
         RoundScore mockScore = new RoundScore(1, "Event", 100, "Location", "Date", "Squad", "Team A", "Athlete A", "Varsity", "M", 25, 25, 0, 0, 0, 0, 0, 0, "singles");
 
         when(trapDataRepository.readRoundScores(anyString())).thenReturn(List.of(mockScore));
@@ -57,11 +57,12 @@ class ReportServiceTest {
     }
 
     @Test
-    void testCsvParsingLogic() {
+    void csvParsingLogic() {
         // Test the parsing logic specifically using the repository refactor
         TrapDataRepository repo = new TrapDataRepository();
-        String csvData = "Header1,Header2,Header3,Header4,Header5,Header6,Header7,Header8,Header9,Header10,Header11,Header12,Header13,Header14,Header15,Header16,Header17,Header18,Header19,Header20\n" +
-                "0,123,Singles,10,Ankeny,2024,Squad,Team A,Player 1,,Varsity,M,25,25,0,0,0,0,0,0";
+        String csvData = """
+                Header1,Header2,Header3,Header4,Header5,Header6,Header7,Header8,Header9,Header10,Header11,Header12,Header13,Header14,Header15,Header16,Header17,Header18,Header19,Header20
+                0,123,Singles,10,Ankeny,2024,Squad,Team A,Player 1,,Varsity,M,25,25,0,0,0,0,0,0""";
 
         StringReader stringReader = new StringReader(csvData);
         List<RoundScore> scores = repo.parseCsv(stringReader, "singles");
