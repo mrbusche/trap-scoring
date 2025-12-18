@@ -1,6 +1,6 @@
 [versions]
 java = "25"
-springBoot = "4.0.0"
+springBoot = "4.0.1"
 poi = "5.5.1"
 opencsv = "5.12.0"
 
