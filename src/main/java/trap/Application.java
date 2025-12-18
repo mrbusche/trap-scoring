@@ -3,6 +3,7 @@ package trap;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.support.RestClientAdapter;
 import org.springframework.web.service.invoker.HttpServiceProxyFactory;
@@ -23,7 +24,7 @@ class Application {
     TrapDataClient trapDataClient(RestClient.Builder builder) {
         // 1. Configure the underlying RestClient (timeouts, etc.)
         RestClient restClient = builder
-                .requestFactory(new org.springframework.http.client.SimpleClientHttpRequestFactory())
+                .requestFactory(new SimpleClientHttpRequestFactory())
                 .build();
 
         // 2. Create the Proxy Factory using the RestClient
