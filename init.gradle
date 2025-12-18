@@ -5,7 +5,7 @@ initscript {
     dependencies { classpath("org.openrewrite:plugin:+") }
 }
 rootProject {
-    plugins.apply(RewritePlugin)
+    plugins.apply(org.openrewrite.gradle.RewritePlugin)
     dependencies {
         rewrite("org.openrewrite.recipe:rewrite-spring:+")
         rewrite("org.openrewrite:rewrite-java:+")
