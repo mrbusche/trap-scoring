@@ -43,7 +43,7 @@ jobs:
           java -jar trap.jar
 
       - name: Upload results
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: trap-league-standings
           path: build/libs/league-data-*.xlsx
