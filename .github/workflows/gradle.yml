@@ -1,7 +1,8 @@
 name: Main Branch
 
 on:
-  push:
+  pull_request:
+    branches: [ main ]
 
 jobs:
   build:
