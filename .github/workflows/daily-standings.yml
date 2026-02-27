@@ -48,3 +48,4 @@ jobs:
           name: trap-league-standings
           path: build/libs/league-data-*.xlsx
           archive: false
+          mime_type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
