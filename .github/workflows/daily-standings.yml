@@ -41,9 +41,14 @@ jobs:
           ls -ltra
           mv trap-*.jar trap.jar
           java -jar trap.jar
+          timestamp=$(date +'%y%m%d%H%M%S')
+          filename="league-data-${timestamp}.xlsx"
+          mv league-data-*.xlsx "$filename"
+          echo "STANDINGS_FILE=build/libs/$filename" >> "$GITHUB_ENV"
 
       - name: Upload results
         uses: actions/upload-artifact@v7
         with:
           name: trap-league-standings
-          path: build/libs/league-data-*.xlsx
+          path: ${{ env.STANDINGS_FILE }}
+          archive: false
