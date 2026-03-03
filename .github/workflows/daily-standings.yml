@@ -48,16 +48,8 @@ jobs:
 
       - name: Upload results
         id: upload_direct
-        continue-on-error: true
         uses: actions/upload-artifact@v7
         with:
           name: trap-league-standings
           path: ${{ env.STANDINGS_FILE }}
           archive: false
-
-      - name: Upload results (zip fallback)
-        if: ${{ steps.upload_direct.outcome == 'failure' }}
-        uses: actions/upload-artifact@v7
-        with:
-          name: trap-league-standings
-          path: ${{ env.STANDINGS_FILE }}
