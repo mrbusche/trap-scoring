@@ -18,9 +18,7 @@ Every day at 6 AM UTC the report is [generated and uploaded](https://github.com/
 
 1. Login to GitHub
 2. Click on the top [Daily Standings](https://github.com/mrbusche/trap-scoring/actions/workflows/daily-standings.yml) link
-3. Download `trap-league-standings`
-4. Extract the zip file
-5. Report will be named `league-data-${todays-date}.xlsx`
+3. Download `league-data-${todays-date}.xlsx`
 
 ## Generating standings on demand
 
