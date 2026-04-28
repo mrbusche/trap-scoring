@@ -36,6 +36,7 @@ import static trap.report.TrapService.getRoundsToCount;
 @Slf4j
 @RequiredArgsConstructor
 public class ReportService {
+
     private final String currentDate = LocalDate.now().format(DateTimeFormatter.ofPattern("MM/dd/yyyy"));
     private final String[] trapTypes = new String[]{EventTypes.SINGLES, EventTypes.DOUBLES, EventTypes.HANDICAP, EventTypes.SKEET, EventTypes.CLAYS, EventTypes.FIVESTAND, EventTypes.DOUBLESKEET};
 
@@ -137,15 +138,15 @@ public class ReportService {
             IndividualTotal firstIndividual = entry.getValue().getFirst();
             var teamName = firstIndividual.team();
 
-            // Determine the number of scores to count based on the type
+            // Determine the number of scores to count based on the type (this is required to handle ties for 5th place)
             int scoresToCount = getRoundsToCount(firstIndividual.type());
 
             // Sum the top scores up to the limit (scoresToCount)
             int scoreSum = entry.getValue().stream().limit(scoresToCount).mapToInt(IndividualTotal::total).sum();
 
             // Update the team's total score by creating a new TeamScore instance
-            teamScoresThatCount.computeIfPresent(teamName, (_, currentTeamScore) ->
-                    currentTeamScore.withTotal(currentTeamScore.total() + scoreSum));
+            teamScoresThatCount.computeIfPresent(teamName, (_, currentTeamScore)
+                    -> currentTeamScore.withTotal(currentTeamScore.total() + scoreSum));
         }
 
         return teamScoresThatCount.values().stream().sorted(Comparator.comparingInt(TeamScore::total).reversed()).toList();
