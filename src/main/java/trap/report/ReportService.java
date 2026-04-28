@@ -30,7 +30,6 @@ import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
-import static trap.report.TrapService.getEventsToCount;
 import static trap.report.TrapService.getRoundsToCount;
 
 @Service
@@ -127,7 +126,7 @@ public class ReportService {
         log.info("Clean data populated in {} ms", System.currentTimeMillis() - start);
     }
 
-    private List<TeamScore> getTeamScores(List<Map.Entry<String, ArrayList<IndividualTotal>>> teamData) {
+    List<TeamScore> getTeamScores(List<Map.Entry<String, ArrayList<IndividualTotal>>> teamData) {
         var teamScoresThatCount = new HashMap<String, TeamScore>();
 
         for (Map.Entry<String, ArrayList<IndividualTotal>> entry : teamData) {
@@ -139,7 +138,7 @@ public class ReportService {
             var teamName = firstIndividual.team();
 
             // Determine the number of scores to count based on the type
-            int scoresToCount = getEventsToCount(firstIndividual.type());
+            int scoresToCount = getRoundsToCount(firstIndividual.type());
 
             // Sum the top scores up to the limit (scoresToCount)
             int scoreSum = entry.getValue().stream().limit(scoresToCount).mapToInt(IndividualTotal::total).sum();
