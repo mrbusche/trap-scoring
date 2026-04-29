@@ -49,7 +49,7 @@ public class DownloadService {
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt(); // Restore interrupted status
             log.error("Download process was interrupted", e);
-            throw new RuntimeException("Download interrupted", e);
+            throw new RuntimeException("Download interrupted {}", e);
         }
 
         var duration = Duration.between(start, Instant.now());
