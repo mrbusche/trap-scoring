@@ -8,9 +8,13 @@ plugins {
 group = "com.trap-scoring"
 version = "10.0.0"
 
+val targetJavaVersion = providers.gradleProperty("javaVersion")
+    .orElse(libs.versions.java)
+    .map { it.toInt() }
+
 java {
     toolchain {
-        languageVersion.set(JavaLanguageVersion.of(libs.versions.java.get().toInt()))
+        languageVersion.set(targetJavaVersion.map { JavaLanguageVersion.of(it) })
     }
 }
 
