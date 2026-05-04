@@ -29,7 +29,7 @@ jobs:
       - name: Run Gradle build
         env:
           SPRING_PROFILES_ACTIVE: test
-        run: ./gradlew build --parallel --configuration-cache
+        run: ./gradlew build --parallel --configuration-cache -PjavaVersion=${{ matrix.java-version }}
 
       - name: Generate file
         run: |
