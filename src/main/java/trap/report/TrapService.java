@@ -40,7 +40,7 @@ public class TrapService {
     );
 
     private static final Set<String> SINGLE_ROUND_TYPES = Set.of(
-            EventTypes.CLAYS, EventTypes.DOUBLES, EventTypes.DOUBLESKEET, EventTypes.FIVESTAND
+            EventTypes.CLAYS, EventTypes.DOUBLES, EventTypes.DOUBLESKEET
     );
 
     private static final int MIN_UNIQUE_LOCATIONS = 3;

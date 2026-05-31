@@ -23,7 +23,7 @@ def compare_excel_files(file1_path, file2_path):
         print(f'Error: File not found -> {file2_path}')
         return
 
-    print(f'--- Starting Comparison ---')
+    print('--- Starting Comparison ---')
     print(f'File A: {file1_path}')
     print(f'File B: {file2_path}')
     print('---------------------------\n')
@@ -70,7 +70,7 @@ def compare_excel_files(file1_path, file2_path):
 
         # Compare Dimensions
         if df1.shape != df2.shape:
-            print(f'  x Dimension mismatch:')
+            print('  x Dimension mismatch:')
             print(f'    File A: {df1.shape[0]} rows, {df1.shape[1]} columns')
             print(f'    File B: {df2.shape[0]} rows, {df2.shape[1]} columns')
             differences_found = True
@@ -101,7 +101,7 @@ def compare_excel_files(file1_path, file2_path):
                 try:
                     diff = df1_sorted.compare(df2_sorted, align_axis=0)
 
-                    print(f'    First 10 differences (after aligning rows):')
+                    print('    First 10 differences (after aligning rows):')
                     print(diff.head(10).to_string())
 
                     if len(diff) > 10:
@@ -119,7 +119,7 @@ def compare_excel_files(file1_path, file2_path):
 
 
 if __name__ == '__main__':
-    file1 = sys.argv[1]
+    file1 = sys.argv[1] if len(sys.argv) > 1 else '../original.xlsx'
 
     search_pattern = os.path.join('..', 'league-data-*.xlsx')
     candidates = glob.glob(search_pattern)

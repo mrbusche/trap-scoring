@@ -10,7 +10,7 @@
 | American Skeet | 2 rounds of 25 | 5      | 3         | 250   |
 | Doubles Skeet  | 1 round of 50  | 5      | 3         | 250   |
 | Sporting Clay  | 1 round of 100 | 4      | 3         | 400   |
-| 5-Stand        | 1 round of 50  | 5      | 3         | 250   |
+| 5-Stand        | 2 rounds of 25 | 5      | 3         | 250   |
 
 ## Downloading the daily generated report
 
