@@ -119,7 +119,7 @@ def compare_excel_files(file1_path, file2_path):
 
 
 if __name__ == '__main__':
-    file1 = sys.argv[1] if len(sys.argv) > 1 else 'original.xlsx'
+    file1 = sys.argv[1] if len(sys.argv) > 1 else '../original.xlsx'
 
     search_pattern = os.path.join('..', 'league-data-*.xlsx')
     candidates = glob.glob(search_pattern)
