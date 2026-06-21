@@ -89,7 +89,7 @@ public class ReportService {
         populateAllIndividualData(workbook, playerFinalTotal);
 
         // use streaming workbook for faster writes
-        var sxssfWorkbook = new SXSSFWorkbook(workbook, 1000);
+        var sxssfWorkbook = new SXSSFWorkbook(workbook, 1000, true, true);
         populateCleanData(sxssfWorkbook.getSheet("Clean Data"), allRoundScores);
 
         ExcelHelper.createFile(sxssfWorkbook);
