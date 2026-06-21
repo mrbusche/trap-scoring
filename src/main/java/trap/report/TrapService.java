@@ -35,7 +35,7 @@ public class TrapService {
             entry(EventTypes.HANDICAP, 5),
             entry(EventTypes.SKEET, 3),
             entry(EventTypes.CLAYS, 3),
-            entry(EventTypes.FIVESTAND, 3),
+            entry(EventTypes.FIVESTAND, 5),
             entry(EventTypes.DOUBLESKEET, 3)
     );
 
