@@ -128,7 +128,6 @@ public class ReportService {
             log.info("Clean data for {} {} scores populated in {} ms", scores.size(), type, System.currentTimeMillis() - typeStart);
         });
 
-        sheet.setAutoFilter(CellRangeAddress.valueOf("A1:S1"));
         log.info("Clean data populated in {} ms", System.currentTimeMillis() - start);
     }
 
