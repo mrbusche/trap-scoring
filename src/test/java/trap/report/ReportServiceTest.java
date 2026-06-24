@@ -34,7 +34,7 @@ class ReportServiceTest {
     private DownloadService downloadService;
 
     @Spy
-    private final TrapService trapService = new TrapService();
+    private TrapService trapService = new TrapService();
 
     @Mock
     private TrapDataRepository trapDataRepository;
@@ -57,7 +57,7 @@ class ReportServiceTest {
         File generatedFile = new File("league-data-" + dateString + ".xlsx");
 
         if (generatedFile.exists()) {
-            generatedFile.delete();
+            assertTrue(generatedFile.delete(), "Cleanup failed: Could not delete generated file");
         }
     }
 

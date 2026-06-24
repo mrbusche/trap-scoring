@@ -1060,4 +1060,29 @@ class TrapServiceTest {
                 () -> assertFalse(TrapService.isSingleRound("skeet"))
         );
     }
+
+    @Test
+    void teamSizesToCount() {
+        assertAll(
+                () -> assertEquals(5, TrapService.getRoundsToCount("singles")),
+                () -> assertEquals(5, TrapService.getRoundsToCount("doubles")),
+                () -> assertEquals(5, TrapService.getRoundsToCount("handicap")),
+                () -> assertEquals(3, TrapService.getRoundsToCount("skeet")),
+                () -> assertEquals(3, TrapService.getRoundsToCount("clays")),
+                () -> assertEquals(5, TrapService.getRoundsToCount("fivestand")),
+                () -> assertEquals(3, TrapService.getRoundsToCount("doublesskeet"))
+        );
+    }
+
+    @Test
+    void helperMethods() {
+        assertAll(
+                () -> assertEquals("", TrapService.trimString(null)),
+                () -> assertEquals("abc", TrapService.trimString("  abc  ")),
+                () -> assertEquals(42, TrapService.parseInteger("42")),
+                () -> assertEquals(0, TrapService.parseInteger("nope")),
+                () -> assertEquals(0, TrapService.setStringToZero("")),
+                () -> assertEquals(7, TrapService.setStringToZero("7"))
+        );
+    }
 }

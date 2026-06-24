@@ -7,8 +7,9 @@ import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.apache.poi.ss.util.CellRangeAddress;
+import org.apache.poi.xssf.streaming.SXSSFWorkbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Service;
 import trap.common.Classifications;
 import trap.common.EventTypes;
@@ -67,7 +68,6 @@ public class ReportService {
 
         var allRoundScores = generateRoundScores();
         log.info("Generated round scores in {} ms", System.currentTimeMillis() - trueStart);
-        populateCleanData(workbook.getSheet("Clean Data"), allRoundScores);
 
         var trapRoundScores = allRoundScores.stream().map(TrapRoundScore::new).toList();
         var playerRoundTotals = trapService.calculatePlayerRoundTotals(trapRoundScores);
@@ -88,10 +88,14 @@ public class ReportService {
         populateTeamIndividualData(workbook, teamScoresByTotal);
         populateAllIndividualData(workbook, playerFinalTotal);
 
-        ExcelHelper.createFile(workbook);
+        // use streaming workbook for faster writes
+        var sxssfWorkbook = new SXSSFWorkbook(workbook, 1000, true, true);
+        populateCleanData(sxssfWorkbook.getSheet("Clean Data"), allRoundScores);
+
+        ExcelHelper.createFile(sxssfWorkbook);
 
         log.info("Finished creating file in {} ms", System.currentTimeMillis() - trueStart);
-        workbook.close();
+        sxssfWorkbook.close();
     }
 
     private List<RoundScore> generateRoundScores() {
@@ -100,9 +104,10 @@ public class ReportService {
                 .toList();
     }
 
-    private Workbook getWorkbook() throws IOException {
-        var in = getClass().getResourceAsStream("/main-template.xlsx");
-        return WorkbookFactory.create(Objects.requireNonNull(in));
+    private XSSFWorkbook getWorkbook() throws IOException {
+        try (var in = getClass().getResourceAsStream("/main-template.xlsx")) {
+            return new XSSFWorkbook(Objects.requireNonNull(in));
+        }
     }
 
     private void populateCleanData(Sheet sheet, List<RoundScore> allRoundScores) {
@@ -110,7 +115,7 @@ public class ReportService {
 
         log.info("Ran get all data for clean data population in {} ms", System.currentTimeMillis() - start);
 
-        var rows = new AtomicInteger(sheet.getLastRowNum());
+        var rows = new AtomicInteger(Math.max(0, sheet.getLastRowNum()));
         Map<String, List<RoundScore>> scoresByType = allRoundScores.stream()
                 .collect(Collectors.groupingBy(RoundScore::type));
 
@@ -123,7 +128,6 @@ public class ReportService {
             log.info("Clean data for {} {} scores populated in {} ms", scores.size(), type, System.currentTimeMillis() - typeStart);
         });
 
-        sheet.setAutoFilter(CellRangeAddress.valueOf("A1:S1"));
         log.info("Clean data populated in {} ms", System.currentTimeMillis() - start);
     }
 
