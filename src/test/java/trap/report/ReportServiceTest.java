@@ -57,7 +57,7 @@ class ReportServiceTest {
         File generatedFile = new File("league-data-" + dateString + ".xlsx");
 
         if (generatedFile.exists()) {
-            generatedFile.delete();
+            assertTrue(generatedFile.delete(), "Cleanup failed: Could not delete generated file");
         }
     }
 
