@@ -78,8 +78,6 @@ jobs:
         uses: gradle/actions/setup-gradle@v6
 
       - name: Generate file from current branch
-        env:
-          SPRING_PROFILES_ACTIVE: test
         run: |
           ./gradlew build --parallel --configuration-cache -PjavaVersion=26
           cd build/libs/
@@ -88,8 +86,6 @@ jobs:
           mv league-data-*.xlsx ../../league-data-current.xlsx
 
       - name: Generate file from main branch
-        env:
-          SPRING_PROFILES_ACTIVE: test
         run: |
           git fetch origin main:refs/remotes/origin/main
           git worktree add ../trap-scoring-main origin/main
