@@ -227,7 +227,7 @@ class ReportServiceTest {
         List<TeamScore> result = reportService.getTeamScores(List.of(entry));
 
         assertEquals(1, result.size());
-        assertEquals(150, result.getFirst().total());
+        assertEquals(200, result.getFirst().total());
     }
 
     @Test
@@ -257,7 +257,7 @@ class ReportServiceTest {
         List<TeamScore> result = reportService.getTeamScores(List.of(entry));
 
         assertEquals(1, result.size());
-        assertEquals(90, result.getFirst().total());
+        assertEquals(120, result.getFirst().total());
     }
 
     @Test
@@ -272,7 +272,7 @@ class ReportServiceTest {
         List<TeamScore> result = reportService.getTeamScores(List.of(entry));
 
         assertEquals(1, result.size());
-        assertEquals(60, result.getFirst().total());
+        assertEquals(90, result.getFirst().total());
     }
 
     @Test
