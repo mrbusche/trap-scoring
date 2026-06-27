@@ -166,6 +166,21 @@ class ReportServiceTest {
     }
 
     @Test
+    void getTeamScores_fiveStandLimitFiveScores_onlyTopFiveCount() {
+        var individuals = new ArrayList<IndividualTotal>();
+        for (int i = 1; i <= 7; i++) {
+            individuals.add(new IndividualTotal(i, "Team A", "Athlete " + i, "Senior/Varsity", "M", i * 10, "fivestand"));
+        }
+        individuals.sort((a, b) -> Integer.compare(b.total(), a.total()));
+        var entry = Map.entry("fivestand Team A Varsity", individuals);
+
+        List<TeamScore> result = reportService.getTeamScores(List.of(entry));
+
+        assertEquals(1, result.size());
+        assertEquals(250, result.getFirst().total());
+    }
+
+    @Test
     void getTeamScores_multipleEntriesSameTeam_accumulatesTotals() {
         // Two entries for the same team (different types) should accumulate
         var singlesIndividuals = new ArrayList<>(List.of(
@@ -181,5 +196,97 @@ class ReportServiceTest {
 
         assertEquals(1, result.size());
         assertEquals(90, result.getFirst().total());
+    }
+
+    @Test
+    void calculateTeamScores_withMultiplePlayers_handlesTieForFifthPlace() {
+        var individuals = new ArrayList<>(List.of(
+                new IndividualTotal(1, "Team A", "Athlete 1", "Senior/Varsity", "M", 100, "singles"),
+                new IndividualTotal(2, "Team A", "Athlete 2", "Senior/Varsity", "M", 90, "singles"),
+                new IndividualTotal(3, "Team A", "Athlete 3", "Senior/Varsity", "M", 80, "singles"),
+                new IndividualTotal(4, "Team A", "Athlete 4", "Senior/Varsity", "M", 70, "singles"),
+                new IndividualTotal(5, "Team A", "Athlete 5", "Senior/Varsity", "M", 60, "singles"),
+                new IndividualTotal(6, "Team A", "Athlete 6", "Senior/Varsity", "M", 60, "singles")
+        ));
+
+        List<TeamScore> result = reportService.getTeamScores(List.of(Map.entry("singles Team A Varsity", individuals)));
+
+        assertEquals(1, result.size());
+        assertEquals(400, result.getFirst().total());
+    }
+
+    @Test
+    void getTeamScores_doublesScoring() {
+        var individuals = new ArrayList<IndividualTotal>();
+        for (int i = 1; i <= 6; i++) {
+            individuals.add(new IndividualTotal(i, "Team A", "Athlete " + i, "Senior/Varsity", "M", i * 10, "doubles"));
+        }
+        individuals.sort((a, b) -> Integer.compare(b.total(), a.total()));
+        var entry = Map.entry("doubles Team A Varsity", individuals);
+
+        List<TeamScore> result = reportService.getTeamScores(List.of(entry));
+
+        assertEquals(1, result.size());
+        assertEquals(200, result.getFirst().total());
+    }
+
+    @Test
+    void getTeamScores_handicapScoring() {
+        var individuals = new ArrayList<IndividualTotal>();
+        for (int i = 1; i <= 7; i++) {
+            individuals.add(new IndividualTotal(i, "Team B", "Athlete " + i, "Senior/Varsity", "M", i * 10, "handicap"));
+        }
+        individuals.sort((a, b) -> Integer.compare(b.total(), a.total()));
+        var entry = Map.entry("handicap Team B Varsity", individuals);
+
+        List<TeamScore> result = reportService.getTeamScores(List.of(entry));
+
+        assertEquals(1, result.size());
+        assertEquals(250, result.getFirst().total());
+    }
+
+    @Test
+    void getTeamScores_skeetScoring() {
+        var individuals = new ArrayList<IndividualTotal>();
+        for (int i = 1; i <= 5; i++) {
+            individuals.add(new IndividualTotal(i, "Team C", "Athlete " + i, "Senior/Varsity", "M", i * 10, "skeet"));
+        }
+        individuals.sort((a, b) -> Integer.compare(b.total(), a.total()));
+        var entry = Map.entry("skeet Team C Varsity", individuals);
+
+        List<TeamScore> result = reportService.getTeamScores(List.of(entry));
+
+        assertEquals(1, result.size());
+        assertEquals(120, result.getFirst().total());
+    }
+
+    @Test
+    void getTeamScores_doublesskeetScoring() {
+        var individuals = new ArrayList<IndividualTotal>();
+        for (int i = 1; i <= 4; i++) {
+            individuals.add(new IndividualTotal(i, "Team D", "Athlete " + i, "Senior/Varsity", "M", i * 10, "doublesskeet"));
+        }
+        individuals.sort((a, b) -> Integer.compare(b.total(), a.total()));
+        var entry = Map.entry("doublesskeet Team D Varsity", individuals);
+
+        List<TeamScore> result = reportService.getTeamScores(List.of(entry));
+
+        assertEquals(1, result.size());
+        assertEquals(90, result.getFirst().total());
+    }
+
+    @Test
+    void getTeamScores_fivestandScoring() {
+        var individuals = new ArrayList<IndividualTotal>();
+        for (int i = 1; i <= 8; i++) {
+            individuals.add(new IndividualTotal(i, "Team E", "Athlete " + i, "Senior/Varsity", "M", i * 10, "fivestand"));
+        }
+        individuals.sort((a, b) -> Integer.compare(b.total(), a.total()));
+        var entry = Map.entry("fivestand Team E Varsity", individuals);
+
+        List<TeamScore> result = reportService.getTeamScores(List.of(entry));
+
+        assertEquals(1, result.size());
+        assertEquals(300, result.getFirst().total());
     }
 }
