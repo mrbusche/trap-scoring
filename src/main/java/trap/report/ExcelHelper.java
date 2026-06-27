@@ -13,13 +13,10 @@ import trap.model.RoundScore;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 
 @Slf4j
 @UtilityClass
 public final class ExcelHelper {
-    private static final DateTimeFormatter FILE_NAME_DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
     private static final String DEFAULT_FONT_NAME = "Calibri";
 
     public static CellStyle setFontForHeaders(Workbook workbook) {
@@ -48,17 +45,16 @@ public final class ExcelHelper {
         sheet.getRow(9).getCell(1).setCellValue(sheet.getRow(9).getCell(1).getStringCellValue() + currentDate);
     }
 
-    public static void setCurrentSeasonHeader(Sheet sheet) {
+    public static void setCurrentSeasonHeader(Sheet sheet, int seasonCutoffMonth) {
         var now = LocalDate.now();
         var month = now.getMonthValue();
         var year = now.getYear();
-        var currentSeason = month > 8 ? year + 1 : year;
+        var currentSeason = month > seasonCutoffMonth ? year + 1 : year;
         sheet.getRow(8).getCell(1).setCellValue(currentSeason + " " + sheet.getRow(8).getCell(1).getStringCellValue());
     }
 
-    public static void createFile(Workbook workbook) throws IOException {
+    public static void createFile(Workbook workbook, String filename) throws IOException {
         long start = System.currentTimeMillis();
-        String filename = generateFilename();
 
         log.info("Creating file: {}", filename);
         try (FileOutputStream fileOutputStream = new FileOutputStream(filename)) {
@@ -71,11 +67,6 @@ public final class ExcelHelper {
         }
 
         log.info("Created file in {} ms", System.currentTimeMillis() - start);
-    }
-
-    private static String generateFilename() {
-        var currentDate = LocalDateTime.now();
-        return "league-data-%s.xlsx".formatted(currentDate.format(FILE_NAME_DATE_FORMATTER));
     }
 
     public static void addCleanData(Row row, RoundScore rowData) {

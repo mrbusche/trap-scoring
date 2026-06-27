@@ -11,6 +11,7 @@ import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Service;
+import trap.config.TrapProperties;
 import trap.common.Classifications;
 import trap.common.EventTypes;
 import trap.model.IndividualTotal;
@@ -22,7 +23,6 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -39,14 +39,14 @@ import static trap.report.TrapService.getRoundsToCount;
 public class ReportService {
 
     private final String currentDate = LocalDate.now().format(DateTimeFormatter.ofPattern("MM/dd/yyyy"));
-    private final String[] trapTypes = new String[]{EventTypes.SINGLES, EventTypes.DOUBLES, EventTypes.HANDICAP, EventTypes.SKEET, EventTypes.CLAYS, EventTypes.FIVESTAND, EventTypes.DOUBLESKEET};
 
     private final DownloadService downloadService;
     private final TrapService trapService;
     private final TrapDataRepository trapDataRepository;
+    private final TrapProperties trapProperties;
 
     public void generateExcelFile() throws Exception {
-        downloadService.downloadFiles(trapTypes);
+        downloadService.downloadFiles();
 
         var workbook = getWorkbook();
 
@@ -92,15 +92,21 @@ public class ReportService {
         var sxssfWorkbook = new SXSSFWorkbook(workbook, 1000, true, true);
         populateCleanData(sxssfWorkbook.getSheet("Clean Data"), allRoundScores);
 
-        ExcelHelper.createFile(sxssfWorkbook);
+        ExcelHelper.createFile(sxssfWorkbook, trapProperties.report().generateFilename());
 
         log.info("Finished creating file in {} ms", System.currentTimeMillis() - trueStart);
         sxssfWorkbook.close();
     }
 
     private List<RoundScore> generateRoundScores() {
-        return Arrays.stream(trapTypes)
-                .flatMap(type -> trapDataRepository.readRoundScores(type).stream())
+        return trapProperties.download().trapTypes().stream()
+                .flatMap(type -> {
+                    try {
+                        return trapDataRepository.readRoundScores(type).stream();
+                    } catch (IOException e) {
+                        throw new IllegalStateException("Failed to read round scores for " + type, e);
+                    }
+                })
                 .toList();
     }
 
@@ -158,7 +164,7 @@ public class ReportService {
 
     private void populateTeamData(Sheet sheet, String teamType, CellStyle mainTextStyle, HashMap<String, ArrayList<IndividualTotal>> teamScoresByTotal) {
         ExcelHelper.setCurrentDateHeader(sheet, currentDate);
-        ExcelHelper.setCurrentSeasonHeader(sheet);
+        ExcelHelper.setCurrentSeasonHeader(sheet, trapProperties.report().seasonCutoffMonth());
 
         var rows = sheet.getLastRowNum();
         Row row;
@@ -199,7 +205,7 @@ public class ReportService {
         var initialStart = System.currentTimeMillis();
         var sheet = workbook.getSheet(sheetName);
         ExcelHelper.setCurrentDateHeader(sheet, currentDate);
-        ExcelHelper.setCurrentSeasonHeader(sheet);
+        ExcelHelper.setCurrentSeasonHeader(sheet, trapProperties.report().seasonCutoffMonth());
 
         var rows = sheet.getLastRowNum();
         Cell cell;
@@ -209,7 +215,7 @@ public class ReportService {
         int maxRow = rows;
         int classificationStartRow;
         var addBlankRowForHeader = false;
-        var classificationList = Arrays.asList(Classifications.VARSITY, Classifications.JUNIOR_VARSITY, Classifications.INTERMEDIATE_ADVANCED, Classifications.INTERMEDIATE_ENTRY, Classifications.ROOKIE);
+        var classificationList = List.of(Classifications.VARSITY, Classifications.JUNIOR_VARSITY, Classifications.INTERMEDIATE_ADVANCED, Classifications.INTERMEDIATE_ENTRY, Classifications.ROOKIE);
         long start;
         for (var classification : classificationList) {
             int column = 1;

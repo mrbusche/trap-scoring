@@ -1,11 +1,12 @@
 package trap.report;
 
 import com.opencsv.CSVReader;
-import lombok.SneakyThrows;
+import com.opencsv.exceptions.CsvException;
 import org.springframework.stereotype.Component;
 import trap.model.RoundScore;
 
 import java.io.FileReader;
+import java.io.IOException;
 import java.io.Reader;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -17,22 +18,24 @@ import static trap.report.TrapService.trimString;
 @Component
 public class TrapDataRepository {
 
-    @SneakyThrows
-    public List<RoundScore> readRoundScores(String trapType) {
+    public List<RoundScore> readRoundScores(String trapType) throws IOException {
         try (var reader = new FileReader(trapType + ".csv", StandardCharsets.UTF_8)) {
             return parseCsv(reader, trapType);
         }
     }
 
-    @SneakyThrows
-    public List<RoundScore> parseCsv(Reader readerSource, String type) {
+    public List<RoundScore> parseCsv(Reader readerSource, String type) throws IOException {
         try (var reader = new CSVReader(readerSource)) {
-            var roundScores = reader.readAll();
-            if (roundScores.isEmpty()) {
-                return List.of();
+            try {
+                var roundScores = reader.readAll();
+                if (roundScores.isEmpty()) {
+                    return List.of();
+                }
+                roundScores.removeFirst(); // Remove header row
+                return roundScores.stream().map(s -> createRoundScore(s, type)).toList();
+            } catch (CsvException e) {
+                throw new IOException("Failed to parse CSV for " + type, e);
             }
-            roundScores.removeFirst(); // Remove header row
-            return roundScores.stream().map(s -> createRoundScore(s, type)).toList();
         }
     }
 
