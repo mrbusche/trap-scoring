@@ -30,7 +30,7 @@ public class TrapService {
     );
 
     private static final Map<String, Integer> ROUND_COUNTS_FOR_TIES = Map.ofEntries(
-            entry(EventTypes.SINGLES, 4),
+            entry(EventTypes.SINGLES, 5),
             entry(EventTypes.DOUBLES, 5),
             entry(EventTypes.HANDICAP, 5),
             entry(EventTypes.SKEET, 3),
