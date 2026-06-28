@@ -33,14 +33,7 @@ public class DownloadService {
         var failures = new ArrayList<Throwable>();
         try (var executor = Executors.newVirtualThreadPerTaskExecutor()) {
             var futures = trapProperties.download().trapTypes().stream()
-                    .map(type -> executor.submit(() -> {
-                        try {
-                            processFile(type);
-                        } catch (IOException e) {
-                            throw new IllegalStateException("Failed to process " + type, e);
-                        }
-                        return null;
-                    }))
+                    .map(type -> executor.submit(() -> downloadFile(type)))
                     .toList();
 
             for (Future<?> future : futures) {
@@ -80,5 +73,14 @@ public class DownloadService {
         Files.writeString(path, cleanContent, StandardCharsets.UTF_8, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
 
         log.info("Finished downloading {} file", type);
+    }
+
+    private Void downloadFile(String type) {
+        try {
+            processFile(type);
+            return null;
+        } catch (IOException e) {
+            throw new IllegalStateException("Failed to process " + type, e);
+        }
     }
 }

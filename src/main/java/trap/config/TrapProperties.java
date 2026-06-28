@@ -10,6 +10,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.validation.annotation.Validated;
 
 import java.time.Duration;
+import java.time.ZoneId;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -23,7 +24,7 @@ public record TrapProperties(@Valid @NotNull Download download, @Valid @NotNull 
 
     public record Report(@NotBlank String outputFilePrefix, @NotBlank String outputFilePattern, @Min(1) @Max(12) int seasonCutoffMonth) {
         public String generateFilename() {
-            return outputFilePrefix + LocalDateTime.now().format(DateTimeFormatter.ofPattern(outputFilePattern)) + ".xlsx";
+            return outputFilePrefix + LocalDateTime.now(ZoneId.systemDefault()).format(DateTimeFormatter.ofPattern(outputFilePattern)) + ".xlsx";
         }
     }
 
