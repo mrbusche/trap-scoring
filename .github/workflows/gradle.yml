@@ -79,7 +79,7 @@ jobs:
 
       - name: Generate file from current branch
         run: |
-          ./gradlew build --parallel --configuration-cache -PjavaVersion=26
+          ./gradlew build --parallel --configuration-cache -PjavaVersion=26 -x test
           cd build/libs/
           mv trap-*.jar trap.jar
           java -jar trap.jar
@@ -90,7 +90,7 @@ jobs:
           git fetch origin main:refs/remotes/origin/main
           git worktree add ../trap-scoring-main origin/main
           cd ../trap-scoring-main
-          ./gradlew build --parallel --configuration-cache -PjavaVersion=26
+          ./gradlew build --parallel --configuration-cache -PjavaVersion=26 -x test
           cd build/libs/
           mv trap-*.jar trap.jar
           java -jar trap.jar
