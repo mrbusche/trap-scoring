@@ -28,10 +28,12 @@ dependencies {
     implementation(libs.opencsv)
 
     implementation(libs.spring.boot.starter)
+    implementation(libs.spring.boot.starter.validation)
     implementation(libs.spring.web)
 
     compileOnly(libs.lombok)
     annotationProcessor(libs.lombok)
+    annotationProcessor(libs.spring.boot.configuration.processor)
 
     testImplementation(libs.spring.boot.starter.test)
 }

@@ -16,9 +16,7 @@ import trap.model.RoundScore;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.time.LocalDate;
-import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -87,7 +85,7 @@ class ExcelHelperTest {
         Cell cell = row.createCell(1);
         cell.setCellValue("Season Standings");
 
-        ExcelHelper.setCurrentSeasonHeader(sheet);
+        ExcelHelper.setCurrentSeasonHeader(sheet, 8);
 
         LocalDate now = LocalDate.now();
         int expectedYear = now.getMonthValue() > 8 ? now.getYear() + 1 : now.getYear();
@@ -205,19 +203,11 @@ class ExcelHelperTest {
 
     @Test
     void testCreateFile() throws IOException {
-        ExcelHelper.createFile(workbook);
+        String filename = "league-data-test.xlsx";
+        ExcelHelper.createFile(workbook, filename);
 
-        // Find the generated file in the current directory and ensure it actually wrote to disk
-        try (Stream<Path> files = Files.list(Paths.get("."))) {
-            Path generatedFile = files
-                    .filter(path -> path.getFileName().toString().startsWith("league-data-") && path.getFileName().toString().endsWith(".xlsx"))
-                    .findFirst()
-                    .orElse(null);
-
-            assertNotNull(generatedFile, "Excel file should have been created on disk");
-
-            // Clean up test artifact
-            Files.deleteIfExists(generatedFile);
-        }
+        Path generatedFile = Path.of(filename);
+        assertTrue(Files.exists(generatedFile), "Excel file should have been created on disk");
+        Files.deleteIfExists(generatedFile);
     }
 }

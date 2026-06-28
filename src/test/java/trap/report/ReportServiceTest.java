@@ -1,17 +1,20 @@
 package trap.report;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import trap.config.TrapProperties;
 import trap.model.IndividualTotal;
 import trap.model.RoundScore;
 import trap.model.TeamScore;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.StringReader;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -39,8 +42,29 @@ class ReportServiceTest {
     @Mock
     private TrapDataRepository trapDataRepository;
 
-    @InjectMocks
     private ReportService reportService;
+
+    @BeforeEach
+    void setUp() {
+        var trapProperties = new TrapProperties(
+                new TrapProperties.Download(
+                        List.of("singles", "doubles", "handicap", "skeet", "clays", "fivestand", "doublesskeet"),
+                        Map.of(
+                                "singles", "8648faf9-42e8-4a9c-b55d-2f251349de7f",
+                                "doubles", "5d5a78a5-2356-477f-b1b8-fe6ee11d25b1",
+                                "handicap", "69ca55d9-3e18-45bc-b57f-73aeb205ece8",
+                                "skeet", "c697d744-0e06-4c3f-a640-fea02f9c9ecd",
+                                "clays", "2c6edb1a-a7ee-43c2-8180-ad199a57be55",
+                                "fivestand", "3c5aecf2-a9f2-49b2-a11f-36965cb1a964",
+                                "doublesskeet", "bdd61066-6e29-4242-b6e9-adf286c2c4ae"
+                        )
+                ),
+                new TrapProperties.Report("league-data-", "yyyyMMddHHmmss", 8),
+                new TrapProperties.Http(Duration.ofSeconds(5), Duration.ofSeconds(30))
+        );
+
+        reportService = new ReportService(downloadService, trapService, trapDataRepository, trapProperties);
+    }
 
     @Test
     void generateExcelFile() throws Exception {
@@ -50,7 +74,7 @@ class ReportServiceTest {
 
         reportService.generateExcelFile();
 
-        verify(downloadService, times(1)).downloadFiles(any());
+        verify(downloadService, times(1)).downloadFiles();
         verify(trapService, atLeastOnce()).calculatePlayerRoundTotals(any());
 
         String dateString = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
@@ -62,7 +86,7 @@ class ReportServiceTest {
     }
 
     @Test
-    void csvParsingLogic() {
+    void csvParsingLogic() throws IOException {
         // Test the parsing logic specifically using the repository refactor
         TrapDataRepository repo = new TrapDataRepository();
         String csvData = """
