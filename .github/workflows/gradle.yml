@@ -79,7 +79,7 @@ jobs:
 
       - name: Generate file from current branch
         run: |
-          ./gradlew build --parallel --configuration-cache -PjavaVersion=26
+          ./gradlew build --parallel --configuration-cache -PjavaVersion=26 -x test
           cd build/libs/
           mv trap-*.jar trap.jar
           java -jar trap.jar
