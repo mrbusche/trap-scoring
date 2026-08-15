@@ -97,7 +97,7 @@ jobs:
           mv league-data-*.xlsx ../../../trap-scoring/main-branch.xlsx
 
       - name: Setup uv
-        uses: astral-sh/setup-uv@v9.0.0
+        uses: astral-sh/setup-uv@v10.0.1
 
       - name: Compare generated files
         run: |
