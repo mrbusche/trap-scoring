@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -76,6 +77,35 @@ class ReportServiceTest {
 
         verify(downloadService, times(1)).downloadFiles();
         verify(trapService, atLeastOnce()).calculatePlayerRoundTotals(any());
+
+        String dateString = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
+        File generatedFile = new File("league-data-" + dateString + ".xlsx");
+
+        if (generatedFile.exists()) {
+            assertTrue(generatedFile.delete(), "Cleanup failed: Could not delete generated file");
+        }
+    }
+
+    @Test
+    void generateExcelFile_moreHandicapScoresThanSinglesScores_doesNotThrow() throws Exception {
+        // Only one singles score for the Varsity/M classification...
+        RoundScore singlesScore = new RoundScore(1, "Event", 100, "Location", "Date", "Squad", "Team A", "Athlete A", "Senior/Varsity", "M", 25, 0, 0, 0, 0, 0, 0, 0, "singles");
+
+        // ...but two handicap scores for the same classification/gender/team, so the handicap sheet
+        // needs an individual row that was never created while populating singles (see ExcelHelper.addPlayerData).
+        RoundScore handicapScoreOne = new RoundScore(2, "Event", 100, "Location", "Date", "Squad", "Team A", "Athlete B", "Senior/Varsity", "M", 90, 0, 0, 0, 0, 0, 0, 0, "handicap");
+        RoundScore handicapScoreTwo = new RoundScore(3, "Event", 100, "Location", "Date", "Squad", "Team A", "Athlete C", "Senior/Varsity", "M", 91, 0, 0, 0, 0, 0, 0, 0, "handicap");
+
+        when(trapDataRepository.readRoundScores(anyString())).thenAnswer(invocation -> {
+            String type = invocation.getArgument(0);
+            return switch (type) {
+                case "singles" -> List.of(singlesScore);
+                case "handicap" -> List.of(handicapScoreOne, handicapScoreTwo);
+                default -> List.<RoundScore>of();
+            };
+        });
+
+        assertDoesNotThrow(() -> reportService.generateExcelFile());
 
         String dateString = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
         File generatedFile = new File("league-data-" + dateString + ".xlsx");
