@@ -38,6 +38,23 @@ import static trap.report.TrapService.getRoundsToCount;
 @RequiredArgsConstructor
 public class ReportService {
 
+    private static final List<String> TEAM_SCORE_TYPES = List.of(
+            EventTypes.HANDICAP,
+            EventTypes.DOUBLES,
+            EventTypes.SKEET,
+            EventTypes.CLAYS,
+            EventTypes.FIVESTAND,
+            EventTypes.DOUBLESKEET
+    );
+
+    private static final List<String> INDIVIDUAL_CLASSIFICATIONS = List.of(
+            Classifications.VARSITY,
+            Classifications.JUNIOR_VARSITY,
+            Classifications.INTERMEDIATE_ADVANCED,
+            Classifications.INTERMEDIATE_ENTRY,
+            Classifications.ROOKIE
+    );
+
     private final String currentDate = LocalDate.now().format(DateTimeFormatter.ofPattern("MM/dd/yyyy"));
 
     private final DownloadService downloadService;
@@ -167,38 +184,46 @@ public class ReportService {
         ExcelHelper.setCurrentSeasonHeader(sheet, trapProperties.report().seasonCutoffMonth());
 
         var rows = sheet.getLastRowNum();
-        Row row;
-
         int updateRow = rows;
         int startColumn = 1;
-        long start = System.currentTimeMillis();
 
-        List<Map.Entry<String, ArrayList<IndividualTotal>>> teamData = teamScoresByTotal.entrySet().stream().filter(f -> f.getValue().getFirst().teamClassificationForTotal().equals(teamType) && f.getValue().getFirst().type().equals(EventTypes.SINGLES)).toList();
-        List<TeamScore> teamScores = getTeamScores(teamData);
-        log.info("Ran query for singles by {} in {} ms", teamType, System.currentTimeMillis() - start);
-        for (var teamScore : teamScores) {
-            row = sheet.createRow(++updateRow);
-            ExcelHelper.addTeamData(row, startColumn, teamScore.name(), teamScore.total(), mainTextStyle);
-        }
+        populateTeamScoresForType(sheet, rows, teamType, EventTypes.SINGLES, startColumn, mainTextStyle, teamScoresByTotal);
 
         if (!Classifications.ROOKIE.equals(teamType)) {
             startColumn += 3;
-
-            var types = new String[]{EventTypes.HANDICAP, EventTypes.DOUBLES, EventTypes.SKEET, EventTypes.CLAYS, EventTypes.FIVESTAND, EventTypes.DOUBLESKEET};
-            for (var type : types) {
-                updateRow = rows;
-                start = System.currentTimeMillis();
-                teamData = teamScoresByTotal.entrySet().stream().filter(f -> f.getValue().getFirst().teamClassificationForTotal().equals(teamType) && f.getValue().getFirst().type().equals(type)).toList();
-                teamScores = getTeamScores(teamData);
-                log.info("Ran query for {} by {} in {} ms", type, teamType, System.currentTimeMillis() - start);
-                for (var teamScore : teamScores) {
-                    row = sheet.getRow(++updateRow);
-                    ExcelHelper.addTeamData(row, startColumn, teamScore.name(), teamScore.total(), mainTextStyle);
-                }
+            for (var type : TEAM_SCORE_TYPES) {
+                populateTeamScoresForType(sheet, rows, teamType, type, startColumn, mainTextStyle, teamScoresByTotal);
                 startColumn += 3;
             }
-
         }
+    }
+
+    private void populateTeamScoresForType(Sheet sheet, int baseRow, String teamType, String eventType, int startColumn,
+            CellStyle mainTextStyle, HashMap<String, ArrayList<IndividualTotal>> teamScoresByTotal) {
+        var teamData = filterTeamScoresByEvent(teamScoresByTotal, teamType, eventType);
+        var teamScores = getTeamScores(teamData);
+
+        long start = System.currentTimeMillis();
+        log.info("Ran query for {} by {} in {} ms", eventType, teamType, System.currentTimeMillis() - start);
+
+        var updateRow = baseRow;
+        for (var teamScore : teamScores) {
+            var row = sheet.getRow(++updateRow);
+            if (row == null) {
+                row = sheet.createRow(updateRow);
+            }
+            ExcelHelper.addTeamData(row, startColumn, teamScore.name(), teamScore.total(), mainTextStyle);
+        }
+    }
+
+    private List<Map.Entry<String, ArrayList<IndividualTotal>>> filterTeamScoresByEvent(
+            HashMap<String, ArrayList<IndividualTotal>> teamScoresByTotal,
+            String teamType,
+            String eventType) {
+        return teamScoresByTotal.entrySet().stream()
+                .filter(entry -> entry.getValue().getFirst().teamClassificationForTotal().equals(teamType))
+                .filter(entry -> entry.getValue().getFirst().type().equals(eventType))
+                .toList();
     }
 
     private void populateIndividualData(Workbook workbook, String sheetName, String gender, CellStyle style, CellStyle mainTextStyle, Map<String, IndividualTotal> allRoundScores) {
@@ -211,47 +236,33 @@ public class ReportService {
         Cell cell;
         Row row;
 
-        int updateRow;
         int maxRow = rows;
-        int classificationStartRow;
         var addBlankRowForHeader = false;
-        var classificationList = List.of(Classifications.VARSITY, Classifications.JUNIOR_VARSITY, Classifications.INTERMEDIATE_ADVANCED, Classifications.INTERMEDIATE_ENTRY, Classifications.ROOKIE);
         long start;
-        for (var classification : classificationList) {
+
+        var justValues = new ArrayList<>(allRoundScores.values());
+        justValues.sort(Comparator.comparingInt(IndividualTotal::total).reversed());
+
+        for (var classification : INDIVIDUAL_CLASSIFICATIONS) {
             int column = 1;
-            updateRow = maxRow;
-            //Add blank row
+            int updateRow = maxRow;
             if (addBlankRowForHeader) {
                 row = sheet.createRow(++updateRow);
                 cell = row.createCell(column);
                 cell.setCellValue("");
             }
             addBlankRowForHeader = true;
-            classificationStartRow = updateRow;
-            //Add row headers
+
+            int classificationStartRow = updateRow;
             row = sheet.createRow(++updateRow);
-            cell = row.createCell(column);
-            cell.setCellValue(classification);
-            cell.setCellStyle(style);
-            cell = row.createCell(column + 4);
-            cell.setCellValue(classification);
-            cell.setCellStyle(style);
-            cell = row.createCell(column + 8);
-            cell.setCellValue(classification);
-            cell.setCellStyle(style);
-            cell = row.createCell(column + 12);
-            cell.setCellValue(classification);
-            cell.setCellStyle(style);
-            cell = row.createCell(column + 16);
-            cell.setCellValue(classification);
-            cell.setCellStyle(style);
+            for (int i = 0; i < 5; i++) {
+                cell = row.createCell(column + (i * 4));
+                cell.setCellValue(classification);
+                cell.setCellStyle(style);
+            }
 
             start = System.currentTimeMillis();
-
-            List<IndividualTotal> justValues = new ArrayList<>(allRoundScores.values());
-            justValues.sort(Comparator.comparingInt(IndividualTotal::total).reversed());
-
-            var individualData = justValues.stream().filter(f -> f.gender().equals(gender) && f.teamClassification().equals(classification) && f.type().equals(EventTypes.SINGLES)).toList();
+            var individualData = filterIndividualScores(justValues, gender, classification, EventTypes.SINGLES);
             log.info("Ran query for singles by {} and {} in {} ms", gender, classification, System.currentTimeMillis() - start);
 
             for (IndividualTotal singlesRowData : individualData) {
@@ -261,12 +272,11 @@ public class ReportService {
             column += 4;
             maxRow = Math.max(maxRow, updateRow);
 
-            String[] types = new String[]{EventTypes.HANDICAP, EventTypes.DOUBLES, EventTypes.SKEET, EventTypes.CLAYS, EventTypes.FIVESTAND, EventTypes.DOUBLESKEET};
-            for (String type : types) {
+            for (String type : TEAM_SCORE_TYPES) {
                 updateRow = classificationStartRow;
                 updateRow++;
                 start = System.currentTimeMillis();
-                individualData = justValues.stream().filter(f -> f.gender().equals(gender) && f.teamClassification().equals(classification) && f.type().equals(type)).toList();
+                individualData = filterIndividualScores(justValues, gender, classification, type);
                 log.info("Ran query for {} by {} and {} in {} ms", type, gender, classification, System.currentTimeMillis() - start);
                 for (IndividualTotal data : individualData) {
                     ++updateRow;
@@ -283,6 +293,14 @@ public class ReportService {
             sheet.setAutoFilter(CellRangeAddress.valueOf("A13:AB13"));
         }
         log.info("{} data populated in {} ms", sheetName, System.currentTimeMillis() - initialStart);
+    }
+
+    private List<IndividualTotal> filterIndividualScores(List<IndividualTotal> values, String gender, String classification, String type) {
+        return values.stream()
+                .filter(item -> item.gender().equals(gender))
+                .filter(item -> item.teamClassification().equals(classification))
+                .filter(item -> item.type().equals(type))
+                .toList();
     }
 
     private HashMap<String, ArrayList<IndividualTotal>> calculateTeamScores(List<IndividualTotal> justValues) {
