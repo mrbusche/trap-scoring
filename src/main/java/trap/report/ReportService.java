@@ -269,7 +269,11 @@ public class ReportService {
                 individualData = justValues.stream().filter(f -> f.gender().equals(gender) && f.teamClassification().equals(classification) && f.type().equals(type)).toList();
                 log.info("Ran query for {} by {} and {} in {} ms", type, gender, classification, System.currentTimeMillis() - start);
                 for (IndividualTotal data : individualData) {
-                    row = sheet.getRow(++updateRow);
+                    ++updateRow;
+                    row = sheet.getRow(updateRow);
+                    if (row == null) {
+                        row = sheet.createRow(updateRow);
+                    }
                     ExcelHelper.addPlayerData(row, column, data.athlete(), data.total(), data.team(), mainTextStyle);
                 }
                 maxRow = Math.max(maxRow, updateRow);
