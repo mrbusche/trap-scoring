@@ -76,32 +76,39 @@ public class TrapService {
 
     public static Gatherer<TrapRoundScore, ?, RoundTotal> expandRounds() {
         return Gatherer.ofSequential((_, element, downstream) -> {
-            boolean isSingle = isSingleRound(element.type());
-
-            if (isSingle) {
-                downstream.push(createRoundTotal(element, element.round1()));
-                if (element.round2() > 0) {
-                    downstream.push(createRoundTotal(element, element.round2()));
-                }
-            } else {
-                // Combined Round 1+2
-                downstream.push(createRoundTotal(element, element.round1() + element.round2()));
-
-                // Pairs
-                int[] pairs = {
-                        element.round3() + element.round4(),
-                        element.round5() + element.round6(),
-                        element.round7() + element.round8()
-                };
-                for (int score : pairs) {
-                    if (score <= 0) {
-                        break;
-                    }
-                    downstream.push(createRoundTotal(element, score));
-                }
+            for (var roundTotal : expandRoundTotals(element)) {
+                downstream.push(roundTotal);
             }
             return true;
         });
+    }
+
+    private static List<RoundTotal> expandRoundTotals(TrapRoundScore element) {
+        if (isSingleRound(element.type())) {
+            var rounds = new ArrayList<RoundTotal>();
+            rounds.add(createRoundTotal(element, element.round1()));
+            if (element.round2() > 0) {
+                rounds.add(createRoundTotal(element, element.round2()));
+            }
+            return rounds;
+        }
+
+        var rounds = new ArrayList<RoundTotal>();
+        rounds.add(createRoundTotal(element, element.round1() + element.round2()));
+
+        int[] pairs = {
+                element.round3() + element.round4(),
+                element.round5() + element.round6(),
+                element.round7() + element.round8()
+        };
+        for (int score : pairs) {
+            if (score <= 0) {
+                break;
+            }
+            rounds.add(createRoundTotal(element, score));
+        }
+
+        return rounds;
     }
 
     private static RoundTotal createRoundTotal(TrapRoundScore r, int total) {
