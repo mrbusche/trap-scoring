@@ -13,7 +13,7 @@ jobs:
     timeout-minutes: 3
     strategy:
       matrix:
-        java-version: [ 26 ]
+        java-version: [ 27 ]
         os: [ ubuntu-latest ]
 
     steps:
