@@ -23,6 +23,8 @@ import java.util.concurrent.Future;
 @Service
 @Slf4j
 public class DownloadService {
+    private static final int MAX_RETRIES = 3;
+
     private final TrapDataClient trapDataClient;
     private final TrapProperties trapProperties;
 
@@ -76,11 +78,21 @@ public class DownloadService {
     }
 
     private Void downloadFile(String type) {
-        try {
-            processFile(type);
-            return null;
-        } catch (IOException e) {
-            throw new IllegalStateException("Failed to process " + type, e);
+        RuntimeException failure = null;
+        for (int attempt = 0; attempt <= MAX_RETRIES; attempt++) {
+            try {
+                processFile(type);
+                return null;
+            } catch (IOException e) {
+                failure = new IllegalStateException("Failed to process " + type, e);
+            } catch (RuntimeException e) {
+                failure = e;
+            }
+
+            if (attempt < MAX_RETRIES) {
+                log.warn("Download of {} file failed on attempt {}/{}; retrying", type, attempt + 1, MAX_RETRIES + 1, failure);
+            }
         }
+        throw failure;
     }
 }
