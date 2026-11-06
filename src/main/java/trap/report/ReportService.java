@@ -62,11 +62,16 @@ public class ReportService {
     private final TrapDataRepository trapDataRepository;
     private final TrapProperties trapProperties;
 
-    public void generateExcelFile() throws Exception {
+    public void generateExcelFile() throws IOException {
         downloadService.downloadFiles();
 
-        var workbook = getWorkbook();
+        try (var workbook = getWorkbook();
+             var sxssfWorkbook = new SXSSFWorkbook(workbook, 1000, true, true)) {
+            populateReport(workbook, sxssfWorkbook);
+        }
+    }
 
+    private void populateReport(XSSFWorkbook workbook, SXSSFWorkbook sxssfWorkbook) throws IOException {
         log.info("Starting file creation");
         log.info("Workbook has {} sheets", workbook.getNumberOfSheets());
         workbook.forEach(sheet -> log.info("- {}", sheet.getSheetName()));
@@ -105,14 +110,11 @@ public class ReportService {
         populateTeamIndividualData(workbook, teamScoresByTotal);
         populateAllIndividualData(workbook, playerFinalTotal);
 
-        // use streaming workbook for faster writes
-        var sxssfWorkbook = new SXSSFWorkbook(workbook, 1000, true, true);
         populateCleanData(sxssfWorkbook.getSheet("Clean Data"), allRoundScores);
 
         ExcelHelper.createFile(sxssfWorkbook, trapProperties.report().generateFilename());
 
         log.info("Finished creating file in {} ms", System.currentTimeMillis() - trueStart);
-        sxssfWorkbook.close();
     }
 
     private List<RoundScore> generateRoundScores() {

@@ -3,7 +3,7 @@ package trap.report;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import trap.client.TrapDataClient;
+import trap.client.ResilientTrapDataClient;
 import trap.config.TrapProperties;
 
 import java.io.IOException;
@@ -23,9 +23,7 @@ import java.util.concurrent.Future;
 @Service
 @Slf4j
 public class DownloadService {
-    private static final int MAX_RETRIES = 3;
-
-    private final TrapDataClient trapDataClient;
+    private final ResilientTrapDataClient trapDataClient;
     private final TrapProperties trapProperties;
 
     public void downloadFiles() {
@@ -35,7 +33,10 @@ public class DownloadService {
         var failures = new ArrayList<Throwable>();
         try (var executor = Executors.newVirtualThreadPerTaskExecutor()) {
             var futures = trapProperties.download().trapTypes().stream()
-                    .map(type -> executor.submit(() -> downloadFile(type)))
+                    .map(type -> executor.submit(() -> {
+                        processFile(type);
+                        return null;
+                    }))
                     .toList();
 
             for (Future<?> future : futures) {
@@ -70,29 +71,10 @@ public class DownloadService {
             throw new IllegalStateException("Failed to download " + type + ": received null content");
         }
 
-        String cleanContent = content.replaceAll(" {2}", " ");
+        String cleanContent = content.replaceAll(" {2}", " ").replace('’', '\'');
         var path = Path.of(type + ".csv");
         Files.writeString(path, cleanContent, StandardCharsets.UTF_8, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
 
         log.info("Finished downloading {} file", type);
-    }
-
-    private Void downloadFile(String type) {
-        RuntimeException failure = null;
-        for (int attempt = 0; attempt <= MAX_RETRIES; attempt++) {
-            try {
-                processFile(type);
-                return null;
-            } catch (IOException e) {
-                failure = new IllegalStateException("Failed to process " + type, e);
-            } catch (RuntimeException e) {
-                failure = e;
-            }
-
-            if (attempt < MAX_RETRIES) {
-                log.warn("Download of {} file failed on attempt {}/{}; retrying", type, attempt + 1, MAX_RETRIES + 1, failure);
-            }
-        }
-        throw failure;
     }
 }
