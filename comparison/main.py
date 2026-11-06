@@ -1,8 +1,10 @@
 import glob
 import os
-import pandas as pd
 import sys
 import warnings
+import zipfile
+
+import pandas as pd
 
 # Suppress specific openpyxl warnings about unparseable headers/footers
 warnings.filterwarnings('ignore', message='Cannot parse header or footer')
@@ -31,7 +33,7 @@ def compare_excel_files(file1_path, file2_path):
     try:
         xl1 = pd.ExcelFile(file1_path)
         xl2 = pd.ExcelFile(file2_path)
-    except Exception as e:
+    except (OSError, ValueError, ImportError, zipfile.BadZipFile) as e:
         print(f'Critical Error reading Excel files: {e}')
         return
 
@@ -58,13 +60,13 @@ def compare_excel_files(file1_path, file2_path):
         print(f"\nAnalyzing Sheet: '{sheet}'...")
 
         try:
-            df1 = xl1.parse(sheet, header=None)
-            df2 = xl2.parse(sheet, header=None)
+            df1 = pd.read_excel(xl1, sheet_name=sheet, header=None)
+            df2 = pd.read_excel(xl2, sheet_name=sheet, header=None)
 
             # Normalize "As of:" cells to ignore date differences
             df1 = df1.replace(to_replace=r'As of:.*', value='As of: IGNORED', regex=True)
             df2 = df2.replace(to_replace=r'As of:.*', value='As of: IGNORED', regex=True)
-        except Exception as e:
+        except (OSError, ValueError, ImportError, KeyError, TypeError, zipfile.BadZipFile) as e:
             print(f"  x Error parsing sheet '{sheet}': {e}")
             continue
 
@@ -106,7 +108,7 @@ def compare_excel_files(file1_path, file2_path):
 
                     if len(diff) > 10:
                         print(f'\n    ... {len(diff) - 10} more differences hidden.')
-                except Exception as e:
+                except (ValueError, TypeError) as e:
                     print(f'    Could not generate detailed diff report: {e}')
 
     print('\n---------------------------')
@@ -133,6 +135,6 @@ if __name__ == '__main__':
         newest_file = max(candidates, key=os.path.getmtime)
         print(f'(Auto-selected baseline file: {newest_file})')
         compare_excel_files(file1, newest_file)
-    except Exception as e:
+    except OSError as e:
         print(f'Error determining newest file: {e}')
         sys.exit(1)

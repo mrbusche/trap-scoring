@@ -3,19 +3,19 @@ name = "comparison"
 version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
-requires-python = ">=3.12"
-dependencies = [
-    "openpyxl==3.1.5",
-    "pandas==3.1.1",
-    "ruff==0.17.4",
-]
+requires-python = ">=3.14"
+dependencies = ["openpyxl==3.1.5", "pandas==3.1.1", "ruff==0.17.4"]
 
 [tool.ruff]
 line-length = 120
 indent-width = 4
+target-version = "py314"
 
 [tool.ruff.format]
 quote-style = "single"
 indent-style = "space"
 skip-magic-trailing-comma = false
 line-ending = "auto"
+
+[tool.ruff.lint]
+ignore = []

@@ -1,9 +1,12 @@
 spring:
   main:
     web-application-type: none
-  threads:
-    virtual:
-      enabled: true
+  http:
+    serviceclient:
+      metabase:
+        base-url: https://metabase.sssfonline.com/public/question
+        connect-timeout: 5s
+        read-timeout: 2m
 
 trap:
   download:
@@ -27,6 +30,3 @@ trap:
     output-file-prefix: league-data-
     output-file-pattern: yyyyMMddHHmmss
     season-cutoff-month: 8
-  http:
-    connect-timeout: 5s
-    read-timeout: 2m

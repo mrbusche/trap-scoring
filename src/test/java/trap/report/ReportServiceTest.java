@@ -3,6 +3,7 @@ package trap.report;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.io.TempDir;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -11,12 +12,10 @@ import trap.model.IndividualTotal;
 import trap.model.RoundScore;
 import trap.model.TeamScore;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
-import java.time.Duration;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -33,6 +32,9 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class ReportServiceTest {
+
+    @TempDir
+    Path outputDirectory;
 
     @Mock
     private DownloadService downloadService;
@@ -60,8 +62,7 @@ class ReportServiceTest {
                                 "doublesskeet", "bdd61066-6e29-4242-b6e9-adf286c2c4ae"
                         )
                 ),
-                new TrapProperties.Report("league-data-", "yyyyMMddHHmmss", 8),
-                new TrapProperties.Http(Duration.ofSeconds(5), Duration.ofSeconds(30))
+                new TrapProperties.Report(outputDirectory.resolve("league-data-").toString(), "yyyyMMddHHmmss", 8)
         );
 
         reportService = new ReportService(downloadService, trapService, trapDataRepository, trapProperties);
@@ -78,11 +79,8 @@ class ReportServiceTest {
         verify(downloadService, times(1)).downloadFiles();
         verify(trapService, atLeastOnce()).calculatePlayerRoundTotals(any());
 
-        String dateString = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
-        File generatedFile = new File("league-data-" + dateString + ".xlsx");
-
-        if (generatedFile.exists()) {
-            assertTrue(generatedFile.delete(), "Cleanup failed: Could not delete generated file");
+        try (var files = Files.list(outputDirectory)) {
+            assertEquals(1, files.filter(path -> path.getFileName().toString().matches("league-data-\\d{14}\\.xlsx")).count());
         }
     }
 
@@ -106,12 +104,8 @@ class ReportServiceTest {
         });
 
         assertDoesNotThrow(() -> reportService.generateExcelFile());
-
-        String dateString = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
-        File generatedFile = new File("league-data-" + dateString + ".xlsx");
-
-        if (generatedFile.exists()) {
-            assertTrue(generatedFile.delete(), "Cleanup failed: Could not delete generated file");
+        try (var files = Files.list(outputDirectory)) {
+            assertEquals(1, files.filter(path -> path.getFileName().toString().matches("league-data-\\d{14}\\.xlsx")).count());
         }
     }
 
