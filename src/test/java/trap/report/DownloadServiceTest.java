@@ -101,8 +101,18 @@ class DownloadServiceTest {
         thread.start();
 
         assertTrue(downloadStarted.await(5, TimeUnit.SECONDS));
-        thread.interrupt();
-        releaseDownload.countDown();
+        long waitDeadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(5);
+        while (thread.getState() != Thread.State.WAITING
+                && thread.isAlive()
+                && System.nanoTime() < waitDeadline) {
+            Thread.sleep(1);
+        }
+        try {
+            assertEquals(Thread.State.WAITING, thread.getState());
+            thread.interrupt();
+        } finally {
+            releaseDownload.countDown();
+        }
         thread.join(5000);
 
         assertFalse(thread.isAlive());
