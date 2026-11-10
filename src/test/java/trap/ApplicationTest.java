@@ -8,6 +8,7 @@ import trap.client.TrapDataClient;
 import trap.report.ReportService;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.Mockito.mockStatic;
 
 @SpringBootTest
 class ApplicationTest {
@@ -21,5 +22,17 @@ class ApplicationTest {
     @Test
     void contextLoads() {
         assertNotNull(trapDataClient);
+    }
+
+    @Test
+    void mainStartsSpringApplication() {
+        String[] args = {"--spring.profiles.active=test"};
+
+        try (var springApplication = mockStatic(org.springframework.boot.SpringApplication.class)) {
+            Application.main(args);
+
+            springApplication.verify(() ->
+                    org.springframework.boot.SpringApplication.run(Application.class, args));
+        }
     }
 }
