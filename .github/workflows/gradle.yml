@@ -31,6 +31,41 @@ jobs:
           SPRING_PROFILES_ACTIVE: test
         run: ./gradlew build --parallel --configuration-cache -PjavaVersion=${{ matrix.java-version }}
 
+      - name: Publish test coverage summary
+        if: always()
+        shell: pwsh
+        run: |
+          $reportPath = "build/reports/jacoco/test/jacocoTestReport.xml"
+          if (-not (Test-Path $reportPath)) {
+            $summary = "## Test coverage (Java ${{ matrix.java-version }} / ${{ matrix.os }})`n`nCoverage report unavailable."
+            $summary | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append
+            Write-Output $summary
+            exit 0
+          }
+
+          [xml]$report = Get-Content $reportPath
+          $counters = @{}
+          foreach ($counter in $report.report.counter) {
+            $counters[$counter.type] = $counter
+          }
+
+          $rows = foreach ($metric in @("LINE", "BRANCH", "INSTRUCTION")) {
+            $covered = [int]$counters[$metric].covered
+            $total = $covered + [int]$counters[$metric].missed
+            $percentage = if ($total -eq 0) { 100 } else { [math]::Round(100 * $covered / $total, 2) }
+            "| $metric | $covered / $total | $percentage% |"
+          }
+          $summaryLines = @(
+            "## Test coverage (Java ${{ matrix.java-version }} / ${{ matrix.os }})",
+            "",
+            "| Metric | Covered | Coverage |",
+            "| --- | ---: | ---: |"
+          )
+          $summaryLines += $rows
+          $summary = $summaryLines -join "`n"
+          $summary | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append
+          Write-Output $summary
+
       - name: Generate file
         run: |
           cd build/libs/
@@ -79,7 +114,7 @@ jobs:
 
       - name: Generate file from current branch
         run: |
-          ./gradlew build --parallel --configuration-cache -PjavaVersion=27 -x test
+          ./gradlew build --parallel --configuration-cache -PjavaVersion=27 -x test -x jacocoTestCoverageVerification
           cd build/libs/
           mv trap-*.jar trap.jar
           java -jar trap.jar
@@ -90,7 +125,7 @@ jobs:
           git fetch origin main:refs/remotes/origin/main
           git worktree add ../trap-scoring-main origin/main
           cd ../trap-scoring-main
-          ./gradlew build --parallel --configuration-cache -PjavaVersion=27 -x test
+          ./gradlew build --parallel --configuration-cache -PjavaVersion=27 -x test -x jacocoTestCoverageVerification
           cd build/libs/
           mv trap-*.jar trap.jar
           java -jar trap.jar
