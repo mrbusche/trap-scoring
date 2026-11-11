@@ -109,6 +109,15 @@ class TrapServiceTest {
     }
 
     @Test
+    void playerRoundTotalsExpandsEveryPositiveRoundPair() {
+        var score = new TrapRoundScore(1, 1, "Team", "Athlete", "Varsity", "M", 1, 1, 1, 1, 1, 1, 1, 1, "singles");
+
+        var totals = trapService.calculatePlayerRoundTotals(List.of(score)).get(score.uniqueName());
+
+        assertEquals(4, totals.size());
+    }
+
+    @Test
     void playerIndividualTotals() {
         var roundScoresPlayer1 = getRoundScoresPlayer1();
         var roundScoresPlayer2 = getRoundScoresPlayer2();
@@ -137,6 +146,32 @@ class TrapServiceTest {
                 () -> assertEquals(49, player2.get(3).total()),
                 () -> assertEquals(40, player2.get(4).total())
         );
+    }
+
+    @Test
+    void playerIndividualTotalsSkipsPlayersWithoutRoundTotals() {
+        var score = new TrapRoundScore(1, 1, "Team", "Athlete", "Varsity", "M", 25, 0, 0, 0, 0, 0, 0, 0, "singles");
+        var playerName = score.uniqueName();
+
+        var totals = trapService.calculatePlayerIndividualTotal(
+                List.of(score),
+                java.util.Map.of(playerName, List.of())
+        );
+
+        assertTrue(totals.get(playerName).isEmpty());
+    }
+
+    @Test
+    void playerFinalTotalsIgnorePlayersWithoutScores() {
+        var scoredTotal = new trap.model.IndividualTotal(1, "Team", "Scored", "Varsity", "M", 25, "singles");
+
+        var totals = trapService.calculatePlayerFinalTotal(java.util.Map.of(
+                "empty-player", List.of(),
+                "scored-player", List.of(scoredTotal)
+        ));
+
+        assertEquals(1, totals.size());
+        assertEquals(25, totals.get("scored-player").total());
     }
 
     @Test

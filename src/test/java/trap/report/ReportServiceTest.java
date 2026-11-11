@@ -110,6 +110,26 @@ class ReportServiceTest {
     }
 
     @Test
+    void generateExcelFile_discardsScoresBelowTheFifthPlaceTie() throws Exception {
+        generateReportWithSinglesScores(25, 24, 23, 22, 21, 20);
+    }
+
+    @Test
+    void generateExcelFile_includesScoresTiedForFifthPlace() throws Exception {
+        generateReportWithSinglesScores(25, 24, 23, 22, 21, 21);
+    }
+
+    @Test
+    void generateExcelFile_wrapsRoundScoreReadFailures() throws Exception {
+        when(trapDataRepository.readRoundScores(anyString())).thenThrow(new IOException("read failed"));
+
+        IllegalStateException failure = org.junit.jupiter.api.Assertions.assertThrows(
+                IllegalStateException.class, () -> reportService.generateExcelFile());
+
+        assertEquals("Failed to read round scores for singles", failure.getMessage());
+    }
+
+    @Test
     void csvParsingLogic() throws IOException {
         // Test the parsing logic specifically using the repository refactor
         TrapDataRepository repo = new TrapDataRepository();
@@ -336,5 +356,23 @@ class ReportServiceTest {
 
         assertEquals(1, result.size());
         assertEquals(300, result.getFirst().total());
+    }
+
+    private void generateReportWithSinglesScores(int... scores) throws Exception {
+        var roundScores = new ArrayList<RoundScore>();
+        for (int i = 0; i < scores.length; i++) {
+            roundScores.add(new RoundScore(
+                    i + 1, "Event " + i, i + 1, "Location " + i, "2024", "Squad", "Team A",
+                    "Athlete " + i, "Senior/Varsity", "M", scores[i], 0, 0, 0, 0, 0, 0, 0, "singles"
+            ));
+        }
+        when(trapDataRepository.readRoundScores(anyString())).thenAnswer(invocation ->
+                "singles".equals(invocation.getArgument(0)) ? roundScores : List.of());
+
+        reportService.generateExcelFile();
+
+        try (var files = Files.list(outputDirectory)) {
+            assertEquals(1, files.filter(path -> path.getFileName().toString().matches("league-data-\\d{14}\\.xlsx")).count());
+        }
     }
 }

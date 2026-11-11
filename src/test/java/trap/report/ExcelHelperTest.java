@@ -94,6 +94,17 @@ class ExcelHelperTest {
     }
 
     @Test
+    void testSetCurrentSeasonHeaderBeforeCutoff() {
+        Row row = sheet.createRow(8);
+        Cell cell = row.createCell(1);
+        cell.setCellValue("Season Standings");
+
+        ExcelHelper.setCurrentSeasonHeader(sheet, 12);
+
+        assertEquals(LocalDate.now().getYear() + " Season Standings", cell.getStringCellValue());
+    }
+
+    @Test
     void testAddCleanData() {
         Row row = sheet.createRow(0);
 
@@ -209,5 +220,12 @@ class ExcelHelperTest {
         Path generatedFile = Path.of(filename);
         assertTrue(Files.exists(generatedFile), "Excel file should have been created on disk");
         Files.deleteIfExists(generatedFile);
+    }
+
+    @Test
+    void testCreateFileRethrowsWriteFailure(@org.junit.jupiter.api.io.TempDir Path tempDir) throws IOException {
+        Path invalidPath = tempDir.resolve("missing-directory").resolve("league-data-test.xlsx");
+
+        assertThrows(IOException.class, () -> ExcelHelper.createFile(workbook, invalidPath.toString()));
     }
 }
