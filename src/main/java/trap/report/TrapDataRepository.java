@@ -61,9 +61,9 @@ public class TrapDataRepository {
 
     private RoundScore createRoundScore(String[] data, String type) {
         return RoundScore.builder()
-                .eventId(parseInteger(valueAt(data, EVENT_ID_COLUMN)))
+                .eventId(parseInteger(valueAt(data, EVENT_ID_COLUMN).replace(",", "")))
                 .event(trimString(valueAt(data, EVENT_NAME_COLUMN)))
-                .locationId(parseInteger(valueAt(data, LOCATION_ID_COLUMN)))
+                .locationId(parseInteger(valueAt(data, LOCATION_ID_COLUMN).replace(",", "")))
                 .location(trimString(valueAt(data, LOCATION_NAME_COLUMN)))
                 .eventDate(trimString(valueAt(data, EVENT_DATE_COLUMN)))
                 .squadName(trimString(valueAt(data, SQUAD_NAME_COLUMN)))

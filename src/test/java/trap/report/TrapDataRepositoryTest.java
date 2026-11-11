@@ -5,6 +5,7 @@ import com.opencsv.exceptions.CsvException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import trap.model.RoundScore;
+import trap.model.TrapRoundScore;
 
 import java.io.IOException;
 import java.io.StringReader;
@@ -38,6 +39,29 @@ class TrapDataRepositoryTest {
         assertEquals(25, score.round1());
         assertEquals(18, score.round8());
         assertEquals(type, score.type());
+    }
+
+    @Test
+    void groupedLocationIdsCountAsDistinctLocationsInStandings() throws Exception {
+        var csv = """
+                Header
+                0,"26,587",Event,"1,943",New Pioneer,2026,Squad,Albia,Ledger Smith,,Senior/Varsity,M,47,49
+                0,26766,Event,"1,817",Walnut Ridge,2026,Squad,Albia,Ledger Smith,,Senior/Varsity,M,47,46
+                0,26800,Event,36,Lake Miami,2026,Squad,Albia,Ledger Smith,,Senior/Varsity,M,43,48
+                """;
+        var scores = repository.parseCsv(new StringReader(csv), "doublesskeet");
+        assertEquals(26587, scores.getFirst().eventId());
+        assertEquals(1943, scores.get(0).locationId());
+        assertEquals(1817, scores.get(1).locationId());
+        assertEquals(36, scores.get(2).locationId());
+
+        var rounds = scores.stream().map(TrapRoundScore::new).toList();
+        var service = new TrapService();
+        var roundTotals = service.calculatePlayerRoundTotals(rounds);
+        var individualTotals = service.calculatePlayerIndividualTotal(rounds, roundTotals);
+        var finalTotals = service.calculatePlayerFinalTotal(individualTotals);
+
+        assertEquals(280, finalTotals.get(rounds.getFirst().uniqueName()).total());
     }
 
     @Test
